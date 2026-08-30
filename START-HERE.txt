@@ -1,0 +1,91 @@
+JANSAMADHAN AI - NOTEPAD COLLEGE PROTOTYPE
+==========================================
+
+HOW TO START
+1. Extract the ZIP file.
+2. Double-click index.html.
+3. It opens in Chrome or Edge. No installation, server, VS Code, Python, or internet is needed.
+4. To view or change the code: right-click index.html > Open with > Notepad.
+
+DEMO LOGIN DETAILS
+
+ADMIN
+Username: admin
+Password: admin123
+
+STUDENT
+Approved demo account: Aditi / Aditi123
+
+UNIVERSITY
+Approved demo account: MACET / MACET123
+
+INDUSTRY
+Approved demo account: BrightGrid Solutions / BrightGrid Solutions123
+
+NEW REGISTRATION RULE
+1. Click Register account.
+2. Select Student, University, or Industry.
+3. Enter the name, email, and college/organization.
+4. Username becomes the exact registered name.
+5. Password becomes the exact registered name followed by 123.
+6. The account remains Pending and cannot log in.
+7. Log in as admin and approve it from Registration approvals.
+8. The approved account can now log in. A rejected account remains blocked.
+
+BEST COLLEGE DEMO ORDER
+1. Register a new Student account and show that login is blocked while approval is pending.
+2. Log in as admin and approve the registration.
+3. Log in with the newly approved Student account.
+4. Log out and click Report a public problem.
+5. Submit a report similar to "Large potholes near Neora main road" with category Roads and location Neora Main Road.
+6. Explain that the basic AI finds the existing active report and increases its duplicate count and attention score.
+7. Log in as admin. Show the attention notification, duplicate count, support request, and priority ordering.
+8. Log in as a student and claim an active problem.
+9. Show the university recommendations that appear after the claim.
+10. Log in as a university and offer mentor/lab support.
+11. Log in as an industry and offer tools or technical support.
+12. Return to the same student and mark the claimed problem solved with a solution note.
+13. Log in as admin to show that the solved record remains visible while it disappears from active partner dashboards.
+
+DUPLICATE AND DANGER PRIORITY SYSTEM
+- 0 or 1 extra matching report: Normal
+- 2 or 3 extra matching reports: Yellow cluster
+- 4 or more extra matching reports: Red cluster
+- Critical safety wording: Critical Admin notification
+- Automatic order: Critical first, then Red, Yellow, and Normal
+- Solved challenges are removed from active Student, University, and Industry lists
+
+The sample data already contains:
+- A yellow pothole cluster
+- A red unsafe-water cluster
+- A critical exposed-electrical-wire challenge
+
+The Admin can acknowledge a critical alert, but the challenge stays prioritized until it is solved.
+
+WHAT THIS PROTOTYPE INCLUDES
+- Separate role selection and dashboards for Admin, Student, University, and Industry
+- Registration for Student, University, and Industry accounts
+- Pending approval, Approve, and Reject workflow controlled by Admin
+- Login blocked until an account is approved
+- Citizen problem reporting without an account
+- Optional image upload saved inside browser storage
+- Basic duplicate detection using keywords, category, and location
+- Yellow marking for 2–3 extra similar reports
+- Red marking for 4+ extra similar reports
+- Automatic Critical > Red > Yellow > Normal ordering on all dashboards
+- Basic danger-keyword detection and critical Admin notifications
+- Admin acknowledgement for critical alerts
+- Admin alerts for unresolved cases older than 7 days
+- Admin priority boost and partner-support request
+- Student claim/release controls and solution recording
+- University recommendations after a student claims a problem
+- University academic-support offers
+- Industry resource-support offers
+- Active-only lists for Student, University, and Industry
+- Solved-case history for Admin
+- Reset Demo Data button
+
+IMPORTANT FOR PRESENTATION
+This is intentionally a front-end college prototype. Registrations, passwords, approvals, reports, and login sessions use the browser's localStorage. Duplicate matching and danger detection are transparent rule-based demonstrations, not a trained AI model or an emergency-response system. Say that a production version would add a backend database, password hashing, verified accounts, trained/validated models, human review, and official notification integrations.
+
+If you want the original sample data again, log into any dashboard and click Reset demo data.
