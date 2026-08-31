@@ -8,6 +8,7 @@
   
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <style>
@@ -239,21 +240,31 @@
 
     function initFirebase(){
       try {
-        if(typeof firebase !== "undefined" && firebase.initializeApp){
+        if(typeof firebase !== "undefined" && firebase.initializeApp && firebase.auth){
           if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
           db = firebase.firestore();
-          updateCloudStatus(false, "Checking Cloud DB...");
-          db.collection("accounts").limit(1).get().then(function(){
+          updateCloudStatus(false, "Connecting securely...");
+
+          firebase.auth().signInAnonymously().then(function(){
+            return db.collection("accounts").limit(1).get();
+          }).then(function(){
             isCloudActive = true;
             updateCloudStatus(true, "Live Cloud DB Active");
             listenToCloudDatabase();
           }).catch(function(err){
             isCloudActive = false;
-            console.warn("Cloud connection check failed:", err);
-            updateCloudStatus(false, "Local Mode - check Firestore rules");
+            console.warn("Firebase auth/cloud connection failed:", err);
+            var code = (err && err.code) ? String(err.code) : "";
+            if(code.indexOf("operation-not-allowed") >= 0){
+              updateCloudStatus(false, "Enable Anonymous Auth in Firebase");
+            } else if(code.indexOf("permission-denied") >= 0){
+              updateCloudStatus(false, "Firestore rules are blocking sync");
+            } else {
+              updateCloudStatus(false, "Cloud unavailable - Local Mode");
+            }
           });
         } else {
-          updateCloudStatus(false, "Local Mode (Firebase unavailable)");
+          updateCloudStatus(false, "Firebase Auth SDK unavailable");
         }
       } catch(e) {
         isCloudActive = false;
@@ -461,15 +472,25 @@
       if(!existing) d.accounts.push(account);
       save(d);
 
+      var cloudSaved = false;
       if(isCloudActive && db){
-        db.collection("accounts").doc(account.id).set(account).catch(function(err){console.warn("Cloud save account error:",err);updateCloudStatus(false,"Cloud save failed - Local Mode")});
+        try {
+          await db.collection("accounts").doc(account.id).set(account);
+          cloudSaved = true;
+        } catch(err) {
+          console.warn("Cloud save account error:",err);
+          isCloudActive = false;
+          updateCloudStatus(false,"Cloud save failed - check Firestore rules");
+        }
       }
 
       var result=document.getElementById("registerResult");
-      result.innerHTML="<strong>Registration submitted!</strong><br>Status: Pending admin approval<br>Username: <b>"+esc(account.username)+"</b><br><small>Remember the password you entered; it is not displayed or stored in plain text.</small>";
+      result.innerHTML=cloudSaved
+        ? "<strong>Registration submitted to the cloud!</strong><br>Status: Pending admin approval<br>Username: <b>"+esc(account.username)+"</b><br><small>It should appear on the Admin dashboard on other devices within a few seconds.</small>"
+        : "<strong>Registration saved only on this device.</strong><br>Cloud sync is not connected yet. Enable Firebase Anonymous Authentication and publish the Firestore rules before testing another device.";
       result.classList.remove("hidden");
       document.getElementById("registerSubmit").disabled=true;
-      toast(isCloudActive?"Registration sent to the Admin Dashboard across devices.":"Registration saved locally. Cloud sync is currently unavailable.",isCloudActive?"good":"warn");
+      toast(cloudSaved?"Registration sent to the Admin Dashboard across devices.":"Cloud sync failed. Registration is local only.",cloudSaved?"good":"warn");
     }
 
     function decideAccount(id,status){
