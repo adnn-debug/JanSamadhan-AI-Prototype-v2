@@ -1,11 +1,13 @@
-JANSAMADHAN AI - NOTEPAD COLLEGE PROTOTYPE
-==========================================
+JANSAMADHAN AI - ADVANCED COLLEGE PROTOTYPE
+===========================================
 
-HOW TO START
-1. Extract the ZIP file.
-2. Double-click index.html.
-3. It opens in Chrome or Edge. No installation, server, VS Code, Python, or internet is needed.
-4. To view or change the code: right-click index.html > Open with > Notepad.
+RECOMMENDATION
+Update the present GitHub repository. Do not create a new repository.
+The current repository already has the Render deployment and Firebase connection.
+Develop and test on the advanced-college-demo branch, then merge it into main.
+
+MAIN DEPLOYED FILE
+templates/index.html
 
 DEMO LOGIN DETAILS
 
@@ -14,78 +16,73 @@ Username: admin
 Password: admin123
 
 STUDENT
-Approved demo account: Aditi / Aditi123
+Aditi / Aditi123
 
 UNIVERSITY
-Approved demo account: MACET / MACET123
+MACET / MACET123
 
 INDUSTRY
-Approved demo account: BrightGrid Solutions / BrightGrid Solutions123
+BrightGrid Solutions / BrightGrid Solutions123
 
-NEW REGISTRATION RULE
-1. Click Register account.
-2. Select Student, University, or Industry.
-3. Enter the name, email, and college/organization.
-4. Username becomes the exact registered name.
-5. Password becomes the exact registered name followed by 123.
-6. The account remains Pending and cannot log in.
-7. Log in as admin and approve it from Registration approvals.
-8. The approved account can now log in. A rejected account remains blocked.
+BEST 7-MINUTE COLLEGE DEMO
+1. Start on the homepage and explain that citizens do not need an account.
+2. Open Track Status and enter JS-1003. Show its institution, progress and public timeline.
+3. Report a new societal challenge. Show the AI category, priority, institution matches and Challenge ID receipt.
+4. Register a new Student partner. Show that login is blocked while approval is pending.
+5. Log in as admin. Approve the partner and show critical alerts, analytics and lifecycle controls.
+6. Log in as Aditi. Open JS-1003, show its proposal, add a milestone and submit a solution for validation.
+7. Return as admin. Verify completion with beneficiaries, outcome metric and evidence.
+8. Track the same ID again as a citizen and show the published impact.
 
-BEST COLLEGE DEMO ORDER
-1. Register a new Student account and show that login is blocked while approval is pending.
-2. Log in as admin and approve the registration.
-3. Log in with the newly approved Student account.
-4. Log out and click Report a public problem.
-5. Submit a report similar to "Large potholes near Neora main road" with category Roads and location Neora Main Road.
-6. Explain that the basic AI finds the existing active report and increases its duplicate count and attention score.
-7. Log in as admin. Show the attention notification, duplicate count, support request, and priority ordering.
-8. Log in as a student and claim an active problem.
-9. Show the university recommendations that appear after the claim.
-10. Log in as a university and offer mentor/lab support.
-11. Log in as an industry and offer tools or technical support.
-12. Return to the same student and mark the claimed problem solved with a solution note.
-13. Log in as admin to show that the solved record remains visible while it disappears from active partner dashboards.
+WHAT IS NOW FUNCTIONAL
+- Forest-green and white responsive public-service design
+- Citizen reporting without login or approval
+- Challenge ID receipt, copy action and public status search
+- Privacy-safe public tracking result
+- Explainable AI category, urgency and safety analysis
+- Active duplicate matching and evidence clustering
+- Critical, high, medium and normal priority support
+- University recommendations by challenge category
+- Partner registration with administrator approve/reject flow
+- Student team claim, proposal, milestone and solution submission
+- University mentoring/lab support and milestone validation
+- Industry tools, expertise, material and pilot-support offers
+- Administrator validation, assignment, lifecycle update and impact approval
+- Eleven internal stages from Submitted to Completed
+- Public progress bar, simplified timeline and time-stamped history
+- Analytics for category distribution and pipeline position
+- Verified beneficiary and outcome metrics
+- Live Firebase sync with local browser fallback
+- Hindi homepage entry points, text resizing and high contrast
 
-DUPLICATE AND DANGER PRIORITY SYSTEM
-- 0 or 1 extra matching report: Normal
-- 2 or 3 extra matching reports: Yellow cluster
-- 4 or more extra matching reports: Red cluster
-- Critical safety wording: Critical Admin notification
-- Automatic order: Critical first, then Red, Yellow, and Normal
-- Solved challenges are removed from active Student, University, and Industry lists
+IMPORTANT TRUTH FOR THE JURY
+The AI in this college prototype is an explainable rule-based simulation. Say that clearly.
+It demonstrates the product workflow and the inputs/outputs expected from a future trained model.
+Human validation remains required for priority, assignment and completion.
 
-The sample data already contains:
-- A yellow pothole cluster
-- A red unsafe-water cluster
-- A critical exposed-electrical-wire challenge
+WHAT A PRODUCTION VERSION STILL NEEDS
+- Server-side authentication, role authorization and secure administrator controls
+- OTP or verified institutional identity instead of demo credentials
+- A trained multilingual classification and semantic duplicate model
+- GIS maps, geotag verification and jurisdiction routing
+- SMS, WhatsApp, email and push notifications
+- Secure object storage for evidence instead of data URLs in Firestore
+- Formal consent, retention, audit log and content-moderation policies
+- Government department APIs and SLA/escalation integrations
+- Offline-first mobile/PWA reporting and assisted access kiosks
+- Model monitoring, bias testing, appeal/correction workflow and security testing
 
-The Admin can acknowledge a critical alert, but the challenge stays prioritized until it is solved.
+SAFE GITHUB AND RENDER UPDATE
+1. Keep the current main branch live while testing.
+2. Push advanced-college-demo to the same GitHub repository.
+3. Open a pull request into main and review the changed templates/index.html file.
+4. Merge only after the report, tracker and four role dashboards work on your laptop.
+5. Render should automatically deploy main using the existing build and start commands.
+6. Open the Render URL in an incognito window and run the 7-minute demo once.
+7. If Firebase says Local demo mode, verify Firebase Anonymous Authentication and Firestore rules before presentation day.
 
-WHAT THIS PROTOTYPE INCLUDES
-- Separate role selection and dashboards for Admin, Student, University, and Industry
-- Registration for Student, University, and Industry accounts
-- Pending approval, Approve, and Reject workflow controlled by Admin
-- Login blocked until an account is approved
-- Citizen problem reporting without an account
-- Optional image upload saved inside browser storage
-- Basic duplicate detection using keywords, category, and location
-- Yellow marking for 2–3 extra similar reports
-- Red marking for 4+ extra similar reports
-- Automatic Critical > Red > Yellow > Normal ordering on all dashboards
-- Basic danger-keyword detection and critical Admin notifications
-- Admin acknowledgement for critical alerts
-- Admin alerts for unresolved cases older than 7 days
-- Admin priority boost and partner-support request
-- Student claim/release controls and solution recording
-- University recommendations after a student claims a problem
-- University academic-support offers
-- Industry resource-support offers
-- Active-only lists for Student, University, and Industry
-- Solved-case history for Admin
-- Reset Demo Data button
-
-IMPORTANT FOR PRESENTATION
-This is intentionally a front-end college prototype. Registrations, passwords, approvals, reports, and login sessions use the browser's localStorage. Duplicate matching and danger detection are transparent rule-based demonstrations, not a trained AI model or an emergency-response system. Say that a production version would add a backend database, password hashing, verified accounts, trained/validated models, human review, and official notification integrations.
-
-If you want the original sample data again, log into any dashboard and click Reset demo data.
+DO NOT
+- Create a second repository unless the current repository cannot be accessed.
+- Delete the existing Render service or Firebase project.
+- Claim that the demo AI is a trained production model.
+- Use real personal passwords in prototype registration.
