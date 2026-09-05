@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -76,6 +75,25 @@
     @media(max-width:650px){.shell{width:calc(100% - 20px)}.utility-inner,.masthead-inner,.govnav-inner{align-items:flex-start;flex-direction:column}.masthead-inner{padding:13px 0}.brandtext{font-size:1.25rem}.navlinks{width:100%}.navlinks a,.navlinks button{flex:1 1 auto;justify-content:center;padding:0 9px}.intro{padding:22px}.flow,.stats,.formgrid,.servicegrid,.architecture,.ai-grid,.detailgrid{grid-template-columns:1fr}.flow div,.serviceitem{border-right:0;border-bottom:1px solid var(--line)}.flow div:last-child{grid-column:auto}.wide{grid-column:auto}.title,.panelhead,.alertrow{align-items:flex-start;flex-direction:column}.offer,.trackrow{grid-template-columns:1fr}.meta{grid-template-columns:1fr}.timeline{grid-template-columns:repeat(3,1fr)}.proto-badge{display:none}.chartrow{grid-template-columns:86px 1fr 24px}}
     .citizen-chatbot{position:fixed;right:20px;bottom:20px;z-index:90;font-size:16px}.chatbot-toggle{display:flex;align-items:center;gap:9px;border:0;border-radius:999px;padding:12px 17px;background:var(--forest);color:#fff;font-weight:850;box-shadow:0 10px 28px rgba(2,53,34,.3)}.chatbot-toggle:hover{background:var(--forest-dark);transform:translateY(-1px)}.chatbot-toggle-icon{display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:#fff;color:var(--forest);font-size:.82rem}.chatbot-panel{position:absolute;right:0;bottom:66px;width:min(380px,calc(100vw - 28px));height:min(570px,calc(100vh - 105px));min-height:430px;background:#fff;border:1px solid #87a897;border-radius:14px;box-shadow:0 18px 55px rgba(1,38,24,.28);overflow:hidden;display:grid;grid-template-rows:auto minmax(0,1fr) auto auto auto}.chatbot-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;background:var(--forest);color:#fff}.chatbot-head strong{display:block}.chatbot-head span{display:block;font-size:.67rem;color:#d8eee2;margin-top:2px}.chatbot-close{width:32px;height:32px;border:1px solid rgba(255,255,255,.6);border-radius:7px;background:transparent;color:#fff;font-size:1.15rem}.chatbot-messages{overflow-y:auto;padding:14px;background:#f6faf7;display:flex;flex-direction:column;gap:9px}.chat-message{max-width:88%;padding:10px 11px;border-radius:11px;font-size:.78rem;line-height:1.5;white-space:pre-wrap}.chat-message.bot{align-self:flex-start;background:#fff;border:1px solid var(--line);border-top-left-radius:3px;color:#30483b}.chat-message.user{align-self:flex-end;background:var(--forest);color:#fff;border-top-right-radius:3px}.chat-message strong{color:inherit}.chat-status{align-self:flex-start;width:94%;padding:11px;border:1px solid #a9c8b7;border-left:4px solid var(--leaf);border-radius:9px;background:#fff;font-size:.75rem}.chat-status b{display:block;color:var(--forest-deep);margin-bottom:4px}.chat-status-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:9px 0}.chat-status-grid span{padding:7px;border-radius:6px;background:var(--mint);color:#385747}.chat-status-grid strong{display:block;color:var(--forest-deep)}.chat-quick{display:flex;gap:6px;padding:9px 10px;overflow-x:auto;border-top:1px solid var(--line);background:#fff}.chat-quick button{flex:0 0 auto;border:1px solid #9ebbaa;border-radius:999px;padding:6px 9px;background:#fff;color:var(--forest);font-size:.68rem;font-weight:800}.chat-quick button:hover{background:var(--mint)}.chatbot-form{display:grid;grid-template-columns:1fr auto;gap:7px;padding:10px;border-top:1px solid var(--line);background:#fff}.chatbot-form input{min-width:0;border:1px solid #a9bdb1;border-radius:8px;padding:9px 10px;font-size:.78rem}.chatbot-form input:focus{outline:3px solid #c9ead9;border-color:var(--leaf)}.chatbot-form button{border:0;border-radius:8px;padding:8px 12px;background:var(--leaf);color:#fff;font-weight:800}.chatbot-note{padding:0 11px 10px;background:#fff;color:var(--muted);font-size:.61rem;line-height:1.4}.toasts{left:18px;right:auto}body.high-contrast .chatbot-panel,body.high-contrast .chatbot-messages,body.high-contrast .chat-message.bot,body.high-contrast .chat-status,body.high-contrast .chat-quick,body.high-contrast .chatbot-form,body.high-contrast .chatbot-note{background:#000;color:#fff;border-color:#fff}body.high-contrast .chat-status b,body.high-contrast .chat-status strong{color:#fff}body.high-contrast .chat-status-grid span{background:#000;color:#fff;border:1px solid #fff}
     @media(max-width:650px){.citizen-chatbot{right:10px;bottom:10px}.chatbot-panel{position:fixed;left:10px;right:10px;bottom:75px;width:auto;height:min(570px,calc(100vh - 95px))}.chatbot-toggle{padding:11px 14px}.toasts{left:10px;right:10px;width:auto;bottom:78px}}
+
+
+    /* ===== JanSahayak bilingual voice input ===== */
+    .chat-input-composer{position:relative;min-width:0}
+    .chat-input-composer #chatbotInput{width:100%;padding-right:46px}
+    .voice-mic{position:absolute;right:5px;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:34px;height:34px!important;padding:0!important;border-radius:50%!important;background:transparent!important;color:var(--forest)!important;border:1px solid transparent!important}
+    .voice-mic:hover{background:var(--mint)!important;border-color:#9ebbaa!important}
+    .voice-mic svg{width:19px;height:19px;fill:currentColor;pointer-events:none}
+    .voice-mic.listening{background:#fff1f1!important;color:#b42318!important;border-color:#ef9a9a!important;animation:voicePulse 1.15s ease-in-out infinite}
+    @keyframes voicePulse{0%,100%{box-shadow:0 0 0 0 rgba(180,35,24,.18)}50%{box-shadow:0 0 0 7px rgba(180,35,24,.08)}}
+    .voice-tools{grid-column:1/-1;display:flex;align-items:center;gap:8px;min-width:0;margin-top:1px}
+    .voice-language{flex:0 0 auto;max-width:145px;border:1px solid #a9bdb1;border-radius:999px;background:#fff;color:var(--forest-deep);padding:5px 8px;font-size:.64rem;font-weight:750}
+    .voice-status{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:.62rem;line-height:1.35}
+    .voice-status.listening{color:#9f1b14;font-weight:800}
+    body.high-contrast :is(.voice-mic,.voice-language){background:#000!important;color:#fff!important;border:2px solid #fff!important}
+    body.high-contrast .voice-mic.listening{background:#fff!important;color:#000!important}
+    body.high-contrast .voice-status,body.high-contrast .voice-status.listening{color:#fff!important}
+    @media(max-width:420px){.voice-tools{align-items:flex-start;flex-direction:column}.voice-language{max-width:100%;width:100%}.voice-status{white-space:normal}}
+
   </style>
 </head>
 <body>
@@ -113,8 +131,25 @@
       <div class="chatbot-head"><div><strong id="chatbotTitle">JanSahayak</strong><span id="chatbotSubtitle">Citizen guidance assistant · Online</span></div><button class="chatbot-close" id="chatbotClose" type="button" aria-label="Close citizen assistant">×</button></div>
       <div class="chatbot-messages" id="chatbotMessages" aria-live="polite" aria-relevant="additions"><div class="chat-message bot">Namaste! I can help you report a challenge, track a Challenge ID, or understand how JanSamadhan works. What would you like to do?</div></div>
       <div class="chat-quick" id="chatbotQuickActions" aria-label="Suggested questions"><button type="button" data-chat-action="report">Report a challenge</button><button type="button" data-chat-action="track">Track status</button><button type="button" data-chat-action="stages">Explain statuses</button><button type="button" data-chat-action="hindi">हिंदी</button></div>
-      <form class="chatbot-form" id="chatbotForm"><label class="skip-link" for="chatbotInput">Ask JanSahayak</label><input id="chatbotInput" maxlength="180" autocomplete="off" placeholder="Type a question or Challenge ID" required><button type="submit" id="chatbotSend">Send</button></form>
-      <div class="chatbot-note" id="chatbotNote">Academic prototype · Chat text is not stored or sent to an external AI service. Status lookup may read existing cloud records.</div>
+      <form class="chatbot-form" id="chatbotForm">
+        <label class="skip-link" for="chatbotInput">Ask JanSahayak</label>
+        <div class="chat-input-composer">
+          <input id="chatbotInput" maxlength="180" autocomplete="off" placeholder="Type a question or Challenge ID" required>
+          <button class="voice-mic" id="chatbotMic" type="button" aria-label="Start voice input" aria-pressed="false" title="Speak your message">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3Zm5-3a1 1 0 1 1 2 0 7 7 0 0 1-6 6.92V21h3a1 1 0 1 1 0 2H8a1 1 0 1 1 0-2h3v-3.08A7 7 0 0 1 5 11a1 1 0 1 1 2 0 5 5 0 0 0 10 0Z"/></svg>
+          </button>
+        </div>
+        <button type="submit" id="chatbotSend">Send</button>
+        <div class="voice-tools">
+          <select class="voice-language" id="chatbotVoiceLanguage" aria-label="Voice recognition language">
+            <option value="auto">Auto · हिंदी + English</option>
+            <option value="hi">हिंदी</option>
+            <option value="en">English</option>
+          </select>
+          <span class="voice-status" id="chatbotVoiceStatus" role="status" aria-live="polite">Tap the microphone and speak.</span>
+        </div>
+      </form>
+      <div class="chatbot-note" id="chatbotNote">Academic prototype · Typed chat is not sent to an external AI service. Voice recognition uses your browser speech service, so microphone audio may be processed by the browser/provider. JanSamadhan does not store the raw audio.</div>
     </div>
     <button class="chatbot-toggle" id="chatbotToggle" type="button" aria-controls="chatbotPanel" aria-expanded="false"><span class="chatbot-toggle-icon" aria-hidden="true">JS</span><span id="chatbotToggleText">Citizen Help</span></button>
   </section>
@@ -189,7 +224,7 @@
     function chatCopy(){return chatLanguage==="hi"?{welcome:"नमस्ते! मैं चुनौती दर्ज करने, चैलेंज आईडी की स्थिति देखने और जनसमाधान की प्रक्रिया समझने में आपकी मदद कर सकता हूँ।",report:"चुनौती दर्ज करने के लिए मैं रिपोर्ट फॉर्म खोल रहा हूँ। स्थान, विवरण और प्रभावित लोगों की अनुमानित संख्या भरें।",track:"अपनी चैलेंज आईडी लिखें, जैसे JS-1003।",stages:"स्थिति क्रम: रिपोर्ट प्राप्त → AI समीक्षा → प्रशासनिक सत्यापन → संस्था को सौंपना → टीम/प्रस्ताव → प्रोटोटाइप व परीक्षण → पायलट → समाधान पूरा।",duplicate:"एक ही स्थान की मिलती-जुलती रिपोर्टें एक चुनौती में जोड़ी जाती हैं। इससे प्रमाण मजबूत होता है और कई टीमों द्वारा एक ही समस्या पर अलग-अलग काम करने से बचाव होता है।",ai:"यह कॉलेज प्रोटोटाइप पारदर्शी नियम और कीवर्ड मिलान से श्रेणी, प्राथमिकता और समान रिपोर्ट सुझाता है। अंतिम निर्णय मानव प्रशासक करता है।",partner:"नागरिक को लॉगिन नहीं चाहिए। केवल छात्र, विश्वविद्यालय और उद्योग भागीदार पंजीकरण करते हैं और प्रशासक की मंजूरी की प्रतीक्षा करते हैं।",safety:"यदि स्थिति में तुरंत खतरा है, तो इस प्रोटोटाइप पर निर्भर न रहें। सुरक्षित दूरी रखें और स्थानीय आपातकालीन या जिम्मेदार प्राधिकरण से संपर्क करें।",notFound:"यह चैलेंज आईडी नहीं मिली। आईडी और हाइफ़न जाँचकर फिर प्रयास करें।",fallback:"मैं रिपोर्ट दर्ज करने, स्थिति देखने, डुप्लिकेट रिपोर्ट, AI विश्लेषण और भागीदार लॉगिन के बारे में मदद कर सकता हूँ। नीचे दिए बटन भी इस्तेमाल कर सकते हैं।"}:{welcome:"Namaste! I can help you report a challenge, track a Challenge ID, or understand how JanSamadhan works.",report:"I’ll open the report form. Add the location, a clear description and the approximate number of people affected.",track:"Please type your Challenge ID, for example JS-1003.",stages:"Status journey: Report received → AI review → Administrator verification → Institution assignment → Team and proposal → Prototype and testing → Pilot → Solution deployed.",duplicate:"Similar reports from the same location are combined into one challenge. This strengthens the evidence and avoids separate teams repeating the same work.",ai:"This college prototype uses transparent rules and keyword matching to suggest category, priority and similar reports. A human administrator makes the final decision.",partner:"Citizens do not need a login. Only students, universities and industry partners register and wait for administrator approval.",safety:"If there is an immediate danger, do not rely on this prototype. Move to a safe distance and contact the appropriate local emergency or responsible authority.",notFound:"I could not find that Challenge ID. Check the ID and hyphens, then try again.",fallback:"I can help with reporting, tracking, duplicate reports, AI analysis and partner access. You can also use the suggested buttons below."}}
     function chatScroll(){var box=document.getElementById("chatbotMessages");box.scrollTop=box.scrollHeight}function chatAdd(text,who){var msg=document.createElement("div");msg.className="chat-message "+(who==="user"?"user":"bot");msg.textContent=text;document.getElementById("chatbotMessages").appendChild(msg);chatScroll()}
     function openChat(){var panel=document.getElementById("chatbotPanel"),toggle=document.getElementById("chatbotToggle");panel.classList.remove("hidden");toggle.setAttribute("aria-expanded","true");setTimeout(function(){document.getElementById("chatbotInput").focus()},0)}function closeChat(){document.getElementById("chatbotPanel").classList.add("hidden");document.getElementById("chatbotToggle").setAttribute("aria-expanded","false");document.getElementById("chatbotToggle").focus()}
-    function chatSetLanguage(next,resetMessages){chatLanguage=next==="hi"?"hi":"en";chatWaitingForId=false;var hi=chatLanguage==="hi",buttons=document.querySelectorAll("[data-chat-action]");document.getElementById("chatbotSubtitle").textContent=hi?"नागरिक सहायता सहायक · ऑनलाइन":"Citizen guidance assistant · Online";document.getElementById("chatbotInput").placeholder=hi?"सवाल या चैलेंज आईडी लिखें":"Type a question or Challenge ID";document.getElementById("chatbotSend").textContent=hi?"भेजें":"Send";document.getElementById("chatbotToggleText").textContent=hi?"नागरिक सहायता":"Citizen Help";document.getElementById("chatbotNote").textContent=hi?"शैक्षणिक प्रोटोटाइप · चैट टेक्स्ट संग्रहित या बाहरी AI सेवा को नहीं भेजा जाता। स्थिति खोज मौजूदा क्लाउड रिकॉर्ड पढ़ सकती है।":"Academic prototype · Chat text is not stored or sent to an external AI service. Status lookup may read existing cloud records.";var labels=hi?["चुनौती दर्ज करें","स्थिति देखें","स्थिति समझें","English"]:["Report a challenge","Track status","Explain statuses","हिंदी"];buttons.forEach(function(b,i){b.textContent=labels[i]});if(resetMessages){document.getElementById("chatbotMessages").innerHTML="";chatAdd(chatCopy().welcome,"bot")}}
+    function chatSetLanguage(next,resetMessages){chatLanguage=next==="hi"?"hi":"en";chatWaitingForId=false;var hi=chatLanguage==="hi",buttons=document.querySelectorAll("[data-chat-action]");document.getElementById("chatbotSubtitle").textContent=hi?"नागरिक सहायता सहायक · ऑनलाइन":"Citizen guidance assistant · Online";document.getElementById("chatbotInput").placeholder=hi?"सवाल या चैलेंज आईडी लिखें":"Type a question or Challenge ID";document.getElementById("chatbotSend").textContent=hi?"भेजें":"Send";document.getElementById("chatbotToggleText").textContent=hi?"नागरिक सहायता":"Citizen Help";document.getElementById("chatbotNote").textContent=hi?"शैक्षणिक प्रोटोटाइप · टाइप किया गया चैट टेक्स्ट बाहरी AI सेवा को नहीं भेजा जाता। आवाज़ पहचान आपके ब्राउज़र की स्पीच सेवा का उपयोग करती है, इसलिए माइक्रोफोन ऑडियो ब्राउज़र/प्रदाता द्वारा प्रोसेस हो सकता है। जनसमाधान कच्चा ऑडियो संग्रहीत नहीं करता।":"Academic prototype · Typed chat is not sent to an external AI service. Voice recognition uses your browser speech service, so microphone audio may be processed by the browser/provider. JanSamadhan does not store the raw audio.";var labels=hi?["चुनौती दर्ज करें","स्थिति देखें","स्थिति समझें","English"]:["Report a challenge","Track status","Explain statuses","हिंदी"];buttons.forEach(function(b,i){b.textContent=labels[i]});if(resetMessages){document.getElementById("chatbotMessages").innerHTML="";chatAdd(chatCopy().welcome,"bot")}}
     function chatStatus(p){var s=stageInfo(p),ai=p.ai||classifyChallenge(p),card=document.createElement("div");card.className="chat-status";card.innerHTML='<b>'+esc(p.id)+' · '+esc(p.title)+'</b><div class="chat-status-grid"><span>'+(chatLanguage==="hi"?'वर्तमान स्थिति':'Current status')+'<strong>'+esc(s.public)+'</strong></span><span>'+(chatLanguage==="hi"?'प्रगति':'Progress')+'<strong>'+s.progress+'%</strong></span><span>'+(chatLanguage==="hi"?'प्राथमिकता':'Priority')+'<strong>'+esc(ai.priority||"Normal")+'</strong></span><span>'+(chatLanguage==="hi"?'संस्था':'Institution')+'<strong>'+esc(p.assignedUniversity|| (chatLanguage==="hi"?'अभी तय नहीं':'Under assignment'))+'</strong></span></div><button class="btn small secondary" type="button" data-chat-open-track="'+esc(p.id)+'">'+(chatLanguage==="hi"?'पूरी समयरेखा देखें':'View full timeline')+'</button>';document.getElementById("chatbotMessages").appendChild(card);chatScroll()}
     async function chatTrack(id){var value=String(id||"").trim().toUpperCase(),p=load().problems.find(function(x){return x.id.toUpperCase()===value});if(!p&&isCloudActive&&db)try{var doc=await db.collection("problems").doc(value).get();if(doc.exists){p=doc.data();p.id=p.id||doc.id;p=normalizeProblem(p)}}catch(e){console.warn("Chat status lookup failed",e)}if(p)chatStatus(p);else chatAdd(chatCopy().notFound,"bot")}
     function hasAny(text,terms){return terms.some(function(term){return text.indexOf(term)>=0})}function handleChat(text){var raw=String(text||"").trim();if(!raw)return;chatAdd(raw,"user");var lower=raw.toLowerCase(),upper=raw.toUpperCase(),idMatch=upper.match(/\bJS(?:-[A-Z0-9]+)+\b/);if(/[\u0900-\u097F]/.test(raw)&&chatLanguage!=="hi")chatSetLanguage("hi",false);var copy=chatCopy();if(idMatch){chatWaitingForId=false;chatTrack(idMatch[0]);return}if(chatWaitingForId){chatAdd(copy.notFound,"bot");return}if(hasAny(lower,["report","submit","lodge","file complaint","new challenge","complaint","issue","problem","शिकायत","समस्या","दर्ज","रिपोर्ट"])){chatAdd(copy.report,"bot");setTimeout(function(){closeChat();document.getElementById("reportError").textContent="";document.getElementById("reportDialog").showModal()},450);return}if(hasAny(lower,["track","status","challenge id","tracking id","स्थिति","स्टेटस","आईडी"])){chatWaitingForId=true;chatAdd(copy.track,"bot");return}if(hasAny(lower,["stage","stages","progress","process","workflow","how long","स्थिति क्रम","प्रक्रिया","कितना समय"])){chatAdd(copy.stages,"bot");return}if(hasAny(lower,["duplicate","similar","same report","merge","डुप्लिकेट","मिलती","समान"])){chatAdd(copy.duplicate,"bot");return}if(hasAny(lower,["ai","confidence","category","priority","model","artificial intelligence","एआई","श्रेणी","प्राथमिकता"])){chatAdd(copy.ai,"bot");return}if(hasAny(lower,["login","register","student","university","industry","partner","account","लॉगिन","पंजीकरण","छात्र","विश्वविद्यालय","उद्योग"])){chatAdd(copy.partner,"bot");return}if(hasAny(lower,["emergency","urgent danger","immediate danger","unsafe","आपात","खतरा","खतरनाक"])){chatAdd(copy.safety,"bot");return}if(hasAny(lower,["hello","hi","hey","namaste","help","नमस्ते","मदद"])){chatAdd(copy.welcome,"bot");return}chatAdd(copy.fallback,"bot")}
@@ -267,7 +302,7 @@
       "Registration submitted.":"पंजीकरण जमा हुआ।","Status: Pending administrator approval":"स्थिति: प्रशासक स्वीकृति लंबित","It is now visible on connected administrator dashboards.":"यह अब जुड़े हुए प्रशासक डैशबोर्ड पर दिखाई देता है।","Saved in local demo mode.":"स्थानीय डेमो मोड में सहेजा गया।",
       "JanSahayak":"जनसहायक","Citizen guidance assistant · Online":"नागरिक सहायता सहायक · ऑनलाइन","Citizen Help":"नागरिक सहायता","Report a challenge":"चुनौती दर्ज करें","Explain statuses":"स्थितियाँ समझें","Send":"भेजें",
       "Namaste! I can help you report a challenge, track a Challenge ID, or understand how JanSamadhan works.":"नमस्ते! मैं चुनौती दर्ज करने, चैलेंज आईडी की स्थिति देखने और जनसमाधान की प्रक्रिया समझने में आपकी मदद कर सकता हूँ।",
-      "Academic prototype · Chat text is not stored or sent to an external AI service. Status lookup may read existing cloud records.":"शैक्षणिक प्रोटोटाइप · चैट टेक्स्ट संग्रहित या बाहरी AI सेवा को नहीं भेजा जाता। स्थिति खोज मौजूदा क्लाउड रिकॉर्ड पढ़ सकती है।",
+      "Academic prototype · Typed chat is not sent to an external AI service. Voice recognition uses your browser speech service, so microphone audio may be processed by the browser/provider. JanSamadhan does not store the raw audio.":"शैक्षणिक प्रोटोटाइप · टाइप किया गया चैट टेक्स्ट बाहरी AI सेवा को नहीं भेजा जाता। आवाज़ पहचान आपके ब्राउज़र की स्पीच सेवा का उपयोग करती है, इसलिए माइक्रोफोन ऑडियो ब्राउज़र/प्रदाता द्वारा प्रोसेस हो सकता है। जनसमाधान कच्चा ऑडियो संग्रहीत नहीं करता।",
       "View full timeline":"पूरी समयरेखा देखें","Institution":"संस्था",
       "Academic SIH prototype for citizen-led challenge discovery and collaborative innovation.":"नागरिक-आधारित चुनौती पहचान और सहयोगात्मक नवाचार के लिए शैक्षणिक SIH प्रोटोटाइप।","AI results are decision support and require human validation.":"AI परिणाम निर्णय सहायता हैं और मानव सत्यापन आवश्यक है।","Academic prototype · Not an official government website":"शैक्षणिक प्रोटोटाइप · यह आधिकारिक सरकारी वेबसाइट नहीं है","JanSamadhan AI · SIH Prototype · Built for demonstration and evaluation":"जनसमाधान AI · SIH प्रोटोटाइप · प्रदर्शन और मूल्यांकन हेतु निर्मित",
       "Help / FAQ":"सहायता / सामान्य प्रश्न","Prototype disclaimer":"प्रोटोटाइप अस्वीकरण"
@@ -287,5 +322,203 @@
     capture(document.body);new MutationObserver(schedule).observe(document.documentElement,{attributes:true,attributeFilter:["lang"],childList:true,subtree:true});apply();
   }());
   </script>
+
+
+  <script>
+  /* ===== JanSahayak bilingual browser voice recognition ===== */
+  (function(){
+    "use strict";
+
+    var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    var input = document.getElementById("chatbotInput");
+    var mic = document.getElementById("chatbotMic");
+    var languageSelect = document.getElementById("chatbotVoiceLanguage");
+    var status = document.getElementById("chatbotVoiceStatus");
+    var recognition = null;
+    var listening = false;
+    var baseText = "";
+    var heardAnything = false;
+    var manualStop = false;
+
+    if(!input || !mic || !languageSelect || !status) return;
+
+    function chatbotLooksHindi(){
+      return document.documentElement.lang === "hi" || /[\u0900-\u097F]/.test(input.getAttribute("placeholder") || "");
+    }
+
+    function chosenRecognitionLanguage(){
+      var mode = languageSelect.value;
+      if(mode === "hi") return "hi-IN";
+      if(mode === "en") return "en-IN";
+      if(/[\u0900-\u097F]/.test(input.value)) return "hi-IN";
+      return chatbotLooksHindi() ? "hi-IN" : "en-IN";
+    }
+
+    function isHindi(){ return chatbotLooksHindi(); }
+
+    function setIdleMessage(){
+      if(listening) return;
+      status.classList.remove("listening");
+      status.textContent = isHindi()
+        ? "माइक्रोफोन दबाएँ और बोलें। टेक्स्ट भेजने से पहले जाँच सकते हैं।"
+        : "Tap the microphone and speak. You can check the text before sending.";
+      mic.setAttribute("aria-label", isHindi() ? "आवाज़ से लिखना शुरू करें" : "Start voice input");
+      mic.setAttribute("title", isHindi() ? "अपना संदेश बोलें" : "Speak your message");
+    }
+
+    function setListeningMessage(lang){
+      status.classList.add("listening");
+      status.textContent = lang === "hi-IN"
+        ? "सुन रहा हूँ… हिंदी बोलें"
+        : "Listening… speak English";
+      mic.setAttribute("aria-label", isHindi() ? "सुनना बंद करें" : "Stop listening");
+      mic.setAttribute("title", isHindi() ? "सुनना बंद करें" : "Stop listening");
+    }
+
+    function setErrorMessage(code){
+      status.classList.remove("listening");
+      var hi = isHindi();
+      var messages = {
+        "not-allowed": hi ? "माइक्रोफोन की अनुमति दें, फिर दोबारा प्रयास करें।" : "Allow microphone access, then try again.",
+        "service-not-allowed": hi ? "ब्राउज़र ने स्पीच सेवा की अनुमति नहीं दी।" : "The browser blocked its speech service.",
+        "audio-capture": hi ? "माइक्रोफोन उपलब्ध नहीं मिला।" : "No microphone was available.",
+        "network": hi ? "स्पीच पहचान के लिए नेटवर्क उपलब्ध नहीं है।" : "The speech service needs a network connection.",
+        "no-speech": hi ? "कोई आवाज़ नहीं मिली। माइक्रोफोन फिर दबाएँ।" : "No speech was heard. Tap the microphone and try again.",
+        "aborted": hi ? "आवाज़ इनपुट रोक दिया गया।" : "Voice input stopped."
+      };
+      status.textContent = messages[code] || (hi ? "आवाज़ पहचान नहीं हो सकी। दोबारा प्रयास करें।" : "Speech could not be recognized. Please try again.");
+    }
+
+    function joinWithBase(transcript){
+      var spoken = String(transcript || "").trim();
+      if(!baseText) return spoken;
+      if(!spoken) return baseText;
+      return (baseText + " " + spoken).trim();
+    }
+
+    function stopRecognition(){
+      manualStop = true;
+      if(recognition && listening){
+        try{ recognition.stop(); }catch(e){}
+      }
+    }
+
+    function startRecognition(){
+      if(!SpeechRecognition){
+        status.textContent = isHindi()
+          ? "इस ब्राउज़र में आवाज़ पहचान उपलब्ध नहीं है। Chrome या Edge में प्रयास करें।"
+          : "Voice recognition is not available in this browser. Try Chrome or Edge.";
+        mic.disabled = true;
+        languageSelect.disabled = true;
+        return;
+      }
+
+      if(listening){ stopRecognition(); return; }
+
+      manualStop = false;
+      heardAnything = false;
+      baseText = input.value.trim();
+      var lang = chosenRecognitionLanguage();
+      recognition = new SpeechRecognition();
+      recognition.lang = lang;
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 3;
+
+      recognition.onstart = function(){
+        listening = true;
+        mic.classList.add("listening");
+        mic.setAttribute("aria-pressed", "true");
+        setListeningMessage(lang);
+      };
+
+      recognition.onresult = function(event){
+        var finalTranscript = "";
+        var interimTranscript = "";
+
+        for(var i = event.resultIndex; i < event.results.length; i++){
+          var result = event.results[i];
+          var best = result[0] ? result[0].transcript : "";
+          if(result.isFinal) finalTranscript += best;
+          else interimTranscript += best;
+        }
+
+        var transcript = (finalTranscript || interimTranscript).trim();
+        if(transcript){
+          heardAnything = true;
+          input.value = joinWithBase(transcript).slice(0, input.maxLength || 180);
+          input.dispatchEvent(new Event("input", {bubbles:true}));
+          input.focus();
+          input.setSelectionRange(input.value.length, input.value.length);
+        }
+
+        if(finalTranscript.trim()){
+          var finalText = finalTranscript.trim();
+          input.value = joinWithBase(finalText).slice(0, input.maxLength || 180);
+          input.dispatchEvent(new Event("input", {bubbles:true}));
+          status.classList.remove("listening");
+          status.textContent = /[\u0900-\u097F]/.test(finalText)
+            ? "सुना गया टेक्स्ट ऊपर है। भेजने से पहले जाँच लें।"
+            : "Transcript added above. Check it before sending.";
+        }
+      };
+
+      recognition.onerror = function(event){
+        if(event.error === "aborted" && manualStop) return;
+        setErrorMessage(event.error);
+      };
+
+      recognition.onnomatch = function(){
+        status.textContent = isHindi()
+          ? "वाक्य साफ़ नहीं समझ पाया। थोड़ा धीरे बोलकर फिर प्रयास करें।"
+          : "I could not recognize that clearly. Try speaking a little more slowly.";
+      };
+
+      recognition.onend = function(){
+        listening = false;
+        mic.classList.remove("listening");
+        mic.setAttribute("aria-pressed", "false");
+        if(manualStop){
+          setIdleMessage();
+        }else if(!heardAnything && !status.textContent){
+          setIdleMessage();
+        }else if(heardAnything && status.classList.contains("listening")){
+          setIdleMessage();
+        }
+      };
+
+      try{
+        recognition.start();
+      }catch(e){
+        listening = false;
+        mic.classList.remove("listening");
+        mic.setAttribute("aria-pressed", "false");
+        status.textContent = isHindi() ? "माइक्रोफोन शुरू नहीं हो सका। फिर प्रयास करें।" : "The microphone could not start. Please try again.";
+      }
+    }
+
+    mic.addEventListener("click", startRecognition);
+    languageSelect.addEventListener("change", function(){
+      if(listening) stopRecognition();
+      setIdleMessage();
+    });
+
+    var uiObserver = new MutationObserver(function(){ setIdleMessage(); });
+    uiObserver.observe(document.documentElement, {attributes:true, attributeFilter:["lang"]});
+    uiObserver.observe(input, {attributes:true, attributeFilter:["placeholder"]});
+
+    if(!SpeechRecognition){
+      mic.disabled = true;
+      mic.style.opacity = ".5";
+      languageSelect.disabled = true;
+      status.textContent = isHindi()
+        ? "इस ब्राउज़र में आवाज़ पहचान उपलब्ध नहीं है। Chrome या Edge उपयोग करें।"
+        : "Voice recognition is unavailable here. Use Chrome or Edge.";
+    }else{
+      setIdleMessage();
+    }
+  })();
+  </script>
+
 </body>
 </html>
