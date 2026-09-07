@@ -237,91 +237,958 @@
   </script>
 
   <script>
-  /* ===== Complete system-interface Hindi translation layer ===== */
-  (function(){
-    "use strict";
-    var HI={
-      "Skip to main content":"मुख्य सामग्री पर जाएँ","Smart India Hackathon · Advanced College Prototype":"स्मार्ट इंडिया हैकाथॉन · उन्नत कॉलेज प्रोटोटाइप",
-      "Accessibility:":"सुगम्यता:","High Contrast":"उच्च कंट्रास्ट","Citizen Challenge Intelligence & Collaborative Resolution Platform":"नागरिक चुनौती बुद्धिमत्ता एवं सहयोगात्मक समाधान मंच",
-      "ACADEMIC DEMONSTRATION · NOT AN OFFICIAL GOVERNMENT WEBSITE":"शैक्षणिक प्रदर्शन · यह आधिकारिक सरकारी वेबसाइट नहीं है",
-      "Home":"होम","Report Challenge":"चुनौती दर्ज करें","Track Status":"स्थिति देखें","About":"परिचय","Partner Login":"भागीदार लॉगिन","Partner Registration":"भागीदार पंजीकरण",
-      "Connecting Cloud DB...":"क्लाउड डेटाबेस से जुड़ रहा है...","Connecting securely...":"सुरक्षित रूप से जुड़ रहा है...","Live Cloud DB Active":"लाइव क्लाउड डेटाबेस सक्रिय","Cloud DB Active":"क्लाउड डेटाबेस सक्रिय","Local Mode":"स्थानीय मोड","Local demo mode":"स्थानीय डेमो मोड","Cloud unavailable · Local demo mode":"क्लाउड उपलब्ध नहीं · स्थानीय डेमो मोड","Cloud sync blocked · Local mode":"क्लाउड सिंक अवरुद्ध · स्थानीय मोड","Cloud save failed · Local mode":"क्लाउड सेव विफल · स्थानीय मोड",
-      "Citizen access:":"नागरिक सुविधा:","Report and track a societal challenge without creating an account. Only students, universities and industry partners require approved portal access.":"बिना खाता बनाए सामाजिक चुनौती दर्ज करें और उसकी स्थिति देखें। केवल छात्र, विश्वविद्यालय और उद्योग भागीदारों को स्वीकृत पोर्टल पहुँच चाहिए।",
-      "Citizen-to-solution innovation pipeline":"नागरिक से समाधान तक नवाचार प्रक्रिया","From a local challenge to a measurable solution.":"स्थानीय चुनौती से मापने योग्य समाधान तक।",
-      "Report a Societal Challenge":"सामाजिक चुनौती दर्ज करें","Track Existing Challenge":"मौजूदा चुनौती देखें","Track by Challenge ID":"चैलेंज आईडी से स्थिति देखें",
-      "Try a demo ID such as JS-1003 or enter the ID received after submission.":"JS-1003 जैसी डेमो आईडी या जमा करने पर मिली आईडी दर्ज करें।","Check status":"स्थिति जाँचें",
-      "No citizen login required.":"नागरिक लॉगिन आवश्यक नहीं है।","Personal reporter details are never shown in the public tracking result.":"रिपोर्ट करने वाले व्यक्ति की निजी जानकारी सार्वजनिक ट्रैकिंग परिणाम में नहीं दिखाई जाती।",
-      "What the platform demonstrates":"प्लेटफ़ॉर्म क्या प्रदर्शित करता है","A connected workflow, not four disconnected dashboards.":"चार अलग-अलग डैशबोर्ड नहीं, बल्कि एक जुड़ी हुई कार्यप्रणाली।",
-      "AI intake & deduplication":"AI इनटेक और डुप्लिकेट पहचान","Suggested category, urgency, safety cues and similarity score are produced at submission.":"जमा करते समय श्रेणी, प्राथमिकता, सुरक्षा संकेत और समानता स्कोर सुझाए जाते हैं।",
-      "Transparent citizen tracking":"पारदर्शी नागरिक ट्रैकिंग","One ID shows the public lifecycle, responsible institution, progress and verified outcome.":"एक आईडी से पूरी सार्वजनिक प्रक्रिया, जिम्मेदार संस्था, प्रगति और सत्यापित परिणाम दिखाई देता है।",
-      "Institution matching":"संस्था मिलान","Universities are recommended by capability; industry can commit expertise and resources.":"क्षमता के आधार पर विश्वविद्यालय सुझाए जाते हैं और उद्योग विशेषज्ञता व संसाधन दे सकता है।",
-      "Impact accountability":"प्रभाव की जवाबदेही","Completion requires administrator validation and can record beneficiaries and outcome evidence.":"समापन के लिए प्रशासक सत्यापन आवश्यक है और लाभार्थी व परिणाम प्रमाण दर्ज किए जा सकते हैं।",
-      "End-to-end challenge lifecycle":"चुनौती की शुरू से अंत तक प्रक्रिया","Every stage creates a visible, time-stamped update.":"हर चरण एक दिखाई देने वाला समय-मुद्रित अपडेट बनाता है।",
-      "1 · Citizen input":"1 · नागरिक इनपुट","Public report, location, people affected and optional photo.":"सार्वजनिक रिपोर्ट, स्थान, प्रभावित लोग और वैकल्पिक फोटो।",
-      "2 · AI intelligence":"2 · AI विश्लेषण","Category, priority, risk, duplicate and institutional match.":"श्रेणी, प्राथमिकता, जोखिम, डुप्लिकेट और संस्था मिलान।",
-      "3 · Validation":"3 · सत्यापन","Administrator reviews authenticity and assigns a suitable institution.":"प्रशासक सत्यता जाँचता है और उपयुक्त संस्था सौंपता है।",
-      "4 · Co-creation":"4 · सह-निर्माण","Student team, mentor, proposal, prototype, testing and industry support.":"छात्र टीम, मेंटर, प्रस्ताव, प्रोटोटाइप, परीक्षण और उद्योग सहयोग।",
-      "5 · Deployment":"5 · तैनाती","Pilot, final verification, impact metrics and public outcome.":"पायलट, अंतिम सत्यापन, प्रभाव मापदंड और सार्वजनिक परिणाम।",
-      "Advanced prototype modules":"उन्नत प्रोटोटाइप मॉड्यूल","Designed to show both present functionality and a credible production path.":"वर्तमान कार्यक्षमता और विश्वसनीय उत्पादन मार्ग दोनों दिखाने के लिए बनाया गया।",
-      "Citizen module":"नागरिक मॉड्यूल","Governance module":"प्रशासन मॉड्यूल","Innovation module":"नवाचार मॉड्यूल","AI decision support":"AI निर्णय सहायता","Analytics module":"विश्लेषण मॉड्यूल","Inclusive access":"समावेशी पहुँच",
-      "Authorized Collaboration Portal":"अधिकृत सहयोग पोर्टल","Citizen tracker":"नागरिक ट्रैकर","New challenge":"नई चुनौती","Dashboard":"डैशबोर्ड","Citizen report":"नागरिक रिपोर्ट","Log out":"लॉग आउट","ADVANCED PROTOTYPE":"उन्नत प्रोटोटाइप",
-      "Approved partner login":"स्वीकृत भागीदार लॉगिन","Citizens do not need an account.":"नागरिकों को खाता बनाने की आवश्यकता नहीं है।","Select an approved institutional role below.":"नीचे स्वीकृत संस्थागत भूमिका चुनें।",
-      "Student":"छात्र","University":"विश्वविद्यालय","Industry":"उद्योग","Administrator":"प्रशासक","Team & prototype work":"टीम और प्रोटोटाइप कार्य","Mentoring & validation":"मेंटोरिंग और सत्यापन","Expertise & resources":"विशेषज्ञता और संसाधन","Approve & govern":"स्वीकृति और प्रशासन",
-      "Name / username":"नाम / उपयोगकर्ता नाम","Password":"पासवर्ड","Sign in to dashboard":"डैशबोर्ड में साइन इन करें","Partner registration":"भागीदार पंजीकरण",
-      "Approval workflow:":"स्वीकृति प्रक्रिया:","Register as":"इस रूप में पंजीकरण करें","Name / institution":"नाम / संस्था","Email":"ईमेल","College / organization":"कॉलेज / संगठन","Demo password":"डेमो पासवर्ड","Confirm password":"पासवर्ड की पुष्टि करें","Prototype security:":"प्रोटोटाइप सुरक्षा:","use a demo-only password, never a personal password.":"केवल डेमो पासवर्ड उपयोग करें, निजी पासवर्ड कभी नहीं।","Submit for administrator approval":"प्रशासक की स्वीकृति हेतु भेजें",
-      "Report a societal challenge":"सामाजिक चुनौती दर्ज करें","AI-assisted intake:":"AI-सहायित इनटेक:","A human administrator validates the result.":"एक मानव प्रशासक परिणाम का सत्यापन करता है।",
-      "Challenge title":"चुनौती का शीर्षक","Category":"श्रेणी","Let AI decide":"AI को तय करने दें","Education":"शिक्षा","Agriculture":"कृषि","Healthcare":"स्वास्थ्य सेवा","Water Resources":"जल संसाधन","Sanitation":"स्वच्छता","Environment":"पर्यावरण","Energy":"ऊर्जा","Urban Development":"शहरी विकास","Accessibility":"सुगम्यता","Public Administration":"लोक प्रशासन","Rural Livelihoods":"ग्रामीण आजीविका","Other":"अन्य",
-      "District":"जिला","Select district":"जिला चुनें","Other / Demo district":"अन्य / डेमो जिला","Locality / landmark":"इलाका / पहचान स्थल","Approx. people affected":"लगभग प्रभावित लोगों की संख्या","Description":"विवरण","Reporter name / community":"रिपोर्टकर्ता का नाम / समुदाय","Citizen mobile number":"नागरिक मोबाइल नंबर","Photo evidence (optional; max 5 MB)":"फोटो प्रमाण (वैकल्पिक; अधिकतम 5 MB)",
-      "Only challenge information is shown in public tracking. Reporter identity is kept out of the public result.":"सार्वजनिक ट्रैकिंग में केवल चुनौती की जानकारी दिखाई जाती है। रिपोर्टकर्ता की पहचान सार्वजनिक परिणाम में नहीं दिखाई जाती।",
-      "Daily limit:":"दैनिक सीमा:","Maximum 10 complaints per mobile number per India calendar day. The raw mobile number is not stored in the complaint record.":"एक मोबाइल नंबर से भारतीय कैलेंडर दिन के अनुसार अधिकतम 10 शिकायतें जमा की जा सकती हैं। कच्चा मोबाइल नंबर शिकायत रिकॉर्ड में संग्रहीत नहीं किया जाता।",
-      "Analyse and submit challenge":"विश्लेषण करें और चुनौती जमा करें","Citizen challenge tracker":"नागरिक चुनौती ट्रैकर","Track status":"स्थिति देखें","Enter a Challenge ID to see its verified public progress.":"सत्यापित सार्वजनिक प्रगति देखने के लिए चैलेंज आईडी दर्ज करें।",
-      "Submission receipt":"जमा करने की रसीद","Validate and update lifecycle":"प्रक्रिया सत्यापित और अपडेट करें","Verified stage":"सत्यापित चरण","Assign / recommend university":"विश्वविद्यालय सौंपें / सुझाएँ","Not assigned":"अभी नहीं सौंपा गया","Public update note":"सार्वजनिक अपडेट नोट","Publish verified update":"सत्यापित अपडेट प्रकाशित करें",
-      "Solution proposal":"समाधान प्रस्ताव","Proposed solution":"प्रस्तावित समाधान","Team / lead":"टीम / लीड","Mentor":"मेंटोर","Estimated duration":"अनुमानित अवधि","Expected impact":"अपेक्षित प्रभाव","Save proposal and update timeline":"प्रस्ताव सहेजें और टाइमलाइन अपडेट करें",
-      "Add milestone update":"माइलस्टोन अपडेट जोड़ें","Milestone reached":"प्राप्त माइलस्टोन","Update note":"अपडेट नोट","Publish milestone":"माइलस्टोन प्रकाशित करें","Submit solution for validation":"सत्यापन के लिए समाधान जमा करें",
-      "This does not mark the challenge solved.":"इससे चुनौती को सीधे हल घोषित नहीं किया जाएगा।","It sends the solution to validation; only the administrator can verify completion and publish impact.":"समाधान सत्यापन के लिए भेजा जाएगा; केवल प्रशासक समापन सत्यापित कर प्रभाव प्रकाशित कर सकता है।","Solution and test evidence":"समाधान और परीक्षण प्रमाण","Submit for validation":"सत्यापन के लिए जमा करें",
-      "Verify completion and impact":"समापन और प्रभाव सत्यापित करें","Verified beneficiaries":"सत्यापित लाभार्थी","Outcome metric":"परिणाम मापदंड","Verification note":"सत्यापन नोट","Approve completion and publish impact":"समापन स्वीकृत करें और प्रभाव प्रकाशित करें","Information":"जानकारी",
-      "Submitted":"जमा","AI Review":"AI समीक्षा","AI review":"AI समीक्षा","Admin Review":"प्रशासक समीक्षा","Under verification":"सत्यापनाधीन","Validated":"सत्यापित","Challenge validated":"चुनौती सत्यापित","Assigned":"सौंपा गया","Institution assigned":"संस्था सौंपी गई","Team Formed":"टीम बनी","Team formed":"टीम बनी","Proposal":"प्रस्ताव","Solution proposed":"समाधान प्रस्तावित","Prototype":"प्रोटोटाइप","Prototype development":"प्रोटोटाइप विकास","Testing":"परीक्षण","Testing & validation":"परीक्षण और सत्यापन","Pilot":"पायलट","Pilot deployment":"पायलट तैनाती","Completed":"पूर्ण","Solution deployed":"समाधान लागू",
-      "Received":"प्राप्त","Under Review":"समीक्षा में","Validated & Assigned":"सत्यापित और सौंपा गया","Solution in Progress":"समाधान पर कार्य जारी","Testing / Pilot":"परीक्षण / पायलट","Resolved":"समाधान पूर्ण",
-      "High confidence":"उच्च विश्वसनीयता","Moderate confidence":"मध्यम विश्वसनीयता","Low confidence":"कम विश्वसनीयता","Normal":"सामान्य","Medium":"मध्यम","High":"उच्च","Critical":"गंभीर","Current status":"वर्तमान स्थिति","Progress":"प्रगति","Last update":"अंतिम अपडेट","Priority":"प्राथमिकता","Responsible institution":"जिम्मेदार संस्था","Under assignment":"संस्था आवंटन जारी","Verified update history":"सत्यापित अपडेट इतिहास","Privacy:":"गोपनीयता:",
-      "Public status":"सार्वजनिक स्थिति","Location":"स्थान","People affected":"प्रभावित लोग","Team lead":"टीम लीड","Reports combined":"संयुक्त रिपोर्ट","Assigned institution":"सौंपी गई संस्था","Awaiting assignment":"आवंटन की प्रतीक्षा","Committed partners":"सहयोगी भागीदार","Current proposal":"वर्तमान प्रस्ताव","AI classification confidence:":"AI वर्गीकरण विश्वसनीयता:","Why:":"कारण:","Critical safety alert":"गंभीर सुरक्षा चेतावनी","Support requested":"सहयोग अनुरोधित",
-      "Administrator command centre":"प्रशासक कमांड सेंटर","Review what needs action first, manage active challenges, verify solutions and publish impact.":"पहले आवश्यक कार्य देखें, सक्रिय चुनौतियों का प्रबंधन करें, समाधान सत्यापित करें और प्रभाव प्रकाशित करें।",
-      "Action required":"कार्रवाई आवश्यक","Critical alerts + approvals":"गंभीर चेतावनियाँ + स्वीकृतियाँ","Active problems":"सक्रिय समस्याएँ","Across the solution pipeline":"समाधान प्रक्रिया में","Awaiting verification":"सत्यापन की प्रतीक्षा","Submitted solutions":"जमा समाधान","Resolved & impact":"समाधान पूर्ण और प्रभाव","Completed challenges remain visible for accountability":"जवाबदेही के लिए पूर्ण चुनौतियाँ दिखाई देती रहती हैं",
-      "Critical safety alerts":"गंभीर सुरक्षा चेतावनियाँ","Partner approvals":"भागीदार स्वीकृतियाँ","Urgent safety alerts and partner approvals are grouped here":"तत्काल सुरक्षा चेतावनियाँ और भागीदार स्वीकृतियाँ यहाँ एक साथ दिखाई जाती हैं",
-      "Validate / update":"सत्यापित / अपडेट करें","Request support":"सहयोग माँगें","Verify completion":"समापन सत्यापित करें","Reopen":"फिर खोलें","Approve":"स्वीकृत करें","Reject":"अस्वीकृत करें","Acknowledge":"स्वीकार करें","Acknowledged":"स्वीकार किया गया",
-      "Solutions awaiting verification":"सत्यापन की प्रतीक्षा वाले समाधान","Only the administrator can approve completion and publish impact":"केवल प्रशासक समापन स्वीकृत कर प्रभाव प्रकाशित कर सकता है","No solutions are waiting for verification.":"कोई समाधान सत्यापन की प्रतीक्षा में नहीं है।","No resolved challenges yet.":"अभी कोई समाधान पूर्ण चुनौती नहीं है।","No active challenges.":"कोई सक्रिय चुनौती नहीं है।",
-      "Challenges by category":"श्रेणी अनुसार चुनौतियाँ","Pipeline distribution":"प्रक्रिया वितरण","Intake":"प्राप्ति","Co-creation":"सह-निर्माण","Testing/Pilot":"परीक्षण/पायलट",
-      "Student innovation workspace":"छात्र नवाचार कार्यक्षेत्र","Your dashboard has two jobs: continue your projects or claim a validated challenge.":"आपके डैशबोर्ड के दो मुख्य काम हैं: अपनी परियोजनाएँ जारी रखें या सत्यापित चुनौती स्वीकार करें।",
-      "My projects":"मेरी परियोजनाएँ","Active team-owned challenges":"टीम की सक्रिय चुनौतियाँ","Available challenges":"उपलब्ध चुनौतियाँ","Validated and ready to claim":"सत्यापित और स्वीकार करने के लिए तैयार","Verified solutions":"सत्यापित समाधान","Completed with admin approval":"प्रशासक की स्वीकृति से पूर्ण","Partner support":"भागीदार सहयोग","University + industry commitments":"विश्वविद्यालय + उद्योग सहयोग",
-      "Proposal → prototype → testing → submit solution for administrator verification":"प्रस्ताव → प्रोटोटाइप → परीक्षण → प्रशासक सत्यापन हेतु समाधान जमा करें","Available validated challenges":"उपलब्ध सत्यापित चुनौतियाँ","Form a team only after administrator validation":"प्रशासक सत्यापन के बाद ही टीम बनाकर चुनौती स्वीकार करें",
-      "Form team / claim":"टीम बनाएँ / स्वीकार करें","Update proposal":"प्रस्ताव अपडेट करें","Create proposal":"प्रस्ताव बनाएँ","Milestone update":"माइलस्टोन अपडेट","Submit solution":"समाधान जमा करें","Release":"छोड़ें","AI university recommendations":"AI विश्वविद्यालय सुझाव",
-      "University collaboration hub":"विश्वविद्यालय सहयोग केंद्र","Industry partnership hub":"उद्योग भागीदारी केंद्र","My supported projects":"मेरी समर्थित परियोजनाएँ","Current commitments":"वर्तमान प्रतिबद्धताएँ","Open opportunities":"खुले अवसर","Available for support":"सहयोग के लिए उपलब्ध","Administrator escalation":"प्रशासक अनुरोध","Testing / pilot":"परीक्षण / पायलट","Near deployment":"तैनाती के करीब",
-      "Available academic opportunities":"उपलब्ध शैक्षणिक अवसर","Available industry opportunities":"उपलब्ध उद्योग अवसर","Commit support only where your organization can add value":"जहाँ आपकी संस्था उपयोगी योगदान दे सकती है, वहीं सहयोग दें","Commit support":"सहयोग दें","Validate milestone":"माइलस्टोन सत्यापित करें",
-      "Faculty mentor":"फैकल्टी मेंटर","Lab and testing support":"लैब और परीक्षण सहयोग","Student project team":"छात्र परियोजना टीम","Research and field survey":"शोध और फील्ड सर्वे","Tools and equipment":"उपकरण और मशीनें","Technical expert":"तकनीकी विशेषज्ञ","Materials or components":"सामग्री या घटक","Pilot sponsorship":"पायलट प्रायोजन","Your organization is supporting this challenge.":"आपकी संस्था इस चुनौती में सहयोग कर रही है।",
-      "Challenge ID not found.":"चैलेंज आईडी नहीं मिली।","Challenge submitted:":"चुनौती जमा हुई:","save this ID.":"इस आईडी को सुरक्षित रखें।","Duplicate safely merged:":"डुप्लिकेट रिपोर्ट सुरक्षित रूप से जोड़ी गई:","AI category":"AI श्रेणी","AI classification confidence":"AI वर्गीकरण विश्वसनीयता","Explainable analysis":"समझाने योग्य AI विश्लेषण","Suggested institutions:":"सुझाई गई संस्थाएँ:","Track this challenge":"इस चुनौती को ट्रैक करें","Copy ID":"आईडी कॉपी करें",
-      "Pending verification":"सत्यापन लंबित","No partner registrations are waiting.":"कोई भागीदार पंजीकरण प्रतीक्षा में नहीं है।","No critical safety phrase is currently detected.":"अभी कोई गंभीर सुरक्षा संकेत नहीं मिला।",
-      "Registration submitted.":"पंजीकरण जमा हुआ।","Status: Pending administrator approval":"स्थिति: प्रशासक स्वीकृति लंबित","It is now visible on connected administrator dashboards.":"यह अब जुड़े हुए प्रशासक डैशबोर्ड पर दिखाई देता है।","Saved in local demo mode.":"स्थानीय डेमो मोड में सहेजा गया।",
-      "JanSahayak":"जनसहायक","Citizen guidance assistant · Online":"नागरिक सहायता सहायक · ऑनलाइन","Citizen Help":"नागरिक सहायता","Report a challenge":"चुनौती दर्ज करें","Explain statuses":"स्थितियाँ समझें","Send":"भेजें",
-      "Namaste! I can help you report a challenge, track a Challenge ID, or understand how JanSamadhan works.":"नमस्ते! मैं चुनौती दर्ज करने, चैलेंज आईडी की स्थिति देखने और जनसमाधान की प्रक्रिया समझने में आपकी मदद कर सकता हूँ।",
-      "Academic prototype · Typed chat is not sent to an external AI service. Voice recognition uses your browser speech service, so microphone audio may be processed by the browser/provider. JanSamadhan does not store the raw audio.":"शैक्षणिक प्रोटोटाइप · टाइप किया गया चैट टेक्स्ट बाहरी AI सेवा को नहीं भेजा जाता। आवाज़ पहचान आपके ब्राउज़र की स्पीच सेवा का उपयोग करती है, इसलिए माइक्रोफोन ऑडियो ब्राउज़र/प्रदाता द्वारा प्रोसेस हो सकता है। जनसमाधान कच्चा ऑडियो संग्रहीत नहीं करता।",
-      "View full timeline":"पूरी समयरेखा देखें","Institution":"संस्था",
-      "Academic SIH prototype for citizen-led challenge discovery and collaborative innovation.":"नागरिक-आधारित चुनौती पहचान और सहयोगात्मक नवाचार के लिए शैक्षणिक SIH प्रोटोटाइप।","AI results are decision support and require human validation.":"AI परिणाम निर्णय सहायता हैं और मानव सत्यापन आवश्यक है।","Academic prototype · Not an official government website":"शैक्षणिक प्रोटोटाइप · यह आधिकारिक सरकारी वेबसाइट नहीं है","JanSamadhan AI · SIH Prototype · Built for demonstration and evaluation":"जनसमाधान AI · SIH प्रोटोटाइप · प्रदर्शन और मूल्यांकन हेतु निर्मित",
-      "Help / FAQ":"सहायता / सामान्य प्रश्न","Prototype disclaimer":"प्रोटोटाइप अस्वीकरण"
+/* ===== JanSamadhan COMPLETE Hindi/English interface translator v2 =====
+   Replace the OLD block:
+   "Complete system-interface Hindi translation layer"
+   with this entire script.
+*/
+(function () {
+  "use strict";
+
+  const EN_HI = {
+    /* ---------- Global / header / navigation ---------- */
+    "Skip to main content":"मुख्य सामग्री पर जाएँ",
+    "Smart India Hackathon · Advanced College Prototype":"स्मार्ट इंडिया हैकाथॉन · उन्नत कॉलेज प्रोटोटाइप",
+    "Accessibility:":"सुगम्यता:",
+    "High Contrast":"उच्च कंट्रास्ट",
+    "Citizen Challenge Intelligence & Collaborative Resolution Platform":"नागरिक चुनौती बुद्धिमत्ता एवं सहयोगात्मक समाधान मंच",
+    "Citizen Challenge & Collaborative Resolution Platform":"नागरिक चुनौती एवं सहयोगात्मक समाधान मंच",
+    "ACADEMIC DEMONSTRATION · NOT AN OFFICIAL GOVERNMENT WEBSITE":"शैक्षणिक प्रदर्शन · यह आधिकारिक सरकारी वेबसाइट नहीं है",
+    "Home":"होम",
+    "Report Challenge":"चुनौती दर्ज करें",
+    "Track Status":"स्थिति देखें",
+    "About":"परिचय",
+    "Partner Login":"भागीदार लॉगिन",
+    "Partner Registration":"भागीदार पंजीकरण",
+    "Dashboard":"डैशबोर्ड",
+    "Citizen tracker":"नागरिक ट्रैकर",
+    "New challenge":"नई चुनौती",
+    "Citizen report":"नागरिक रिपोर्ट",
+    "Log out":"लॉग आउट",
+    "Logged out.":"लॉग आउट हो गया।",
+    "Reset demo data":"डेमो डेटा रीसेट करें",
+    "ADVANCED PROTOTYPE":"उन्नत प्रोटोटाइप",
+
+    /* ---------- Cloud status ---------- */
+    "Connecting Cloud DB...":"क्लाउड डेटाबेस से जुड़ रहा है...",
+    "Connecting securely...":"सुरक्षित रूप से जुड़ रहा है...",
+    "Live Cloud DB Active":"लाइव क्लाउड डेटाबेस सक्रिय",
+    "Cloud DB Active":"क्लाउड डेटाबेस सक्रिय",
+    "Local Mode":"स्थानीय मोड",
+    "Local demo mode":"स्थानीय डेमो मोड",
+    "Cloud unavailable · Local demo mode":"क्लाउड उपलब्ध नहीं · स्थानीय डेमो मोड",
+    "Cloud sync blocked · Local mode":"क्लाउड सिंक अवरुद्ध · स्थानीय मोड",
+    "Cloud save failed · Local mode":"क्लाउड सेव विफल · स्थानीय मोड",
+
+    /* ---------- Home ---------- */
+    "Citizen access:":"नागरिक सुविधा:",
+    "Report and track a societal challenge without creating an account. Only students, universities and industry partners require approved portal access.":"बिना खाता बनाए सामाजिक चुनौती दर्ज करें और उसकी स्थिति देखें। केवल छात्र, विश्वविद्यालय और उद्योग भागीदारों को स्वीकृत पोर्टल पहुँच चाहिए।",
+    "Citizen-to-solution innovation pipeline":"नागरिक से समाधान तक नवाचार प्रक्रिया",
+    "From a local challenge to a measurable solution.":"स्थानीय चुनौती से मापने योग्य समाधान तक।",
+    "JanSamadhan AI analyses citizen reports, groups duplicates, flags urgency, recommends capable institutions, and makes every verified stage visible through one tracking ID.":"जनसमाधान AI नागरिक रिपोर्ट का विश्लेषण करता है, समान रिपोर्टों को जोड़ता है, तात्कालिकता चिन्हित करता है, सक्षम संस्थाएँ सुझाता है और हर सत्यापित चरण को एक ट्रैकिंग आईडी से दिखाता है।",
+    "Report a Societal Challenge":"सामाजिक चुनौती दर्ज करें",
+    "Track Existing Challenge":"मौजूदा चुनौती देखें",
+    "Track by Challenge ID":"चैलेंज आईडी से स्थिति देखें",
+    "Try a demo ID such as JS-1003 or enter the ID received after submission.":"JS-1003 जैसी डेमो आईडी या जमा करने पर मिली आईडी दर्ज करें।",
+    "Check status":"स्थिति जाँचें",
+    "No citizen login required.":"नागरिक लॉगिन आवश्यक नहीं है।",
+    "Personal reporter details are never shown in the public tracking result.":"रिपोर्ट करने वाले व्यक्ति की निजी जानकारी सार्वजनिक ट्रैकिंग परिणाम में नहीं दिखाई जाती।",
+    "What the platform demonstrates":"प्लेटफ़ॉर्म क्या प्रदर्शित करता है",
+    "A connected workflow, not four disconnected dashboards.":"चार अलग-अलग डैशबोर्ड नहीं, बल्कि एक जुड़ी हुई कार्यप्रणाली।",
+    "AI intake & deduplication":"AI इनटेक और डुप्लिकेट पहचान",
+    "Suggested category, urgency, safety cues and similarity score are produced at submission.":"जमा करते समय श्रेणी, प्राथमिकता, सुरक्षा संकेत और समानता स्कोर सुझाए जाते हैं।",
+    "Transparent citizen tracking":"पारदर्शी नागरिक ट्रैकिंग",
+    "One ID shows the public lifecycle, responsible institution, progress and verified outcome.":"एक आईडी से सार्वजनिक प्रक्रिया, जिम्मेदार संस्था, प्रगति और सत्यापित परिणाम दिखाई देता है।",
+    "Institution matching":"संस्था मिलान",
+    "Universities are recommended by capability; industry can commit expertise and resources.":"क्षमता के आधार पर विश्वविद्यालय सुझाए जाते हैं और उद्योग विशेषज्ञता व संसाधन दे सकता है।",
+    "Impact accountability":"प्रभाव की जवाबदेही",
+    "Completion requires administrator validation and can record beneficiaries and outcome evidence.":"समापन के लिए प्रशासक सत्यापन आवश्यक है और लाभार्थी व परिणाम प्रमाण दर्ज किए जा सकते हैं।",
+    "End-to-end challenge lifecycle":"चुनौती की शुरू से अंत तक प्रक्रिया",
+    "Every stage creates a visible, time-stamped update.":"हर चरण एक दिखाई देने वाला समय-मुद्रित अपडेट बनाता है।",
+    "1 · Citizen input":"1 · नागरिक इनपुट",
+    "Public report, location, people affected and optional photo.":"सार्वजनिक रिपोर्ट, स्थान, प्रभावित लोग और वैकल्पिक फोटो।",
+    "2 · AI intelligence":"2 · AI विश्लेषण",
+    "Category, priority, risk, duplicate and institutional match.":"श्रेणी, प्राथमिकता, जोखिम, डुप्लिकेट और संस्था मिलान।",
+    "3 · Validation":"3 · सत्यापन",
+    "Administrator reviews authenticity and assigns a suitable institution.":"प्रशासक सत्यता जाँचता है और उपयुक्त संस्था सौंपता है।",
+    "4 · Co-creation":"4 · सह-निर्माण",
+    "Student team, mentor, proposal, prototype, testing and industry support.":"छात्र टीम, मेंटर, प्रस्ताव, प्रोटोटाइप, परीक्षण और उद्योग सहयोग।",
+    "5 · Deployment":"5 · तैनाती",
+    "Pilot, final verification, impact metrics and public outcome.":"पायलट, अंतिम सत्यापन, प्रभाव मापदंड और सार्वजनिक परिणाम।",
+    "Advanced prototype modules":"उन्नत प्रोटोटाइप मॉड्यूल",
+    "Designed to show both present functionality and a credible production path.":"वर्तमान कार्यक्षमता और विश्वसनीय उत्पादन मार्ग दोनों दिखाने के लिए बनाया गया।",
+    "Citizen module":"नागरिक मॉड्यूल",
+    "Governance module":"प्रशासन मॉड्यूल",
+    "Innovation module":"नवाचार मॉड्यूल",
+    "AI decision support":"AI निर्णय सहायता",
+    "Analytics module":"विश्लेषण मॉड्यूल",
+    "Inclusive access":"समावेशी पहुँच",
+
+    /* ---------- Authentication ---------- */
+    "Authorized Collaboration Portal":"अधिकृत सहयोग पोर्टल",
+    "Approved partner login":"स्वीकृत भागीदार लॉगिन",
+    "Citizens do not need an account.":"नागरिकों को खाता बनाने की आवश्यकता नहीं है।",
+    "Select an approved institutional role below.":"नीचे स्वीकृत संस्थागत भूमिका चुनें।",
+    "Student":"छात्र",
+    "University":"विश्वविद्यालय",
+    "Industry":"उद्योग",
+    "Administrator":"प्रशासक",
+    "Citizen":"नागरिक",
+    "System":"सिस्टम",
+    "JanSamadhan workflow":"जनसमाधान कार्यप्रणाली",
+    "AI duplicate service":"AI डुप्लिकेट सेवा",
+    "JanSamadhan AI":"जनसमाधान AI",
+    "Team & prototype work":"टीम और प्रोटोटाइप कार्य",
+    "Mentoring & validation":"मेंटोरिंग और सत्यापन",
+    "Expertise & resources":"विशेषज्ञता और संसाधन",
+    "Approve & govern":"स्वीकृति और प्रशासन",
+    "Name / username":"नाम / उपयोगकर्ता नाम",
+    "Password":"पासवर्ड",
+    "Sign in to dashboard":"डैशबोर्ड में साइन इन करें",
+    "Partner registration":"भागीदार पंजीकरण",
+    "Approval workflow:":"स्वीकृति प्रक्रिया:",
+    "Register as":"इस रूप में पंजीकरण करें",
+    "Name / institution":"नाम / संस्था",
+    "Email":"ईमेल",
+    "College / organization":"कॉलेज / संगठन",
+    "Demo password":"डेमो पासवर्ड",
+    "Confirm password":"पासवर्ड की पुष्टि करें",
+    "Prototype security:":"प्रोटोटाइप सुरक्षा:",
+    "use a demo-only password, never a personal password.":"केवल डेमो पासवर्ड उपयोग करें, निजी पासवर्ड कभी नहीं।",
+    "Submit for administrator approval":"प्रशासक की स्वीकृति हेतु भेजें",
+    "Password must contain at least 6 characters.":"पासवर्ड में कम से कम 6 अक्षर होने चाहिए।",
+    "Passwords do not match.":"दोनों पासवर्ड मेल नहीं खाते।",
+    "This partner registration already exists.":"यह भागीदार पंजीकरण पहले से मौजूद है।",
+    "Partner registration sent for approval.":"भागीदार पंजीकरण स्वीकृति के लिए भेज दिया गया।",
+    "Registration submitted.":"पंजीकरण जमा हो गया।",
+    "Status: Pending administrator approval":"स्थिति: प्रशासक की स्वीकृति लंबित",
+    "It is now visible on connected administrator dashboards.":"यह अब जुड़े हुए प्रशासक डैशबोर्ड पर दिखाई दे रहा है।",
+    "Saved in local demo mode.":"स्थानीय डेमो मोड में सहेजा गया।",
+
+    /* ---------- Report form ---------- */
+    "Report a societal challenge":"सामाजिक चुनौती दर्ज करें",
+    "AI-assisted intake:":"AI-सहायित इनटेक:",
+    "A human administrator validates the result.":"एक मानव प्रशासक परिणाम का सत्यापन करता है।",
+    "Challenge title":"चुनौती का शीर्षक",
+    "Category":"श्रेणी",
+    "Let AI decide":"AI को तय करने दें",
+    "Education":"शिक्षा",
+    "Agriculture":"कृषि",
+    "Healthcare":"स्वास्थ्य सेवा",
+    "Water Resources":"जल संसाधन",
+    "Sanitation":"स्वच्छता",
+    "Environment":"पर्यावरण",
+    "Energy":"ऊर्जा",
+    "Urban Development":"शहरी विकास",
+    "Accessibility":"सुगम्यता",
+    "Public Administration":"लोक प्रशासन",
+    "Rural Livelihoods":"ग्रामीण आजीविका",
+    "Other":"अन्य",
+    "District":"जिला",
+    "Select district":"जिला चुनें",
+    "Other / Demo district":"अन्य / डेमो जिला",
+    "Demo district":"डेमो जिला",
+    "Locality / landmark":"इलाका / पहचान स्थल",
+    "Approx. people affected":"लगभग प्रभावित लोगों की संख्या",
+    "Description":"विवरण",
+    "Reporter name / community":"रिपोर्टकर्ता का नाम / समुदाय",
+    "Citizen mobile number":"नागरिक मोबाइल नंबर",
+    "Photo evidence (optional; max 5 MB)":"फोटो प्रमाण (वैकल्पिक; अधिकतम 5 MB)",
+    "Only challenge information is shown in public tracking. Reporter identity is kept out of the public result.":"सार्वजनिक ट्रैकिंग में केवल चुनौती की जानकारी दिखाई जाती है। रिपोर्टकर्ता की पहचान सार्वजनिक परिणाम में नहीं दिखाई जाती।",
+    "Daily limit:":"दैनिक सीमा:",
+    "Maximum 10 complaints per mobile number per India calendar day. The raw mobile number is not stored in the complaint record.":"एक मोबाइल नंबर से भारतीय कैलेंडर दिन के अनुसार अधिकतम 10 शिकायतें जमा की जा सकती हैं। कच्चा मोबाइल नंबर शिकायत रिकॉर्ड में संग्रहीत नहीं किया जाता।",
+    "Analyse and submit challenge":"विश्लेषण करें और चुनौती जमा करें",
+    "Enter a valid 10-digit Indian mobile number.":"सही 10 अंकों का भारतीय मोबाइल नंबर दर्ज करें।",
+    "Checking daily complaint limit...":"दैनिक शिकायत सीमा जाँची जा रही है...",
+    "Could not verify the complaint limit. Please try again.":"शिकायत सीमा जाँच नहीं हो सकी। कृपया दोबारा प्रयास करें।",
+    "Today's limit of 10 complaints has been reached. Submit the next complaint tomorrow.":"आज की 10 शिकायतों की सीमा पूरी हो चुकी है। अगली शिकायत कल जमा करें।",
+    "Challenge created with an urgent administrator alert.":"चुनौती बनाई गई और प्रशासक को तत्काल चेतावनी भेजी गई।",
+    "Challenge created and sent for validation.":"चुनौती बनाई गई और सत्यापन के लिए भेजी गई।",
+
+    /* ---------- Tracker / receipt ---------- */
+    "Citizen challenge tracker":"नागरिक चुनौती ट्रैकर",
+    "Track status":"स्थिति देखें",
+    "Enter a Challenge ID to see its verified public progress.":"सत्यापित सार्वजनिक प्रगति देखने के लिए चैलेंज आईडी दर्ज करें।",
+    "Challenge ID not found.":"चैलेंज आईडी नहीं मिली।",
+    "Check the spelling, including hyphens, and try again.":"आईडी की वर्तनी और हाइफ़न जाँचकर फिर प्रयास करें।",
+    "Submission receipt":"जमा करने की रसीद",
+    "Challenge submitted:":"चुनौती जमा हुई:",
+    "save this ID.":"इस आईडी को सुरक्षित रखें।",
+    "The administrator can now validate and route the challenge.":"प्रशासक अब चुनौती का सत्यापन करके उसे आगे भेज सकता है।",
+    "Duplicate safely merged:":"डुप्लिकेट रिपोर्ट सुरक्षित रूप से जोड़ी गई:",
+    "Your report increased its community evidence instead of creating a competing record.":"नई अलग रिकॉर्ड बनाने के बजाय आपकी रिपोर्ट ने मौजूदा चुनौती के सामुदायिक प्रमाण को मजबूत किया।",
+    "AI category":"AI श्रेणी",
+    "AI classification confidence":"AI वर्गीकरण विश्वसनीयता",
+    "AI classification confidence:":"AI वर्गीकरण विश्वसनीयता:",
+    "Explainable analysis":"समझाने योग्य AI विश्लेषण",
+    "Suggested institutions:":"सुझाई गई संस्थाएँ:",
+    "Administrator review required":"प्रशासक समीक्षा आवश्यक",
+    "Track this challenge":"इस चुनौती को ट्रैक करें",
+    "Copy ID":"आईडी कॉपी करें",
+    "Challenge ID copied.":"चैलेंज आईडी कॉपी हो गई।",
+    "Current status":"वर्तमान स्थिति",
+    "Progress":"प्रगति",
+    "Last update":"अंतिम अपडेट",
+    "Priority":"प्राथमिकता",
+    "Responsible institution":"जिम्मेदार संस्था",
+    "Under assignment":"संस्था आवंटन जारी",
+    "Verified update history":"सत्यापित अपडेट इतिहास",
+    "Privacy:":"गोपनीयता:",
+    "reporter identity and private partner data are excluded from this public view.":"इस सार्वजनिक दृश्य में रिपोर्टकर्ता की पहचान और भागीदारों की निजी जानकारी शामिल नहीं है।",
+    "Verified public impact":"सत्यापित सार्वजनिक प्रभाव",
+    "Public status":"सार्वजनिक स्थिति",
+
+    /* ---------- Stages ---------- */
+    "Submitted":"जमा",
+    "Report received":"रिपोर्ट प्राप्त",
+    "AI Review":"AI समीक्षा",
+    "AI review":"AI समीक्षा",
+    "Admin Review":"प्रशासक समीक्षा",
+    "Under verification":"सत्यापनाधीन",
+    "Validated":"सत्यापित",
+    "Challenge validated":"चुनौती सत्यापित",
+    "Assigned":"सौंपा गया",
+    "Institution assigned":"संस्था सौंपी गई",
+    "Team Formed":"टीम बनी",
+    "Team formed":"टीम बनी",
+    "Proposal":"प्रस्ताव",
+    "Solution proposed":"समाधान प्रस्तावित",
+    "Prototype":"प्रोटोटाइप",
+    "Prototype development":"प्रोटोटाइप विकास",
+    "Testing":"परीक्षण",
+    "Testing & validation":"परीक्षण और सत्यापन",
+    "Pilot":"पायलट",
+    "Pilot deployment":"पायलट तैनाती",
+    "Completed":"पूर्ण",
+    "Solution deployed":"समाधान लागू",
+    "Received":"प्राप्त",
+    "Under Review":"समीक्षा में",
+    "Validated & Assigned":"सत्यापित और सौंपा गया",
+    "Solution in Progress":"समाधान पर कार्य जारी",
+    "Testing / Pilot":"परीक्षण / पायलट",
+    "Resolved":"समाधान पूर्ण",
+    "Status updated":"स्थिति अपडेट हुई",
+    "Challenge report received.":"चुनौती रिपोर्ट प्राप्त हुई।",
+    "Human validation required":"मानव सत्यापन आवश्यक",
+    "General civic context":"सामान्य नागरिक संदर्भ",
+
+    /* ---------- Confidence / priority / risk ---------- */
+    "High confidence":"उच्च विश्वसनीयता",
+    "Moderate confidence":"मध्यम विश्वसनीयता",
+    "Low confidence":"कम विश्वसनीयता",
+    "Normal":"सामान्य",
+    "Medium":"मध्यम",
+    "High":"उच्च",
+    "Critical":"गंभीर",
+    "Possible electrical danger":"संभावित विद्युत खतरा",
+    "Possible fire or hazardous leak":"संभावित आग या खतरनाक रिसाव",
+    "Possible structural or terrain danger":"संभावित संरचनात्मक या भू-भाग संबंधी खतरा",
+    "Possible unsafe public water supply":"संभावित असुरक्षित सार्वजनिक जल आपूर्ति",
+    "Possible immediate public-safety danger":"संभावित तात्कालिक सार्वजनिक सुरक्षा खतरा",
+    "No critical safety phrase detected":"कोई गंभीर सुरक्षा संकेत नहीं मिला",
+    "Low-confidence classification — administrator verification required before routing.":"कम विश्वसनीयता वाला वर्गीकरण — आगे भेजने से पहले प्रशासक सत्यापन आवश्यक है।",
+    "Low-confidence classification — sent for administrator verification before routing.":"कम विश्वसनीयता वाला वर्गीकरण — आगे भेजने से पहले प्रशासक सत्यापन के लिए भेजा गया है।",
+
+    /* ---------- Card / metadata ---------- */
+    "Location":"स्थान",
+    "People affected":"प्रभावित लोग",
+    "Team lead":"टीम लीड",
+    "Reports combined":"संयुक्त रिपोर्ट",
+    "Assigned institution":"सौंपी गई संस्था",
+    "Awaiting assignment":"आवंटन की प्रतीक्षा",
+    "Committed partners":"सहयोगी भागीदार",
+    "Current proposal":"वर्तमान प्रस्ताव",
+    "Mentor:":"मेंटोर:",
+    "Verified impact":"सत्यापित प्रभाव",
+    "Solution verified":"समाधान सत्यापित",
+    "Solution awaiting validation":"समाधान सत्यापन की प्रतीक्षा में",
+    "Critical safety alert":"गंभीर सुरक्षा चेतावनी",
+    "Support requested":"सहयोग अनुरोधित",
+    "Yellow cluster":"पीला क्लस्टर",
+    "Red cluster":"लाल क्लस्टर",
+    "matches":"मिलान",
+    "beneficiaries":"लाभार्थी",
+
+    /* ---------- Admin ---------- */
+    "Administrator command centre":"प्रशासक कमांड सेंटर",
+    "Review what needs action first, manage active challenges, verify solutions and publish impact.":"पहले आवश्यक कार्य देखें, सक्रिय चुनौतियों का प्रबंधन करें, समाधान सत्यापित करें और प्रभाव प्रकाशित करें।",
+    "Action required":"कार्रवाई आवश्यक",
+    "Critical alerts + approvals":"गंभीर चेतावनियाँ + स्वीकृतियाँ",
+    "Active problems":"सक्रिय समस्याएँ",
+    "Across the solution pipeline":"समाधान प्रक्रिया में",
+    "Awaiting verification":"सत्यापन की प्रतीक्षा",
+    "Submitted solutions":"जमा समाधान",
+    "Resolved & impact":"समाधान पूर्ण और प्रभाव",
+    "Completed challenges remain visible for accountability":"जवाबदेही के लिए पूर्ण चुनौतियाँ दिखाई देती रहती हैं",
+    "Critical safety alerts":"गंभीर सुरक्षा चेतावनियाँ",
+    "Partner approvals":"भागीदार स्वीकृतियाँ",
+    "Urgent safety alerts and partner approvals are grouped here":"तत्काल सुरक्षा चेतावनियाँ और भागीदार स्वीकृतियाँ यहाँ एक साथ दिखाई जाती हैं",
+    "Validate, assign institutions and request support from one place":"एक ही स्थान से सत्यापन करें, संस्था सौंपें और सहयोग का अनुरोध करें",
+    "Validate / update":"सत्यापित / अपडेट करें",
+    "Request support":"सहयोग माँगें",
+    "Verify completion":"समापन सत्यापित करें",
+    "Reopen":"फिर खोलें",
+    "Approve":"स्वीकृत करें",
+    "Reject":"अस्वीकृत करें",
+    "Acknowledge":"स्वीकार करें",
+    "Acknowledged":"स्वीकार किया गया",
+    "Pending verification":"सत्यापन लंबित",
+    "Solutions awaiting verification":"सत्यापन की प्रतीक्षा वाले समाधान",
+    "Only the administrator can approve completion and publish impact":"केवल प्रशासक समापन स्वीकृत कर प्रभाव प्रकाशित कर सकता है",
+    "No solutions are waiting for verification.":"कोई समाधान सत्यापन की प्रतीक्षा में नहीं है।",
+    "No resolved challenges yet.":"अभी कोई समाधान पूर्ण चुनौती नहीं है।",
+    "No active challenges.":"कोई सक्रिय चुनौती नहीं है।",
+    "No partner registrations are waiting.":"कोई भागीदार पंजीकरण प्रतीक्षा में नहीं है।",
+    "No critical safety phrase is currently detected.":"अभी कोई गंभीर सुरक्षा संकेत नहीं मिला।",
+    "Challenges by category":"श्रेणी अनुसार चुनौतियाँ",
+    "Pipeline distribution":"प्रक्रिया वितरण",
+    "Intake":"प्राप्ति",
+    "Co-creation":"सह-निर्माण",
+    "Testing/Pilot":"परीक्षण/पायलट",
+    "Validate and update lifecycle":"प्रक्रिया सत्यापित और अपडेट करें",
+    "Verified stage":"सत्यापित चरण",
+    "Assign / recommend university":"विश्वविद्यालय सौंपें / सुझाएँ",
+    "Not assigned":"अभी नहीं सौंपा गया",
+    "Public update note":"सार्वजनिक अपडेट नोट",
+    "Publish verified update":"सत्यापित अपडेट प्रकाशित करें",
+    "Verified lifecycle update published.":"सत्यापित प्रक्रिया अपडेट प्रकाशित हो गया।",
+    "Support request sent to partner dashboards.":"सहयोग अनुरोध भागीदार डैशबोर्ड पर भेज दिया गया।",
+    "Challenge reopened.":"चुनौती फिर से समीक्षा के लिए खोली गई।",
+
+    /* ---------- Student ---------- */
+    "Student innovation workspace":"छात्र नवाचार कार्यक्षेत्र",
+    "Your dashboard has two jobs: continue your projects or claim a validated challenge.":"आपके डैशबोर्ड के दो मुख्य काम हैं: अपनी परियोजनाएँ जारी रखें या सत्यापित चुनौती स्वीकार करें।",
+    "My projects":"मेरी परियोजनाएँ",
+    "Active team-owned challenges":"टीम की सक्रिय चुनौतियाँ",
+    "Available challenges":"उपलब्ध चुनौतियाँ",
+    "Validated and ready to claim":"सत्यापित और स्वीकार करने के लिए तैयार",
+    "Verified solutions":"सत्यापित समाधान",
+    "Completed with admin approval":"प्रशासक की स्वीकृति से पूर्ण",
+    "Partner support":"भागीदार सहयोग",
+    "University + industry commitments":"विश्वविद्यालय + उद्योग सहयोग",
+    "Proposal → prototype → testing → submit solution for administrator verification":"प्रस्ताव → प्रोटोटाइप → परीक्षण → प्रशासक सत्यापन हेतु समाधान जमा करें",
+    "Available validated challenges":"उपलब्ध सत्यापित चुनौतियाँ",
+    "Form a team only after administrator validation":"प्रशासक सत्यापन के बाद ही टीम बनाकर चुनौती स्वीकार करें",
+    "Form team / claim":"टीम बनाएँ / स्वीकार करें",
+    "Update proposal":"प्रस्ताव अपडेट करें",
+    "Create proposal":"प्रस्ताव बनाएँ",
+    "Milestone update":"माइलस्टोन अपडेट",
+    "Submit solution":"समाधान जमा करें",
+    "Release":"छोड़ें",
+    "AI university recommendations":"AI विश्वविद्यालय सुझाव",
+    "No validated unassigned challenges are available.":"कोई सत्यापित और बिना आवंटित चुनौती उपलब्ध नहीं है।",
+    "You have not formed a team for a challenge yet.":"आपने अभी किसी चुनौती के लिए टीम नहीं बनाई है।",
+    "A team already owns this challenge.":"यह चुनौती पहले से किसी टीम के पास है।",
+    "Team formed. Proposal tools are now available.":"टीम बन गई। अब प्रस्ताव संबंधी उपकरण उपलब्ध हैं।",
+    "Challenge released.":"चुनौती वापस उपलब्ध पूल में छोड़ दी गई।",
+    "Only the assigned team can update this proposal.":"केवल सौंपी गई टीम इस प्रस्ताव को अपडेट कर सकती है।",
+    "Proposal saved to the public lifecycle.":"प्रस्ताव सार्वजनिक प्रक्रिया में सहेज दिया गया।",
+    "Select the current or a later milestone.":"वर्तमान या उसके बाद का माइलस्टोन चुनें।",
+    "Milestone update published.":"माइलस्टोन अपडेट प्रकाशित हो गया।",
+    "Only the challenge team can submit its solution.":"केवल इस चुनौती की टीम समाधान जमा कर सकती है।",
+    "Solution sent for validation; it is not marked completed yet.":"समाधान सत्यापन के लिए भेज दिया गया है; अभी इसे पूर्ण घोषित नहीं किया गया है।",
+
+    /* ---------- Proposal / milestone / solution / impact ---------- */
+    "Solution proposal":"समाधान प्रस्ताव",
+    "Proposed solution":"प्रस्तावित समाधान",
+    "Team / lead":"टीम / लीड",
+    "Mentor":"मेंटोर",
+    "Estimated duration":"अनुमानित अवधि",
+    "Expected impact":"अपेक्षित प्रभाव",
+    "Save proposal and update timeline":"प्रस्ताव सहेजें और समयरेखा अपडेट करें",
+    "Add milestone update":"माइलस्टोन अपडेट जोड़ें",
+    "Milestone reached":"प्राप्त माइलस्टोन",
+    "Update note":"अपडेट नोट",
+    "Publish milestone":"माइलस्टोन प्रकाशित करें",
+    "Submit solution for validation":"सत्यापन के लिए समाधान जमा करें",
+    "This does not mark the challenge solved.":"इससे चुनौती को सीधे हल घोषित नहीं किया जाएगा।",
+    "It sends the solution to validation; only the administrator can verify completion and publish impact.":"समाधान सत्यापन के लिए भेजा जाएगा; केवल प्रशासक समापन सत्यापित कर प्रभाव प्रकाशित कर सकता है।",
+    "Solution and test evidence":"समाधान और परीक्षण प्रमाण",
+    "Submit for validation":"सत्यापन के लिए जमा करें",
+    "Verify completion and impact":"समापन और प्रभाव सत्यापित करें",
+    "Verified beneficiaries":"सत्यापित लाभार्थी",
+    "Outcome metric":"परिणाम मापदंड",
+    "Verification note":"सत्यापन नोट",
+    "Approve completion and publish impact":"समापन स्वीकृत करें और प्रभाव प्रकाशित करें",
+
+    /* ---------- University / Industry ---------- */
+    "University collaboration hub":"विश्वविद्यालय सहयोग केंद्र",
+    "Industry partnership hub":"उद्योग भागीदारी केंद्र",
+    "Focus on the projects you already support, then review new academic collaboration requests.":"पहले उन परियोजनाओं पर ध्यान दें जिनका आप समर्थन कर रहे हैं, फिर नए शैक्षणिक सहयोग अनुरोध देखें।",
+    "Focus on your commitments first, then review new requests for practical support.":"पहले अपनी मौजूदा प्रतिबद्धताओं पर ध्यान दें, फिर व्यावहारिक सहयोग के नए अनुरोध देखें।",
+    "My supported projects":"मेरी समर्थित परियोजनाएँ",
+    "Current commitments":"वर्तमान प्रतिबद्धताएँ",
+    "Open opportunities":"खुले अवसर",
+    "Available for support":"सहयोग के लिए उपलब्ध",
+    "Administrator escalation":"प्रशासक अनुरोध",
+    "Testing / pilot":"परीक्षण / पायलट",
+    "Near deployment":"तैनाती के करीब",
+    "Mentor teams, validate milestones and document academic contribution.":"टीमों को मार्गदर्शन दें, माइलस्टोन सत्यापित करें और शैक्षणिक योगदान दर्ज करें।",
+    "Track the challenges receiving your expertise, tools or pilot support.":"उन चुनौतियों को ट्रैक करें जिन्हें आपकी विशेषज्ञता, उपकरण या पायलट सहयोग मिल रहा है।",
+    "Available academic opportunities":"उपलब्ध शैक्षणिक अवसर",
+    "Available industry opportunities":"उपलब्ध उद्योग अवसर",
+    "Commit support only where your organization can add value":"जहाँ आपकी संस्था उपयोगी योगदान दे सकती है, वहीं सहयोग दें",
+    "Commit support":"सहयोग दें",
+    "Validate milestone":"माइलस्टोन सत्यापित करें",
+    "Faculty mentor":"फैकल्टी मेंटर",
+    "Lab and testing support":"लैब और परीक्षण सहयोग",
+    "Student project team":"छात्र परियोजना टीम",
+    "Research and field survey":"शोध और फील्ड सर्वे",
+    "Tools and equipment":"उपकरण और मशीनें",
+    "Technical expert":"तकनीकी विशेषज्ञ",
+    "Materials or components":"सामग्री या घटक",
+    "Pilot sponsorship":"पायलट प्रायोजन",
+    "Your organization is supporting this challenge.":"आपकी संस्था इस चुनौती में सहयोग कर रही है।",
+    "No supported projects yet.":"अभी कोई समर्थित परियोजना नहीं है।",
+    "No active challenge currently needs new support.":"अभी किसी सक्रिय चुनौती को नए सहयोग की आवश्यकता नहीं है।",
+    "Academic support committed.":"शैक्षणिक सहयोग दर्ज हो गया।",
+    "Industry support committed.":"उद्योग सहयोग दर्ज हो गया।",
+    "already offered":"पहले से प्रस्तावित",
+    "Student teams, field survey and rapid prototype support":"छात्र टीम, फील्ड सर्वे और त्वरित प्रोटोटाइप सहयोग",
+    "Community research, testing guidance and faculty mentoring":"सामुदायिक शोध, परीक्षण मार्गदर्शन और फैकल्टी मेंटरिंग",
+    "Engineering review, technical mentor and design validation":"इंजीनियरिंग समीक्षा, तकनीकी मेंटर और डिज़ाइन सत्यापन",
+    "Innovation lab, domain mentoring and pilot support":"नवाचार लैब, डोमेन मेंटरिंग और पायलट सहयोग",
+
+    /* ---------- Common support types ---------- */
+    "Water testing guidance":"जल परीक्षण मार्गदर्शन",
+    "Electrical safety mentor":"विद्युत सुरक्षा मेंटर",
+    "Equipment and components":"उपकरण और घटक",
+    "Administrator assignment":"प्रशासक द्वारा आवंटन",
+
+    /* ---------- Information dialogs ---------- */
+    "Information":"जानकारी",
+    "Help / FAQ":"सहायता / सामान्य प्रश्न",
+    "Privacy":"गोपनीयता",
+    "Prototype disclaimer":"प्रोटोटाइप अस्वीकरण",
+    "Use A−, A and A+ to resize text. High Contrast changes the palette. All major actions use labelled buttons and native keyboard-accessible dialogs.":"टेक्स्ट का आकार बदलने के लिए A−, A और A+ का उपयोग करें। उच्च कंट्रास्ट रंग योजना बदलता है। सभी प्रमुख कार्रवाइयों में लेबल वाले बटन और कीबोर्ड से उपयोग योग्य डायलॉग हैं।",
+    "Citizens report without an account and receive a Challenge ID. Use Track Status to see public progress. Students, universities and industry partners register, then wait for administrator approval.":"नागरिक बिना खाता बनाए रिपोर्ट दर्ज करते हैं और चैलेंज आईडी प्राप्त करते हैं। सार्वजनिक प्रगति देखने के लिए स्थिति देखें का उपयोग करें। छात्र, विश्वविद्यालय और उद्योग भागीदार पंजीकरण करते हैं और फिर प्रशासक की स्वीकृति की प्रतीक्षा करते हैं।",
+    "The public tracker shows challenge details, stage, institution and impact. It does not display the reporter name, partner emails or account credentials. Production deployment should add a formal consent and retention policy.":"सार्वजनिक ट्रैकर चुनौती का विवरण, चरण, संस्था और प्रभाव दिखाता है। यह रिपोर्टकर्ता का नाम, भागीदार ईमेल या खाता विवरण नहीं दिखाता। उत्पादन संस्करण में औपचारिक सहमति और डेटा-संग्रह नीति जोड़ी जानी चाहिए।",
+    "This is an academic demonstration, not an official government portal. AI outputs are explainable decision support; validation, assignment and completion remain human decisions.":"यह एक शैक्षणिक प्रदर्शन है, आधिकारिक सरकारी पोर्टल नहीं। AI परिणाम समझाने योग्य निर्णय सहायता हैं; सत्यापन, आवंटन और समापन मानव निर्णय ही रहते हैं।",
+
+    /* ---------- Chatbot ---------- */
+    "JanSahayak":"जनसहायक",
+    "Citizen guidance assistant · Online":"नागरिक सहायता सहायक · ऑनलाइन",
+    "Citizen Help":"नागरिक सहायता",
+    "Report a challenge":"चुनौती दर्ज करें",
+    "Explain statuses":"स्थितियाँ समझें",
+    "Send":"भेजें",
+    "Ask JanSahayak":"जनसहायक से पूछें",
+    "Namaste! I can help you report a challenge, track a Challenge ID, or understand how JanSamadhan works. What would you like to do?":"नमस्ते! मैं चुनौती दर्ज करने, चैलेंज आईडी की स्थिति देखने और जनसमाधान की प्रक्रिया समझने में आपकी मदद कर सकता हूँ। आप क्या करना चाहेंगे?",
+    "Namaste! I can help you report a challenge, track a Challenge ID, or understand how JanSamadhan works.":"नमस्ते! मैं चुनौती दर्ज करने, चैलेंज आईडी की स्थिति देखने और जनसमाधान की प्रक्रिया समझने में आपकी मदद कर सकता हूँ।",
+    "Academic prototype · Typed chat is not sent to an external AI service. Voice recognition uses your browser speech service, so microphone audio may be processed by the browser/provider. JanSamadhan does not store the raw audio.":"शैक्षणिक प्रोटोटाइप · टाइप किया गया चैट टेक्स्ट बाहरी AI सेवा को नहीं भेजा जाता। आवाज़ पहचान आपके ब्राउज़र की स्पीच सेवा का उपयोग करती है, इसलिए माइक्रोफोन ऑडियो ब्राउज़र/प्रदाता द्वारा प्रोसेस हो सकता है। जनसमाधान कच्चा ऑडियो संग्रहीत नहीं करता।",
+    "View full timeline":"पूरी समयरेखा देखें",
+    "Institution":"संस्था",
+    "Tap the microphone and speak.":"माइक्रोफोन दबाएँ और बोलें।",
+    "Tap the microphone and speak. You can check the text before sending.":"माइक्रोफोन दबाएँ और बोलें। भेजने से पहले टेक्स्ट जाँच सकते हैं।",
+    "Auto · हिंदी + English":"स्वतः · हिंदी + अंग्रेज़ी",
+    "English":"अंग्रेज़ी",
+    "Listening… speak English":"सुन रहा हूँ… अंग्रेज़ी बोलें",
+    "Transcript added above. Check it before sending.":"सुना गया टेक्स्ट ऊपर जोड़ दिया गया है। भेजने से पहले जाँच लें।",
+    "Voice input stopped.":"आवाज़ इनपुट रोक दिया गया।",
+    "Allow microphone access, then try again.":"माइक्रोफोन की अनुमति दें, फिर दोबारा प्रयास करें।",
+    "The browser blocked its speech service.":"ब्राउज़र ने अपनी स्पीच सेवा की अनुमति नहीं दी।",
+    "No microphone was available.":"माइक्रोफोन उपलब्ध नहीं मिला।",
+    "The speech service needs a network connection.":"स्पीच सेवा के लिए नेटवर्क कनेक्शन आवश्यक है।",
+    "No speech was heard. Tap the microphone and try again.":"कोई आवाज़ नहीं मिली। माइक्रोफोन फिर दबाएँ और प्रयास करें।",
+    "Speech could not be recognized. Please try again.":"आवाज़ पहचानी नहीं जा सकी। कृपया दोबारा प्रयास करें।",
+    "I could not recognize that clearly. Try speaking a little more slowly.":"वाक्य साफ़ समझ नहीं आया। थोड़ा धीरे बोलकर फिर प्रयास करें।",
+    "Voice recognition is not available in this browser. Try Chrome or Edge.":"इस ब्राउज़र में आवाज़ पहचान उपलब्ध नहीं है। Chrome या Edge में प्रयास करें।",
+    "Voice recognition is unavailable here. Use Chrome or Edge.":"यहाँ आवाज़ पहचान उपलब्ध नहीं है। Chrome या Edge उपयोग करें।",
+    "The microphone could not start. Please try again.":"माइक्रोफोन शुरू नहीं हो सका। कृपया फिर प्रयास करें।",
+
+    /* ---------- Footer ---------- */
+    "Academic SIH prototype for citizen-led challenge discovery and collaborative innovation.":"नागरिक-आधारित चुनौती पहचान और सहयोगात्मक नवाचार के लिए शैक्षणिक SIH प्रोटोटाइप।",
+    "AI results are decision support and require human validation.":"AI परिणाम निर्णय सहायता हैं और मानव सत्यापन आवश्यक है।",
+    "Academic prototype · Not an official government website":"शैक्षणिक प्रोटोटाइप · यह आधिकारिक सरकारी वेबसाइट नहीं है",
+    "JanSamadhan AI · SIH Prototype · Built for demonstration and evaluation":"जनसमाधान AI · SIH प्रोटोटाइप · प्रदर्शन और मूल्यांकन हेतु निर्मित",
+
+    /* ---------- Known demo content (only exact demo text; real citizen text is preserved) ---------- */
+    "Large potholes near Neora main road":"नेउरा मुख्य सड़क के पास बड़े गड्ढे",
+    "Several deep potholes are slowing traffic near the college turn and affecting daily commuters.":"कॉलेज मोड़ के पास कई गहरे गड्ढों के कारण यातायात धीमा हो रहा है और रोज़ आने-जाने वाले लोग प्रभावित हो रहे हैं।",
+    "Local residents":"स्थानीय निवासी",
+    "Neora Main Road":"नेउरा मुख्य सड़क",
+    "Unsafe drinking water near community tap":"सामुदायिक नल के पास असुरक्षित पेयजल",
+    "Water has an unusual colour after rainfall and similar reports came from the same lane.":"बारिश के बाद पानी का रंग असामान्य हो जाता है और उसी गली से ऐसी ही अन्य रिपोर्टें भी आई हैं।",
+    "Ward 12 residents":"वार्ड 12 के निवासी",
+    "Ward 12 Community Tap":"वार्ड 12 सामुदायिक नल",
+    "Broken streetlights on hostel approach road":"हॉस्टल जाने वाली सड़क पर खराब स्ट्रीटलाइटें",
+    "Four streetlights are not working, making the road difficult to use after evening classes.":"चार स्ट्रीटलाइटें काम नहीं कर रही हैं, जिससे शाम की कक्षाओं के बाद सड़क का उपयोग कठिन हो जाता है।",
+    "College Hostel Road":"कॉलेज हॉस्टल रोड",
+    "Low-cost sensor-assisted LED restoration and fault reporting kit.":"कम लागत वाली सेंसर-सहायित LED मरम्मत और खराबी रिपोर्टिंग किट।",
+    "Aditi and Campus Innovation Team":"अदिति और कैंपस इनोवेशन टीम",
+    "5 weeks":"5 सप्ताह",
+    "Restore safe evening access for students":"छात्रों के लिए शाम के समय सुरक्षित आवागमन बहाल करना",
+    "Waste collection skipped near market":"बाज़ार के पास कचरा संग्रह नहीं हुआ",
+    "Waste has not been collected from the market-side bins for several days.":"बाज़ार के पास लगे डिब्बों से कई दिनों से कचरा नहीं उठाया गया है।",
+    "Shopkeepers group":"दुकानदार समूह",
+    "Neora Market":"नेउरा बाज़ार",
+    "College bus stop sign was damaged":"कॉलेज बस स्टॉप का संकेतक क्षतिग्रस्त था",
+    "The damaged sign reduced visibility for commuters during evening hours.":"क्षतिग्रस्त संकेतक के कारण शाम के समय यात्रियों को उसे देखना कठिन हो रहा था।",
+    "Neora Bus Stop":"नेउरा बस स्टॉप",
+    "Installed a new sign with reflective tape and verified evening visibility.":"परावर्तक टेप के साथ नया संकेतक लगाया गया और शाम के समय दृश्यता सत्यापित की गई।",
+    "1 sign restored with reflective markings":"परावर्तक निशानों के साथ 1 संकेतक बहाल किया गया",
+    "Administrator field verification completed.":"प्रशासक द्वारा स्थल सत्यापन पूरा किया गया।",
+    "Exposed live electrical wire near school gate":"स्कूल गेट के पास खुला जीवित विद्युत तार",
+    "An exposed live wire is hanging close to the public entrance and needs urgent professional attention.":"सार्वजनिक प्रवेश द्वार के पास खुला जीवित विद्युत तार लटक रहा है और तत्काल पेशेवर कार्रवाई की आवश्यकता है।",
+    "School staff":"स्कूल कर्मचारी",
+    "Neora Primary School Gate":"नेउरा प्राथमिक विद्यालय गेट",
+    "Patna":"पटना"
+  };
+
+  const ATTR_EN_HI = {
+    "Accessibility tools":"सुगम्यता उपकरण",
+    "Primary navigation":"मुख्य नेविगेशन",
+    "Quick status search":"त्वरित स्थिति खोज",
+    "Challenge ID":"चैलेंज आईडी",
+    "Challenge tracking ID":"चैलेंज ट्रैकिंग आईडी",
+    "Example: JS-1003":"उदाहरण: JS-1003",
+    "Enter Challenge ID, e.g. JS-1003":"चैलेंज आईडी दर्ज करें, जैसे JS-1003",
+    "Unsafe drinking water near community tap":"सामुदायिक नल के पास असुरक्षित पेयजल",
+    "Ward, block, village or landmark":"वार्ड, ब्लॉक, गाँव या पहचान स्थल",
+    "What is happening, how often, and who is affected?":"क्या हो रहा है, कितनी बार हो रहा है और कौन प्रभावित है?",
+    "Citizen or community name":"नागरिक या समुदाय का नाम",
+    "10-digit mobile number":"10 अंकों का मोबाइल नंबर",
+    "Example: Rahul Kumar":"उदाहरण: राहुल कुमार",
+    "Example: MACET":"उदाहरण: MACET",
+    "Faculty or domain mentor":"फैकल्टी या डोमेन मेंटर",
+    "Example: 6 weeks":"उदाहरण: 6 सप्ताह",
+    "Explain what was verified or completed at this stage.":"इस चरण में क्या सत्यापित या पूरा हुआ, लिखें।",
+    "Describe the proposed solution and why it is suitable.":"प्रस्तावित समाधान और उसकी उपयुक्तता का वर्णन करें।",
+    "What was built, tested or learned?":"क्या बनाया, परीक्षण किया या सीखा गया?",
+    "Type a question or Challenge ID":"प्रश्न या चैलेंज आईडी लिखें",
+    "Close citizen assistant":"नागरिक सहायता बंद करें",
+    "Suggested questions":"सुझाए गए प्रश्न",
+    "Start voice input":"आवाज़ से लिखना शुरू करें",
+    "Stop listening":"सुनना बंद करें",
+    "Speak your message":"अपना संदेश बोलें",
+    "Voice recognition language":"आवाज़ पहचान भाषा",
+    "Challenge evidence":"चुनौती का प्रमाण"
+  };
+
+  const HI_EN = {};
+  Object.keys(EN_HI).forEach(k => { if (!HI_EN[EN_HI[k]]) HI_EN[EN_HI[k]] = k; });
+  const ATTR_HI_EN = {};
+  Object.keys(ATTR_EN_HI).forEach(k => { if (!ATTR_HI_EN[ATTR_EN_HI[k]]) ATTR_HI_EN[ATTR_EN_HI[k]] = k; });
+
+  const MONTH_HI = {
+    Jan:"जनवरी", Feb:"फ़रवरी", Mar:"मार्च", Apr:"अप्रैल",
+    May:"मई", Jun:"जून", Jul:"जुलाई", Aug:"अगस्त",
+    Sep:"सितम्बर", Oct:"अक्टूबर", Nov:"नवम्बर", Dec:"दिसम्बर"
+  };
+
+  const ORIGINAL_TEXT = new WeakMap();
+  const ORIGINAL_ATTR = new WeakMap();
+  let scheduled = false;
+  let applying = false;
+
+  function trimParts(value) {
+    const m = String(value ?? "").match(/^(\s*)([\s\S]*?)(\s*)$/);
+    return { lead:m ? m[1] : "", body:m ? m[2] : String(value ?? ""), tail:m ? m[3] : "" };
+  }
+
+  function exactHindi(s) {
+    return EN_HI[s] || ATTR_EN_HI[s] || null;
+  }
+
+  function exactEnglish(s) {
+    return HI_EN[s] || ATTR_HI_EN[s] || null;
+  }
+
+  function translateKeywordList(list) {
+    const KEYWORDS = {
+      school:"स्कूल", student:"छात्र", teacher:"शिक्षक", classroom:"कक्षा", learning:"शिक्षा", college:"कॉलेज",
+      farmer:"किसान", crop:"फसल", irrigation:"सिंचाई", soil:"मिट्टी", seed:"बीज", farm:"खेती",
+      health:"स्वास्थ्य", clinic:"क्लिनिक", hospital:"अस्पताल", medicine:"दवा", patient:"मरीज", disease:"बीमारी",
+      water:"पानी", tap:"नल", drainage:"जल निकासी", well:"कुआँ", pipeline:"पाइपलाइन", leak:"रिसाव",
+      waste:"कचरा", garbage:"कचरा", toilet:"शौचालय", sewage:"सीवेज", cleaning:"सफाई", hygiene:"स्वच्छता",
+      pollution:"प्रदूषण", air:"वायु", river:"नदी", tree:"पेड़", forest:"वन", plastic:"प्लास्टिक",
+      electric:"विद्युत", electricity:"बिजली", wire:"तार", power:"बिजली", streetlight:"स्ट्रीटलाइट", solar:"सौर", transformer:"ट्रांसफॉर्मर",
+      road:"सड़क", pothole:"गड्ढा", traffic:"यातायात", bus:"बस", bridge:"पुल", footpath:"फुटपाथ",
+      wheelchair:"व्हीलचेयर", disabled:"दिव्यांग", accessibility:"सुगम्यता", ramp:"रैंप", braille:"ब्रेल",
+      certificate:"प्रमाणपत्र", office:"कार्यालय", service:"सेवा", document:"दस्तावेज़", queue:"कतार", portal:"पोर्टल",
+      village:"गाँव", livelihood:"आजीविका", artisan:"कारीगर", rural:"ग्रामीण", market:"बाज़ार"
     };
-    var ATTR={
-      "Accessibility tools":"सुगम्यता उपकरण","Primary navigation":"मुख्य नेविगेशन","Quick status search":"त्वरित स्थिति खोज","Challenge ID":"चैलेंज आईडी","Challenge tracking ID":"चैलेंज ट्रैकिंग आईडी",
-      "Example: JS-1003":"उदाहरण: JS-1003","Enter Challenge ID, e.g. JS-1003":"चैलेंज आईडी दर्ज करें, जैसे JS-1003","Unsafe drinking water near community tap":"समुदायिक नल के पास असुरक्षित पेयजल","Ward, block, village or landmark":"वार्ड, ब्लॉक, गाँव या पहचान स्थल",
-      "What is happening, how often, and who is affected?":"क्या हो रहा है, कितनी बार हो रहा है और कौन प्रभावित है?","Citizen or community name":"नागरिक या समुदाय का नाम","10-digit mobile number":"10 अंकों का मोबाइल नंबर","Example: Rahul Kumar":"उदाहरण: राहुल कुमार","Example: MACET":"उदाहरण: MACET",
-      "Faculty or domain mentor":"फैकल्टी या डोमेन मेंटर","Example: 6 weeks":"उदाहरण: 6 सप्ताह","Explain what was verified or completed at this stage.":"इस चरण में क्या सत्यापित या पूरा हुआ, लिखें।","Describe the proposed solution and why it is suitable.":"प्रस्तावित समाधान और उसकी उपयुक्तता का वर्णन करें।","What was built, tested or learned?":"क्या बनाया, परीक्षण किया या सीखा गया?","Type a question or Challenge ID":"प्रश्न या चैलेंज आईडी लिखें","Close citizen assistant":"नागरिक सहायता बंद करें","Suggested questions":"सुझाए गए प्रश्न"
+    return list.split(",").map(x => {
+      const t = x.trim();
+      return KEYWORDS[t.toLowerCase()] || t;
+    }).join(", ");
+  }
+
+  function toHindiDynamic(s) {
+    let m;
+
+    if ((m = s.match(/^(\d+)\s+people reportedly affected$/i)))
+      return m[1] + " लोग प्रभावित बताए गए";
+
+    if ((m = s.match(/^Keywords:\s*(.+)$/i)))
+      return "कीवर्ड: " + translateKeywordList(m[1]);
+
+    if ((m = s.match(/^(.+?)\s+priority$/i)))
+      return (EN_HI[m[1]] || m[1]) + " प्राथमिकता";
+
+    if ((m = s.match(/^Yellow cluster · (\d+) matches$/i)))
+      return "पीला क्लस्टर · " + m[1] + " मिलान";
+
+    if ((m = s.match(/^Red cluster · (\d+) matches$/i)))
+      return "लाल क्लस्टर · " + m[1] + " मिलान";
+
+    if ((m = s.match(/^(\d[\d,]*)\s+beneficiaries$/i)))
+      return m[1] + " लाभार्थी";
+
+    if ((m = s.match(/^updated\s+(.+)$/i)))
+      return "अद्यतन " + m[1];
+
+    if ((m = s.match(/^Team:\s*(.+)$/i)))
+      return "टीम: " + m[1];
+
+    if ((m = s.match(/^Mentor:\s*(.+)$/i)))
+      return "मेंटोर: " + m[1];
+
+    if ((m = s.match(/^Approved (student|university|industry) demo:$/i))) {
+      const role = {student:"छात्र", university:"विश्वविद्यालय", industry:"उद्योग"}[m[1].toLowerCase()];
+      return "स्वीकृत " + role + " डेमो:";
+    }
+
+    if ((m = s.match(/^Report merged with (.+) to strengthen the evidence\.$/i)))
+      return "प्रमाण मजबूत करने के लिए रिपोर्ट " + m[1] + " के साथ जोड़ दी गई।";
+
+    if ((m = s.match(/^You can submit (\d+) more complaints today\.$/i)))
+      return "आज आप " + m[1] + " और शिकायतें जमा कर सकते हैं।";
+
+    if ((m = s.match(/^AI found (\d+)% similarity with an existing active challenge\.$/i)))
+      return "AI ने मौजूदा सक्रिय चुनौती से " + m[1] + "% समानता पाई।";
+
+    if ((m = s.match(/^Additional citizen evidence merged at (\d+)% similarity\.$/i)))
+      return "अतिरिक्त नागरिक प्रमाण " + m[1] + "% समानता पर जोड़ दिया गया।";
+
+    if ((m = s.match(/^(.+?) approved\.$/i)))
+      return m[1] + " स्वीकृत किया गया।";
+
+    if ((m = s.match(/^(.+?) rejected\.$/i)))
+      return m[1] + " अस्वीकृत किया गया।";
+
+    if ((m = s.match(/^Academic support committed:\s*(.+)$/i)))
+      return "शैक्षणिक सहयोग दर्ज: " + (EN_HI[m[1]] || m[1]);
+
+    if ((m = s.match(/^Industry support committed:\s*(.+)$/i)))
+      return "उद्योग सहयोग दर्ज: " + (EN_HI[m[1]] || m[1]);
+
+    if ((m = s.match(/^(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{4})$/)))
+      return m[1] + " " + MONTH_HI[m[2]] + " " + m[3];
+
+    return s;
+  }
+
+  function translateFragmentsToHindi(s) {
+    // Exact match first.
+    const exact = exactHindi(s);
+    if (exact) return exact;
+
+    // Dynamic whole-string rules.
+    let out = toHindiDynamic(s);
+    if (out !== s) return out;
+
+    // Translate known platform phrases inside compound generated text.
+    const replacements = [
+      ["Solution awaiting validation","समाधान सत्यापन की प्रतीक्षा में"],
+      ["Solution verified","समाधान सत्यापित"],
+      ["AI classification confidence:","AI वर्गीकरण विश्वसनीयता:"],
+      ["Human validation required","मानव सत्यापन आवश्यक"],
+      ["General civic context","सामान्य नागरिक संदर्भ"],
+      ["Possible electrical danger","संभावित विद्युत खतरा"],
+      ["Possible fire or hazardous leak","संभावित आग या खतरनाक रिसाव"],
+      ["Possible structural or terrain danger","संभावित संरचनात्मक या भू-भाग संबंधी खतरा"],
+      ["Possible unsafe public water supply","संभावित असुरक्षित सार्वजनिक जल आपूर्ति"],
+      ["Possible immediate public-safety danger","संभावित तात्कालिक सार्वजनिक सुरक्षा खतरा"],
+      ["No critical safety phrase detected","कोई गंभीर सुरक्षा संकेत नहीं मिला"],
+      ["High confidence","उच्च विश्वसनीयता"],
+      ["Moderate confidence","मध्यम विश्वसनीयता"],
+      ["Low confidence","कम विश्वसनीयता"],
+      ["Awaiting assignment","आवंटन की प्रतीक्षा"],
+      ["Current proposal","वर्तमान प्रस्ताव"],
+      ["Committed partners","सहयोगी भागीदार"],
+      ["Verified impact","सत्यापित प्रभाव"],
+      ["Verified public impact","सत्यापित सार्वजनिक प्रभाव"],
+      ["Team lead","टीम लीड"],
+      ["Reports combined","संयुक्त रिपोर्ट"],
+      ["Assigned institution","सौंपी गई संस्था"],
+      ["People affected","प्रभावित लोग"],
+      ["Location","स्थान"],
+      ["Why:","कारण:"],
+      ["Priority","प्राथमिकता"],
+      ["Category","श्रेणी"],
+      ["Institution","संस्था"],
+      ["Progress","प्रगति"]
+    ];
+    replacements.forEach(([a,b]) => { out = out.split(a).join(b); });
+
+    // Translate priority tokens when they occur in generated compound text.
+    out = out.replace(/\bCritical priority\b/g, "गंभीर प्राथमिकता")
+             .replace(/\bHigh priority\b/g, "उच्च प्राथमिकता")
+             .replace(/\bMedium priority\b/g, "मध्यम प्राथमिकता")
+             .replace(/\bNormal priority\b/g, "सामान्य प्राथमिकता");
+
+    // Translate keyword reason fragments inside longer AI text.
+    out = out.replace(/Keywords:\s*([^·<]+)/gi, function(_, list) {
+      return "कीवर्ड: " + translateKeywordList(list.trim());
+    });
+
+    // Translate variable beneficiary fragments.
+    out = out.replace(/(\d[\d,]*)\s+beneficiaries/gi, "$1 लाभार्थी");
+
+    return out;
+  }
+
+  function translateToEnglish(s) {
+    return exactEnglish(s) || s;
+  }
+
+  function isScriptStyle(node) {
+    const p = node && node.parentElement;
+    return !p || !!p.closest("script,style");
+  }
+
+  function isFormValueNode(node) {
+    const p = node && node.parentElement;
+    return !!(p && p.matches("textarea"));
+  }
+
+  function isUserContentNode(node) {
+    const p = node && node.parentElement;
+    return !!(p && p.closest("[data-user-content]"));
+  }
+
+  function isKnownDemoText(s) {
+    return Object.prototype.hasOwnProperty.call(EN_HI, s);
+  }
+
+  function captureTextNode(node) {
+    if (!ORIGINAL_TEXT.has(node)) ORIGINAL_TEXT.set(node, node.nodeValue);
+  }
+
+  function translateTextNode(node, hiMode) {
+    if (isScriptStyle(node) || isFormValueNode(node)) return;
+    captureTextNode(node);
+
+    const original = ORIGINAL_TEXT.get(node);
+    if (original == null) return;
+
+    const parts = trimParts(original);
+    if (!parts.body) return;
+
+    // Real citizen-entered challenge title/description remains exactly as submitted.
+    // Known seeded demo text is translated because it belongs to the prototype demo.
+    if (isUserContentNode(node) && !isKnownDemoText(parts.body)) {
+      node.nodeValue = original;
+      return;
+    }
+
+    const translated = hiMode
+      ? translateFragmentsToHindi(parts.body)
+      : translateToEnglish(parts.body);
+
+    const nextValue = parts.lead + translated + parts.tail;
+    if (node.nodeValue !== nextValue) node.nodeValue = nextValue;
+  }
+
+  function captureAttributes(el) {
+    if (ORIGINAL_ATTR.has(el)) return;
+    ORIGINAL_ATTR.set(el, {
+      placeholder: el.getAttribute("placeholder"),
+      ariaLabel: el.getAttribute("aria-label"),
+      title: el.getAttribute("title"),
+      alt: el.getAttribute("alt")
+    });
+  }
+
+  function translateAttributes(el, hiMode) {
+    if (el.closest("script,style")) return;
+    captureAttributes(el);
+    const original = ORIGINAL_ATTR.get(el);
+    if (!original) return;
+
+    [
+      ["placeholder", original.placeholder],
+      ["aria-label", original.ariaLabel],
+      ["title", original.title],
+      ["alt", original.alt]
+    ].forEach(([name, value]) => {
+      if (value == null) return;
+      const translated = hiMode
+        ? (ATTR_EN_HI[value] || EN_HI[value] || translateFragmentsToHindi(value))
+        : (ATTR_HI_EN[value] || HI_EN[value] || value);
+      if (el.getAttribute(name) !== translated) el.setAttribute(name, translated);
+    });
+  }
+
+  function translateSelectOptions(hiMode) {
+    document.querySelectorAll("option").forEach(opt => {
+      if (!ORIGINAL_TEXT.has(opt.firstChild) && opt.firstChild && opt.firstChild.nodeType === Node.TEXT_NODE) {
+        ORIGINAL_TEXT.set(opt.firstChild, opt.firstChild.nodeValue);
+      }
+      if (opt.firstChild && opt.firstChild.nodeType === Node.TEXT_NODE) translateTextNode(opt.firstChild, hiMode);
+    });
+  }
+
+  function translateHead(hiMode) {
+    if (!document.documentElement.dataset.originalTitle) {
+      document.documentElement.dataset.originalTitle = document.title;
+    }
+    const enTitle = document.documentElement.dataset.originalTitle;
+    document.title = hiMode
+      ? "जनसमाधान AI | नागरिक चुनौती समाधान मंच"
+      : enTitle;
+
+    const meta = document.querySelector('meta[name="description"]');
+    if (meta) {
+      if (!meta.dataset.originalContent) meta.dataset.originalContent = meta.getAttribute("content") || "";
+      meta.setAttribute("content", hiMode
+        ? "जनसमाधान AI नागरिकों द्वारा दर्ज सामाजिक चुनौतियों को सरकारी सत्यापन, विश्वविद्यालय टीमों और उद्योग सहयोग से जोड़ता है।"
+        : meta.dataset.originalContent);
+    }
+  }
+
+  function forceLanguageButtons(hiMode) {
+    document.querySelectorAll("[data-language]").forEach(btn => {
+      const label = hiMode ? "English" : "हिंदी";
+      const aria = hiMode ? "Switch to English" : "हिंदी में बदलें";
+      if (btn.textContent !== label) btn.textContent = label;
+      if (btn.getAttribute("aria-label") !== aria) btn.setAttribute("aria-label", aria);
+      if (btn.getAttribute("title") !== aria) btn.setAttribute("title", aria);
+    });
+  }
+
+  function syncChatLanguage(hiMode) {
+    // The main app already contains chatSetLanguage inside its own closure.
+    // We therefore translate the visible chat UI directly here as a guaranteed fallback.
+    const map = {
+      chatbotSubtitle: hiMode ? "नागरिक सहायता सहायक · ऑनलाइन" : "Citizen guidance assistant · Online",
+      chatbotSend: hiMode ? "भेजें" : "Send",
+      chatbotToggleText: hiMode ? "नागरिक सहायता" : "Citizen Help"
     };
-    var textOriginal=new WeakMap(),attrOriginal=new WeakMap(),scheduled=false;
-    function shouldSkip(n){var p=n.parentElement;if(!p||p.closest("script,style,[data-user-content]"))return true;if(p.classList&&p.classList.contains("history-row"))return true;return false}
-    function capture(root){var walker=document.createTreeWalker(root||document.body,NodeFilter.SHOW_TEXT),n;while((n=walker.nextNode())){if(shouldSkip(n))continue;if(!textOriginal.has(n))textOriginal.set(n,n.nodeValue)}document.querySelectorAll("*").forEach(function(el){if(el.closest("script,style,[data-user-content]"))return;if(!attrOriginal.has(el))attrOriginal.set(el,{placeholder:el.getAttribute("placeholder"),aria:el.getAttribute("aria-label"),title:el.getAttribute("title")})})}
-    function pattern(s){var m;if(HI[s])return HI[s];if((m=s.match(/^(\d+)\s+people reportedly affected$/i)))return m[1]+" लोग प्रभावित बताए गए";if((m=s.match(/^(.+)\s+priority$/i)))return(HI[m[1]]||m[1])+" प्राथमिकता";if((m=s.match(/^Yellow cluster · (\d+) matches$/i)))return"पीला क्लस्टर · "+m[1]+" मिलान";if((m=s.match(/^Red cluster · (\d+) matches$/i)))return"लाल क्लस्टर · "+m[1]+" मिलान";if((m=s.match(/^(.+)\s+beneficiaries$/i)))return m[1]+" लाभार्थी";if((m=s.match(/^updated (.+)$/i)))return"अद्यतन "+m[1];if((m=s.match(/^Team:\s*(.+)$/i)))return"टीम: "+m[1];if((m=s.match(/^Approved (student|university|industry) demo:/i)))return"स्वीकृत "+(HI[m[1][0].toUpperCase()+m[1].slice(1)]||m[1])+" डेमो:";return s}
-    function apply(){var hi=document.documentElement.lang==="hi";capture(document.body);var walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT),n;while((n=walker.nextNode())){if(shouldSkip(n))continue;var original=textOriginal.get(n);if(original==null)continue;if(!hi){n.nodeValue=original;continue}var t=original.trim();if(!t)continue;var translated=pattern(t);if(translated!==t){var lead=(original.match(/^\s*/)||[""])[0],tail=(original.match(/\s*$/)||[""])[0];n.nodeValue=lead+translated+tail}}document.querySelectorAll("*").forEach(function(el){if(el.closest("script,style,[data-user-content]"))return;var o=attrOriginal.get(el);if(!o)return;[["placeholder","placeholder"],["aria","aria-label"],["title","title"]].forEach(function(pair){var val=o[pair[0]];if(val==null)return;el.setAttribute(pair[1],hi?(ATTR[val]||HI[val]||val):val)})});document.querySelectorAll("[data-language]").forEach(function(b){b.textContent=hi?"English":"हिंदी"})}
-    function schedule(){if(scheduled)return;scheduled=true;requestAnimationFrame(function(){scheduled=false;apply()})}
-    capture(document.body);new MutationObserver(schedule).observe(document.documentElement,{attributes:true,attributeFilter:["lang"],childList:true,subtree:true});apply();
-  }());
-  </script>
+    Object.keys(map).forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.textContent !== map[id]) el.textContent = map[id];
+    });
+
+    const input = document.getElementById("chatbotInput");
+    if (input) {
+      const ph = hiMode ? "सवाल या चैलेंज आईडी लिखें" : "Type a question or Challenge ID";
+      if (input.placeholder !== ph) input.placeholder = ph;
+    }
+
+    const quick = document.querySelectorAll("[data-chat-action]");
+    const labels = hiMode
+      ? ["चुनौती दर्ज करें","स्थिति देखें","स्थितियाँ समझें","English"]
+      : ["Report a challenge","Track status","Explain statuses","हिंदी"];
+    quick.forEach((b,i) => { if (labels[i] && b.textContent !== labels[i]) b.textContent = labels[i]; });
+
+    // Voice selector text follows the website language without changing its values.
+    const voice = document.getElementById("chatbotVoiceLanguage");
+    if (voice) {
+      Array.from(voice.options).forEach(opt => {
+        let text = opt.textContent;
+        if (opt.value === "auto") text = hiMode ? "स्वतः · हिंदी + अंग्रेज़ी" : "Auto · हिंदी + English";
+        if (opt.value === "hi") text = "हिंदी";
+        if (opt.value === "en") text = hiMode ? "अंग्रेज़ी" : "English";
+        if (opt.textContent !== text) opt.textContent = text;
+      });
+    }
+  }
+
+  function translateDocument() {
+    if (applying) return;
+    applying = true;
+    try {
+      const hiMode = document.documentElement.lang === "hi";
+      document.documentElement.setAttribute("lang", hiMode ? "hi" : "en");
+
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      let node;
+      while ((node = walker.nextNode())) translateTextNode(node, hiMode);
+
+      document.querySelectorAll("*").forEach(el => translateAttributes(el, hiMode));
+      translateSelectOptions(hiMode);
+      translateHead(hiMode);
+      forceLanguageButtons(hiMode);
+      syncChatLanguage(hiMode);
+    } finally {
+      applying = false;
+    }
+  }
+
+  function scheduleTranslate() {
+    if (scheduled || applying) return;
+    scheduled = true;
+    requestAnimationFrame(function () {
+      scheduled = false;
+      translateDocument();
+    });
+  }
+
+  /* Capture initial English DOM before changes. */
+  (function captureInitial() {
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    let node;
+    while ((node = walker.nextNode())) {
+      if (!isScriptStyle(node)) captureTextNode(node);
+    }
+    document.querySelectorAll("*").forEach(captureAttributes);
+  })();
+
+  /*
+    Observe:
+      - language changes
+      - dashboard rerenders
+      - dialogs/receipts/toasts/history added later
+      - cloud status changes
+      - chatbot/voice text changes
+  */
+  const observer = new MutationObserver(function (mutations) {
+    if (applying) return;
+
+    mutations.forEach(m => {
+      if (m.type === "childList") {
+        m.addedNodes.forEach(n => {
+          if (n.nodeType === Node.TEXT_NODE) captureTextNode(n);
+          if (n.nodeType === Node.ELEMENT_NODE) {
+            const w = document.createTreeWalker(n, NodeFilter.SHOW_TEXT);
+            let t;
+            while ((t = w.nextNode())) captureTextNode(t);
+            n.querySelectorAll && n.querySelectorAll("*").forEach(captureAttributes);
+            captureAttributes(n);
+          }
+        });
+      }
+      if (m.type === "characterData") captureTextNode(m.target);
+    });
+
+    scheduleTranslate();
+  });
+
+  observer.observe(document.documentElement, {
+    subtree: true,
+    childList: true,
+    characterData: true,
+    attributes: true,
+    attributeFilter: ["lang"]
+  });
+
+  /*
+    Re-run translation just after clicks/submits because the main app often
+    creates new dashboard/dialog/toast content synchronously after the event.
+  */
+  document.addEventListener("click", scheduleTranslate, true);
+  document.addEventListener("submit", scheduleTranslate, true);
+  document.addEventListener("change", scheduleTranslate, true);
+
+  translateDocument();
+
+  // Expose only a harmless refresh helper for debugging.
+  window.refreshJanSamadhanLanguage = translateDocument;
+})();
+</script>
+
 
 
   <script>
