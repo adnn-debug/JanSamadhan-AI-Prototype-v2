@@ -1,6 +1,6 @@
 /* JanSamadhan AI — lightweight runtime status + workflow loader.
    Keeps the page responsive, reports the active AI mode honestly,
-   and loads workflow-v4 exactly once. */
+   and loads workflow-v4 + recurrence intelligence exactly once. */
 (function(){
   "use strict";
 
@@ -20,7 +20,7 @@
         : "Academic prototype · Some free-text chat questions and AI analysis may be processed by the configured Groq AI service. Challenge tracking, login and verified workflow actions remain handled by JanSamadhan. Do not enter passwords, OTPs, Aadhaar numbers or banking information. Voice recognition uses your browser speech service, so microphone audio may be processed by the browser/provider. JanSamadhan does not store raw audio.";
     }
     return isHindi()
-      ? "शैक्षणिक प्रोटोटाइप · चैट और AI निर्णय सहायता अभी स्थानीय fallback logic से प्रोसेस होती है; कोई टेक्स्ट Groq को नहीं भेजा जाता। पासवर्ड, OTP, आधार नंबर या बैंकिंग जानकारी फिर भी दर्ज न करें। आवाज़ पहचान आपके ब्राउज़र की स्पीच सेवा का उपयोग करती है, इसलिए माइक्रोफोन ऑडियो ब्राउज़र/प्रदाता द्वारा प्रोसेस हो सकता है। जनसमाधान कच्चा ऑडियो संग्रहीत नहीं करता।"
+      ? "शैक्षणिक प्रोटोटाइप · चैट और AI निर्णय सहायता अभी स्थानीय fallback logic से प्रोसेस होती है; कोई टेक्स्ट Groq को नहीं भेजा जाता। पासवर्ड, OTP, आधार नंबर या बैंकिंग जानकारी फिर भी दर्ज न करें। आवाज़ पहचान आपके ब्राउज़र की स्पीच सेवा का उपयोग करती है, इसलिए माइोफोन ऑडियो ब्राउज़र/प्रदाता द्वारा प्रोसेस हो सकता है। जनसमाधान कच्चा ऑडियो संग्रहीत नहीं करता।"
       : "Academic prototype · Chat and AI decision support are currently processed by the local fallback logic; no text is sent to Groq. Still, do not enter passwords, OTPs, Aadhaar numbers or banking information. Voice recognition uses your browser speech service, so microphone audio may be processed by the browser/provider. JanSamadhan does not store raw audio.";
   }
 
@@ -87,10 +87,20 @@
     document.body.appendChild(s);
   }
 
+  function loadRecurrence(){
+    if(id("js-recurrence-v1"))return;
+    var s=document.createElement("script");
+    s.id="js-recurrence-v1";
+    s.src="/static/recurrence-v1.js";
+    s.defer=true;
+    document.body.appendChild(s);
+  }
+
   function init(){
     ensureBadge();
     checkHealth();
     loadWorkflow();
+    loadRecurrence();
     new MutationObserver(function(){
       setTimeout(function(){ensureBadge();updatePrivacyNote()},0);
     }).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
