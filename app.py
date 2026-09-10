@@ -1,4 +1,6 @@
 from flask import Flask, render_template, jsonify, request
+from groq import Groq
+import json
 import os
 import re
 import time
@@ -6,6 +8,7 @@ from collections import defaultdict, deque
 
 app = Flask(__name__)
 
+GROQ_MODEL = os.environ.get("GROQ_MODEL", "openai/gpt-oss-20b")
 MAX_REQUESTS = 60
 RATE_WINDOW_SECONDS = 10 * 60
 request_log = defaultdict(deque)
@@ -87,7 +90,8 @@ def home():
 
 @app.get("/health")
 def health():
-    return jsonify(status="ok", service="JanSamadhan AI", ai_mode="demo"), 200
+    mode = "groq+local-fallback" if os.environ.get("GROQ_API_KEY") else "local-fallback"
+    return jsonify(status="ok", service="JanSamadhan AI", ai_mode=mode), 200
 
 
 def _client_ip():
@@ -120,11 +124,7 @@ def _category(text, requested=""):
     requested = _clean(requested, 100)
     if requested in ALLOWED_CATEGORIES and requested != "Other":
         return requested
-
-    scores = {}
-    for category, terms in CATEGORY_RULES.items():
-        scores[category] = sum(1 for term in terms if term in text)
-
+    scores = {category: sum(1 for term in terms if term in text) for category, terms in CATEGORY_RULES.items()}
     best = max(scores, key=scores.get) if scores else "Other"
     return best if scores.get(best, 0) > 0 else "Other"
 
@@ -135,7 +135,6 @@ def _demo_analysis(payload, admin=False):
     location = _clean(payload.get("location"), 260)
     district = _clean(payload.get("district"), 100)
     requested_category = _clean(payload.get("category"), 100)
-
     try:
         affected = int(payload.get("affected") or 0)
     except (TypeError, ValueError):
@@ -144,16 +143,8 @@ def _demo_analysis(payload, admin=False):
     text = f"{title} {description} {location} {district}".lower()
     category = _category(text, requested_category)
     authority = AUTHORITY_MAP.get(category, AUTHORITY_MAP["Other"])
-
     critical = _contains_any(text, DANGER_TERMS)
-    if critical:
-        priority = "Critical"
-    elif affected >= 300:
-        priority = "High"
-    elif affected >= 75:
-        priority = "Medium"
-    else:
-        priority = "Normal"
+    priority = "Critical" if critical else "High" if affected >= 300 else "Medium" if affected >= 75 else "Normal"
 
     direct_signal = _contains_any(text, DIRECT_TERMS)
     innovation_signal = _contains_any(text, INNOVATION_TERMS)
@@ -164,10 +155,7 @@ def _demo_analysis(payload, admin=False):
         collaborators = ["Students", "University"]
         if any(x in text for x in ["equipment", "industry", "pilot", "manufacture", "deployment"]):
             collaborators.append("Industry")
-        reason = (
-            "The issue appears to benefit from research, design or prototyping. "
-            "Government remains the case owner while innovation partners support solution development."
-        )
+        reason = "The issue appears to benefit from research, design or prototyping. Government remains the case owner while innovation partners support solution development."
     elif hybrid_signal or (innovation_signal and direct_signal):
         resolution_path = "Hybrid"
         collaborators = ["University"]
@@ -176,26 +164,13 @@ def _demo_analysis(payload, admin=False):
         if any(x in text for x in ["equipment", "technology", "pilot", "sensor", "industry"]):
             collaborators.append("Industry")
         collaborators = list(dict.fromkeys(collaborators))[:3]
-        reason = (
-            "A responsible public authority must act, but technical investigation, testing or innovation support "
-            "could improve the resolution."
-        )
+        reason = "A responsible public authority must act, but technical investigation, testing or innovation support could improve the resolution."
     else:
         resolution_path = "Direct Government Action"
         collaborators = []
-        reason = (
-            "This looks mainly like routine public-service, maintenance or operational work that should be handled "
-            "directly by the responsible authority."
-        )
+        reason = "This looks mainly like routine public-service, maintenance or operational work that should be handled directly by the responsible authority."
 
-    if critical:
-        target_days = 1
-    elif resolution_path == "Direct Government Action":
-        target_days = 5 if priority in {"High", "Medium"} else 7
-    elif resolution_path == "Hybrid":
-        target_days = 14
-    else:
-        target_days = 21
+    target_days = 1 if critical else 5 if resolution_path == "Direct Government Action" and priority in {"High", "Medium"} else 7 if resolution_path == "Direct Government Action" else 14 if resolution_path == "Hybrid" else 21
 
     missing = []
     if not location:
@@ -224,7 +199,7 @@ def _demo_analysis(payload, admin=False):
         next_action = "Administrator verification is required before routing or assignment is treated as confirmed."
 
     return {
-        "mode": "demo",
+        "mode": "local-fallback",
         "summary": summary,
         "suggested_category": category,
         "priority": priority,
@@ -243,7 +218,6 @@ def _demo_chat(message):
     raw = _clean(message, 1200)
     text = raw.lower()
     hindi = bool(re.search(r"[\u0900-\u097F]", raw))
-
     if hindi:
         if any(x in text for x in ["सरकार", "अथॉरिटी", "authority", "government"]):
             return "हर केस का मुख्य मालिक Government / Nodal Administrator रहता है। AI केवल जिम्मेदार प्राधिकरण और समाधान मार्ग सुझाता है; अंतिम रूटिंग मानव प्रशासक तय करता है।"
@@ -264,10 +238,151 @@ def _demo_chat(message):
     return "JanSamadhan keeps every reported problem under one Challenge ID and one transparent lifecycle. Government remains the case owner, while the resolution path determines whether direct authority action or optional innovation support is used."
 
 
+def _groq_client():
+    key = os.environ.get("GROQ_API_KEY")
+    return Groq(api_key=key, timeout=20.0) if key else None
+
+
+def _system_prompt():
+    return """You are JanSamadhan AI, the decision-support intelligence inside an academic Smart India Hackathon prototype.
+
+GOVERNANCE MODEL
+- Every citizen report is one governed case with one Challenge ID.
+- Government / Nodal Administrator is always the case owner.
+- Resolution path must be Direct Government Action, Collaborative Innovation, or Hybrid.
+- Students, universities and industry are optional contributors only and never replace government ownership or final verification.
+
+ROUTING
+- Direct Government Action: routine maintenance, service delivery, enforcement or operational work.
+- Collaborative Innovation: research, design, prototyping, field study or experimentation under government supervision.
+- Hybrid: government action is required and technical, research, industry or student support can materially help.
+
+RULES
+- Never invent a Challenge ID, live status, approval, completion or assignment.
+- Never present an AI recommendation as an official government order.
+- Prefer generic functional authority names, not invented officers.
+- Human administrator validation is final.
+- Any target_days is a prototype accountability target, never an official SLA.
+- Do not request passwords, OTPs, Aadhaar numbers or banking credentials.
+- If there is immediate danger, advise contacting the appropriate emergency/responsible authority rather than relying only on this prototype.
+- Use Hindi when the user writes mainly in Hindi; otherwise use English.
+- Keep answers concise and easy to understand."""
+
+
+def _groq_chat(message, history):
+    client = _groq_client()
+    if client is None:
+        return None
+    messages = [{"role": "system", "content": _system_prompt() + "\nYou are now JanSahayak, the citizen-facing assistant. Explain JanSamadhan and help with civic report wording, routing, collaboration, tracking and accountability. Do not claim to change database state. For live status, direct the user to the site's Challenge-ID tracker unless verified case data is supplied."}]
+    if isinstance(history, list):
+        for item in history[-8:]:
+            if not isinstance(item, dict):
+                continue
+            content = _clean(item.get("content"), 700)
+            if content:
+                messages.append({"role": "user" if item.get("role") == "user" else "assistant", "content": content})
+    messages.append({"role": "user", "content": _clean(message, 1200)})
+    response = client.chat.completions.create(
+        model=GROQ_MODEL,
+        messages=messages,
+        reasoning_effort="low",
+        max_completion_tokens=380,
+        temperature=0.3,
+    )
+    return _clean(response.choices[0].message.content, 2400)
+
+
+def _sanitize_llm_analysis(result):
+    if not isinstance(result, dict):
+        raise ValueError("Invalid Groq analysis")
+    category = result.get("suggested_category", "Other")
+    if category not in ALLOWED_CATEGORIES:
+        category = "Other"
+    priority = result.get("priority", "Normal")
+    if priority not in {"Critical", "High", "Medium", "Normal"}:
+        priority = "Normal"
+    path = result.get("resolution_path", "Direct Government Action")
+    if path not in {"Direct Government Action", "Collaborative Innovation", "Hybrid"}:
+        path = "Direct Government Action"
+    collaborators = result.get("recommended_collaborators", [])
+    if not isinstance(collaborators, list):
+        collaborators = []
+    collaborators = [x for x in collaborators if x in {"Students", "University", "Industry"}][:3]
+    if path == "Direct Government Action":
+        collaborators = []
+    try:
+        target_days = int(result.get("target_days", 7))
+    except (TypeError, ValueError):
+        target_days = 7
+    target_days = max(1, min(target_days, 30))
+    missing = result.get("missing_information", [])
+    if not isinstance(missing, list):
+        missing = []
+    return {
+        "mode": "groq",
+        "summary": _clean(result.get("summary"), 420),
+        "suggested_category": category,
+        "priority": priority,
+        "responsible_authority": _clean(result.get("responsible_authority") or "District / Local Administration", 120),
+        "resolution_path": path,
+        "recommended_collaborators": collaborators,
+        "reason": _clean(result.get("reason"), 650),
+        "recommended_action": _clean(result.get("recommended_action"), 450),
+        "missing_information": [_clean(x, 140) for x in missing[:4] if _clean(x, 140)],
+        "target_days": target_days,
+        "target_note": "Prototype accountability target only — not an official SLA.",
+    }
+
+
+def _groq_analysis(payload, admin=False):
+    client = _groq_client()
+    if client is None:
+        return None
+    instructions = """Analyze the civic challenge and return only a JSON object with these keys: summary, suggested_category, priority, responsible_authority, resolution_path, recommended_collaborators, reason, recommended_action, missing_information, target_days.
+
+Constraints:
+- suggested_category must be one of: %s
+- priority: Critical, High, Medium, or Normal.
+- resolution_path: Direct Government Action, Collaborative Innovation, or Hybrid.
+- recommended_collaborators may contain only Students, University, Industry.
+- Direct Government Action should normally have no innovation collaborators.
+- responsible_authority should be a generic functional public authority.
+- target_days must be 1 to 30 and is only a prototype target.
+- Government/Nodal Administrator remains case owner.
+- Do not invent a live status or official SLA.
+%s""" % (
+        ", ".join(ALLOWED_CATEGORIES),
+        "This is an admin brief: recommend the administrator's next verification/routing action." if admin else "This is citizen intake decision support: routing remains a recommendation until admin verification."
+    )
+    case_data = {
+        "challenge_id": _clean(payload.get("id"), 100) or None,
+        "title": _clean(payload.get("title"), 220),
+        "description": _clean(payload.get("description"), 1500),
+        "category": _clean(payload.get("category"), 100) or None,
+        "district": _clean(payload.get("district"), 100),
+        "location": _clean(payload.get("location"), 260),
+        "affected_people_reported": payload.get("affected") or 0,
+        "current_stage": _clean(payload.get("stage"), 80) or None,
+    }
+    response = client.chat.completions.create(
+        model=GROQ_MODEL,
+        messages=[
+            {"role": "system", "content": _system_prompt()},
+            {"role": "user", "content": instructions + "\nCASE DATA:\n" + json.dumps(case_data, ensure_ascii=False)},
+        ],
+        response_format={"type": "json_object"},
+        reasoning_effort="low",
+        max_completion_tokens=700,
+        temperature=0.2,
+    )
+    raw = _clean(response.choices[0].message.content, 6000)
+    return _sanitize_llm_analysis(json.loads(raw))
+
+
 @app.post("/api/ai")
 def ai():
     if _rate_limited():
-        return jsonify(error="Too many demo requests. Please try again shortly."), 429
+        return jsonify(error="Too many requests. Please try again shortly."), 429
 
     data = request.get_json(silent=True) or {}
     task = _clean(data.get("task"), 40)
@@ -277,13 +392,25 @@ def ai():
         message = _clean(payload.get("message"), 1200)
         if not message:
             return jsonify(error="Message is required."), 400
-        return jsonify(reply=_demo_chat(message), mode="demo"), 200
+        try:
+            reply = _groq_chat(message, payload.get("history", []))
+            if reply:
+                return jsonify(reply=reply, mode="groq"), 200
+        except Exception:
+            app.logger.exception("Groq chat unavailable; using local fallback")
+        return jsonify(reply=_demo_chat(message), mode="local-fallback"), 200
 
     if task in {"analyze_report", "admin_brief"}:
         title = _clean(payload.get("title"), 220)
         description = _clean(payload.get("description"), 1500)
         if not title and not description:
             return jsonify(error="Add a title or description first."), 400
+        try:
+            analysis = _groq_analysis(payload, admin=(task == "admin_brief"))
+            if analysis:
+                return jsonify(analysis), 200
+        except Exception:
+            app.logger.exception("Groq analysis unavailable; using local fallback")
         return jsonify(_demo_analysis(payload, admin=(task == "admin_brief"))), 200
 
     return jsonify(error="Unsupported AI task."), 400
