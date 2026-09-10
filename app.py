@@ -1,6 +1,4 @@
 from flask import Flask, render_template, jsonify, request
-from openai import OpenAI
-import json
 import os
 import re
 import time
@@ -8,372 +6,287 @@ from collections import defaultdict, deque
 
 app = Flask(__name__)
 
-# -------------------------------------------------------------------
-# JanSamadhan AI v3 add-on configuration
-# -------------------------------------------------------------------
-MODEL = os.environ.get("OPENAI_MODEL", "gpt-5.6-luna")
-MAX_REQUESTS = 20
+MAX_REQUESTS = 60
 RATE_WINDOW_SECONDS = 10 * 60
 request_log = defaultdict(deque)
 
 ALLOWED_CATEGORIES = [
-    "Education",
-    "Agriculture",
-    "Healthcare",
-    "Water Resources",
-    "Sanitation",
-    "Environment",
-    "Energy",
-    "Urban Development",
-    "Accessibility",
-    "Public Administration",
-    "Rural Livelihoods",
-    "Other",
+    "Education", "Agriculture", "Healthcare", "Water Resources",
+    "Sanitation", "Environment", "Energy", "Urban Development",
+    "Accessibility", "Public Administration", "Rural Livelihoods", "Other"
 ]
 
-RESOLUTION_PATHS = [
-    "Direct Government Action",
-    "Collaborative Innovation",
-    "Hybrid",
+CATEGORY_RULES = {
+    "Education": ["school", "college", "classroom", "teacher", "student", "library", "education"],
+    "Agriculture": ["farmer", "crop", "irrigation", "farm", "soil", "agriculture"],
+    "Healthcare": ["hospital", "clinic", "doctor", "health", "medicine", "ambulance"],
+    "Water Resources": ["water", "tap", "drinking water", "pipeline", "leak", "contamination", "जल"],
+    "Sanitation": ["garbage", "waste", "sewage", "drain", "sanitation", "toilet", "कचरा"],
+    "Environment": ["pollution", "air quality", "river", "plastic", "environment", "smoke", "पेड़"],
+    "Energy": ["electric", "electricity", "streetlight", "street light", "power", "wire", "transformer"],
+    "Urban Development": ["road", "pothole", "bridge", "traffic", "footpath", "street", "building"],
+    "Accessibility": ["wheelchair", "disabled", "accessible", "ramp", "blind", "accessibility"],
+    "Public Administration": ["certificate", "office", "public service", "administration", "queue", "record"],
+    "Rural Livelihoods": ["village", "livelihood", "self help group", "rural", "employment"],
+}
+
+AUTHORITY_MAP = {
+    "Education": "Education Authority",
+    "Agriculture": "Agriculture / Rural Development Authority",
+    "Healthcare": "Public Health Authority",
+    "Water Resources": "Water Supply / Water Resources Authority",
+    "Sanitation": "Sanitation / Waste Authority",
+    "Environment": "Environment / Pollution Control Authority",
+    "Energy": "Electricity / Utility Authority",
+    "Urban Development": "Road / Public Works Authority",
+    "Accessibility": "District / Local Administration",
+    "Public Administration": "District / Local Administration",
+    "Rural Livelihoods": "Rural Development Authority",
+    "Other": "District / Local Administration",
+}
+
+DANGER_TERMS = [
+    "live wire", "exposed wire", "electric shock", "electrocution", "gas leak",
+    "fire", "building collapse", "bridge collapse", "landslide", "open manhole",
+    "fallen electric pole", "contaminated drinking water", "unsafe drinking water"
+]
+
+DIRECT_TERMS = [
+    "pothole", "garbage", "waste collection", "broken streetlight", "streetlight not working",
+    "sewage overflow", "blocked drain", "broken pipe", "road repair", "fallen pole",
+    "damaged sign", "cleaning", "repair", "maintenance"
+]
+
+INNOVATION_TERMS = [
+    "prototype", "research", "sensor", "monitoring system", "prediction", "early warning",
+    "new solution", "design", "automation", "data analysis", "machine learning", "ai system",
+    "field study", "testing", "experiment", "low cost solution"
+]
+
+HYBRID_TERMS = [
+    "repeated", "recurring", "contamination", "flooding", "water quality", "pollution",
+    "landslide", "structural", "complex", "multiple locations", "chronic", "survey",
+    "testing required", "technical investigation"
 ]
 
 
-def _inject_ai_addon(html: str) -> str:
-    """
-    Load the AI add-on without editing templates/index.html.
-    Existing HTML/CSS/JS stays untouched.
-    """
-    addon = '<script src="/static/jansahayak-ai-v3.js" defer></script>'
-    if addon in html:
+def _inject_ai_addon(html):
+    addons = (
+        '<script src="/static/jansahayak-ai-v3.js" defer></script>\n'
+        '<script src="/static/demo-mode-ui.js" defer></script>'
+    )
+    if '/static/demo-mode-ui.js' in html:
         return html
-    return html.replace("</body>", f"  {addon}\n</body>")
+    return html.replace("</body>", "  " + addons + "\n</body>")
 
 
 @app.get("/")
 def home():
-    # Keep the existing template exactly as it is and inject only our add-on.
     return _inject_ai_addon(render_template("index.html"))
 
 
 @app.get("/health")
 def health():
-    # Existing health route preserved.
-    return jsonify(status="ok", service="JanSamadhan AI"), 200
+    return jsonify(status="ok", service="JanSamadhan AI", ai_mode="demo"), 200
 
 
-def _client_ip() -> str:
+def _client_ip():
     forwarded = request.headers.get("X-Forwarded-For", "")
     if forwarded:
         return forwarded.split(",")[0].strip()
     return request.remote_addr or "unknown"
 
 
-def _rate_limited() -> bool:
+def _rate_limited():
     now = time.time()
-    key = _client_ip()
-    q = request_log[key]
-
+    q = request_log[_client_ip()]
     while q and now - q[0] > RATE_WINDOW_SECONDS:
         q.popleft()
-
     if len(q) >= MAX_REQUESTS:
         return True
-
     q.append(now)
     return False
 
 
-def _get_client():
-    api_key = os.environ.get("OPENAI_API_KEY")
-    if not api_key:
-        return None
-    return OpenAI(api_key=api_key, timeout=25.0)
-
-
-def _clean_text(value, limit=4000):
+def _clean(value, limit=4000):
     return str(value or "").strip()[:limit]
 
 
-def _extract_json(text: str):
-    """
-    Accept normal JSON or JSON wrapped in a markdown fence.
-    """
-    raw = (text or "").strip()
-    if not raw:
-        raise ValueError("Empty model response")
+def _contains_any(text, terms):
+    return any(term in text for term in terms)
 
-    raw = re.sub(r"^```(?:json)?\s*", "", raw, flags=re.I)
-    raw = re.sub(r"\s*```$", "", raw)
+
+def _category(text, requested=""):
+    requested = _clean(requested, 100)
+    if requested in ALLOWED_CATEGORIES and requested != "Other":
+        return requested
+
+    scores = {}
+    for category, terms in CATEGORY_RULES.items():
+        scores[category] = sum(1 for term in terms if term in text)
+
+    best = max(scores, key=scores.get) if scores else "Other"
+    return best if scores.get(best, 0) > 0 else "Other"
+
+
+def _demo_analysis(payload, admin=False):
+    title = _clean(payload.get("title"), 220)
+    description = _clean(payload.get("description"), 1500)
+    location = _clean(payload.get("location"), 260)
+    district = _clean(payload.get("district"), 100)
+    requested_category = _clean(payload.get("category"), 100)
 
     try:
-        return json.loads(raw)
-    except json.JSONDecodeError:
-        match = re.search(r"\{[\s\S]*\}", raw)
-        if not match:
-            raise
-        return json.loads(match.group(0))
+        affected = int(payload.get("affected") or 0)
+    except (TypeError, ValueError):
+        affected = 0
 
+    text = f"{title} {description} {location} {district}".lower()
+    category = _category(text, requested_category)
+    authority = AUTHORITY_MAP.get(category, AUTHORITY_MAP["Other"])
 
-def _base_instructions():
-    return """
-You are the AI decision-support layer inside JanSamadhan AI, an academic
-Smart India Hackathon prototype.
-
-CORE GOVERNANCE MODEL
-- Every citizen report becomes ONE governed case with ONE Challenge ID.
-- Government / the nodal administrator is always the CASE OWNER.
-- The case may follow one of only three resolution paths:
-  1. Direct Government Action
-  2. Collaborative Innovation
-  3. Hybrid
-- Students, universities and industry are OPTIONAL contributors.
-- They never replace government ownership or government verification.
-
-DIRECT GOVERNMENT ACTION
-Use when the issue is mainly routine service delivery, maintenance,
-enforcement or operational action that a responsible public authority
-can normally handle directly.
-
-COLLABORATIVE INNOVATION
-Use when the main work is research, design, prototyping, field study,
-experimentation or a new solution and government supervision remains.
-
-HYBRID
-Use when a responsible government authority must act but technical,
-research, testing, student or industry support can materially help.
-
-SAFETY AND ACCURACY RULES
-- Never invent a Challenge ID.
-- Never invent a live complaint status.
-- Never claim that an authority accepted, completed or verified work
-  unless that fact is supplied in the request.
-- Never present an AI recommendation as an official government order.
-- Never invent an official legal SLA. Any target_days value is only a
-  prototype accountability target and must be described that way.
-- Prefer generic functional authority names such as
-  "Road / Public Works Authority", "Water Supply Authority",
-  "Electricity / Utility Authority", "Sanitation / Waste Authority",
-  "Public Health Authority", "Environment / Pollution Control Authority",
-  "Education Authority", "District / Local Administration",
-  rather than inventing a specific office or officer.
-- AI is decision support. Human administrator validation is final.
-- Do not request passwords, OTPs, Aadhaar numbers, bank details or other
-  credentials.
-- If there is immediate danger, advise contacting the appropriate
-  emergency/responsible authority and not relying only on this prototype.
-- Be concise and citizen-friendly.
-- Respond in Hindi when the user's input is mainly Hindi; otherwise use English.
-""".strip()
-
-
-def _call_text(client, instructions, payload, max_output_tokens=450):
-    response = client.responses.create(
-        model=MODEL,
-        instructions=instructions,
-        input=json.dumps(payload, ensure_ascii=False),
-        max_output_tokens=max_output_tokens,
-    )
-    return (response.output_text or "").strip()
-
-
-def _call_json(client, instructions, payload, max_output_tokens=700):
-    text = _call_text(
-        client,
-        instructions + "\nReturn ONLY valid JSON. Do not use markdown fences.",
-        payload,
-        max_output_tokens=max_output_tokens,
-    )
-    return _extract_json(text)
-
-
-def _sanitize_analysis(result):
-    if not isinstance(result, dict):
-        raise ValueError("Invalid analysis")
-
-    category = result.get("suggested_category", "Other")
-    if category not in ALLOWED_CATEGORIES:
-        category = "Other"
-
-    priority = result.get("priority", "Normal")
-    if priority not in {"Critical", "High", "Medium", "Normal"}:
+    critical = _contains_any(text, DANGER_TERMS)
+    if critical:
+        priority = "Critical"
+    elif affected >= 300:
+        priority = "High"
+    elif affected >= 75:
+        priority = "Medium"
+    else:
         priority = "Normal"
 
-    path = result.get("resolution_path", "Direct Government Action")
-    if path not in RESOLUTION_PATHS:
-        path = "Direct Government Action"
+    direct_signal = _contains_any(text, DIRECT_TERMS)
+    innovation_signal = _contains_any(text, INNOVATION_TERMS)
+    hybrid_signal = _contains_any(text, HYBRID_TERMS)
 
-    collaborators = result.get("recommended_collaborators", [])
-    if not isinstance(collaborators, list):
+    if innovation_signal and not direct_signal and not hybrid_signal:
+        resolution_path = "Collaborative Innovation"
+        collaborators = ["Students", "University"]
+        if any(x in text for x in ["equipment", "industry", "pilot", "manufacture", "deployment"]):
+            collaborators.append("Industry")
+        reason = (
+            "The issue appears to benefit from research, design or prototyping. "
+            "Government remains the case owner while innovation partners support solution development."
+        )
+    elif hybrid_signal or (innovation_signal and direct_signal):
+        resolution_path = "Hybrid"
+        collaborators = ["University"]
+        if any(x in text for x in ["prototype", "survey", "field", "student", "research"]):
+            collaborators.insert(0, "Students")
+        if any(x in text for x in ["equipment", "technology", "pilot", "sensor", "industry"]):
+            collaborators.append("Industry")
+        collaborators = list(dict.fromkeys(collaborators))[:3]
+        reason = (
+            "A responsible public authority must act, but technical investigation, testing or innovation support "
+            "could improve the resolution."
+        )
+    else:
+        resolution_path = "Direct Government Action"
         collaborators = []
-    collaborators = [
-        x for x in collaborators
-        if x in {"Students", "University", "Industry"}
-    ][:3]
+        reason = (
+            "This looks mainly like routine public-service, maintenance or operational work that should be handled "
+            "directly by the responsible authority."
+        )
 
-    if path == "Direct Government Action":
-        collaborators = []
+    if critical:
+        target_days = 1
+    elif resolution_path == "Direct Government Action":
+        target_days = 5 if priority in {"High", "Medium"} else 7
+    elif resolution_path == "Hybrid":
+        target_days = 14
+    else:
+        target_days = 21
 
-    try:
-        target_days = int(result.get("target_days", 7))
-    except (TypeError, ValueError):
-        target_days = 7
-    target_days = max(1, min(target_days, 30))
+    missing = []
+    if not location:
+        missing.append("Exact locality or landmark")
+    if affected <= 0:
+        missing.append("Approximate number of people affected")
+    if len(description) < 35:
+        missing.append("A clearer description of what is happening")
+    if not any(word in text for word in ["day", "week", "month", "since", "today", "yesterday"]):
+        missing.append("How long the issue has been happening")
 
-    missing = result.get("missing_information", [])
-    if not isinstance(missing, list):
-        missing = []
-    missing = [_clean_text(x, 140) for x in missing[:4] if _clean_text(x, 140)]
+    summary = title or description[:120] or "Citizen-reported civic challenge"
+    if len(summary) > 150:
+        summary = summary[:147] + "..."
+
+    if admin:
+        if critical:
+            next_action = f"Verify the immediate safety risk and route the case to {authority} for urgent professional action."
+        elif resolution_path == "Direct Government Action":
+            next_action = f"Verify the report and assign it to {authority}. Keep the case in the same Challenge-ID timeline until completion is verified."
+        elif resolution_path == "Hybrid":
+            next_action = f"Verify the report, keep {authority} as the responsible authority, and add only the technical or academic support that is actually useful."
+        else:
+            next_action = "Verify that the challenge genuinely needs innovation work, then invite suitable student/university support under government supervision."
+    else:
+        next_action = "Administrator verification is required before routing or assignment is treated as confirmed."
 
     return {
-        "summary": _clean_text(result.get("summary"), 420),
+        "mode": "demo",
+        "summary": summary,
         "suggested_category": category,
         "priority": priority,
-        "responsible_authority": _clean_text(
-            result.get("responsible_authority") or "District / Local Administration",
-            120,
-        ),
-        "resolution_path": path,
+        "responsible_authority": authority,
+        "resolution_path": resolution_path,
         "recommended_collaborators": collaborators,
-        "reason": _clean_text(result.get("reason"), 650),
-        "recommended_action": _clean_text(result.get("recommended_action"), 450),
-        "missing_information": missing,
+        "reason": reason,
+        "recommended_action": next_action,
+        "missing_information": missing[:4],
         "target_days": target_days,
         "target_note": "Prototype accountability target only — not an official SLA.",
     }
 
 
+def _demo_chat(message):
+    raw = _clean(message, 1200)
+    text = raw.lower()
+    hindi = bool(re.search(r"[\u0900-\u097F]", raw))
+
+    if hindi:
+        if any(x in text for x in ["सरकार", "अथॉरिटी", "authority", "government"]):
+            return "हर केस का मुख्य मालिक Government / Nodal Administrator रहता है। AI केवल जिम्मेदार प्राधिकरण और समाधान मार्ग सुझाता है; अंतिम रूटिंग मानव प्रशासक तय करता है।"
+        if any(x in text for x in ["student", "university", "industry", "छात्र", "विश्वविद्यालय", "उद्योग"]):
+            return "छात्र, विश्वविद्यालय और उद्योग हर समस्या में शामिल नहीं होते। उन्हें तभी जोड़ा जाता है जब शोध, परीक्षण, प्रोटोटाइप, विशेषज्ञता या संसाधनों की सच में जरूरत हो।"
+        if any(x in text for x in ["overdue", "delay", "देरी", "नहीं हुआ", "fix"]):
+            return "अगर तय प्रोटोटाइप समय में काम पूरा नहीं होता, केस Overdue दिखता है और Government/Nodal Admin उसे escalate, reassign या collaboration जोड़ सकता है। वही Challenge ID और वही tracker चलता रहता है।"
+        return "जनसमाधान में हर समस्या एक ही Challenge ID के तहत चलती है। Government case owner रहता है और समस्या के अनुसार Direct Government Action, Collaborative Innovation या Hybrid मार्ग चुना जाता है।"
+
+    if any(x in text for x in ["government", "authority", "department", "owner"]):
+        return "Government / the Nodal Administrator remains the owner of every case. The system recommends a responsible functional authority and a resolution path, but a human administrator confirms the routing."
+    if any(x in text for x in ["student", "university", "industry", "collaboration"]):
+        return "Students, universities and industry are optional contributors, not replacements for government. They are added only when research, testing, prototyping, expertise or resources can materially help."
+    if any(x in text for x in ["overdue", "delay", "not fixed", "not solved", "escalat"]):
+        return "If a confirmed route passes its prototype accountability target without verified completion, the case is marked overdue for the nodal administrator. It can then be escalated, reassigned, reviewed or given additional collaboration while keeping the same Challenge ID and tracker."
+    if any(x in text for x in ["direct", "hybrid", "innovation", "resolution path"]):
+        return "JanSamadhan uses three resolution paths: Direct Government Action for routine service work, Collaborative Innovation for research/prototyping work, and Hybrid when government action plus technical or academic support is useful."
+    return "JanSamadhan keeps every reported problem under one Challenge ID and one transparent lifecycle. Government remains the case owner, while the resolution path determines whether direct authority action or optional innovation support is used."
+
+
 @app.post("/api/ai")
 def ai():
     if _rate_limited():
-        return jsonify(error="AI request limit reached. Please try again later."), 429
-
-    client = _get_client()
-    if client is None:
-        return jsonify(error="AI service is not configured."), 503
+        return jsonify(error="Too many demo requests. Please try again shortly."), 429
 
     data = request.get_json(silent=True) or {}
-    task = _clean_text(data.get("task"), 40)
+    task = _clean(data.get("task"), 40)
     payload = data.get("payload") or {}
 
-    try:
-        if task == "chat":
-            message = _clean_text(payload.get("message"), 1200)
-            if not message:
-                return jsonify(error="Message is required."), 400
+    if task == "chat":
+        message = _clean(payload.get("message"), 1200)
+        if not message:
+            return jsonify(error="Message is required."), 400
+        return jsonify(reply=_demo_chat(message), mode="demo"), 200
 
-            history = payload.get("history", [])
-            if not isinstance(history, list):
-                history = []
+    if task in {"analyze_report", "admin_brief"}:
+        title = _clean(payload.get("title"), 220)
+        description = _clean(payload.get("description"), 1500)
+        if not title and not description:
+            return jsonify(error="Add a title or description first."), 400
+        return jsonify(_demo_analysis(payload, admin=(task == "admin_brief"))), 200
 
-            safe_history = []
-            for item in history[-8:]:
-                if not isinstance(item, dict):
-                    continue
-                role = "user" if item.get("role") == "user" else "assistant"
-                content = _clean_text(item.get("content"), 700)
-                if content:
-                    safe_history.append({"role": role, "content": content})
-
-            instructions = _base_instructions() + """
-
-CHAT ROLE
-You are JanSahayak. Explain JanSamadhan, help citizens phrase reports,
-explain the single-case lifecycle, authority routing, resolution paths,
-tracking, collaboration and accountability.
-
-The website's deterministic code — not you — performs complaint submission,
-Challenge-ID lookup, authentication, database writes, approvals and
-verified status changes.
-
-When asked for live status and no verified status data is supplied, tell
-the user to use the Challenge-ID tracker rather than guessing.
-""".rstrip()
-
-            reply = _call_text(
-                client,
-                instructions,
-                {
-                    "conversation": safe_history,
-                    "current_message": message,
-                },
-                max_output_tokens=380,
-            )
-            if not reply:
-                raise ValueError("Empty AI response")
-            return jsonify(reply=reply), 200
-
-        if task in {"analyze_report", "admin_brief"}:
-            title = _clean_text(payload.get("title"), 220)
-            description = _clean_text(payload.get("description"), 1500)
-            location = _clean_text(payload.get("location"), 260)
-            district = _clean_text(payload.get("district"), 100)
-            current_category = _clean_text(payload.get("category"), 100)
-            current_stage = _clean_text(payload.get("stage"), 80)
-            challenge_id = _clean_text(payload.get("id"), 100)
-
-            try:
-                affected = int(payload.get("affected") or 0)
-            except (TypeError, ValueError):
-                affected = 0
-
-            if not title and not description:
-                return jsonify(error="Add a title or description first."), 400
-
-            extra = ""
-            if task == "admin_brief":
-                extra = """
-This is an ADMIN AI BRIEF. In recommended_action, tell the government/nodal
-administrator what to verify or do next. Keep government as case owner.
-Use the supplied current stage only; do not invent a new status.
-"""
-
-            instructions = _base_instructions() + extra + f"""
-
-ANALYSE THE CASE AND RETURN EXACTLY THIS JSON SHAPE:
-{{
-  "summary": "one short neutral case summary",
-  "suggested_category": "one of: {", ".join(ALLOWED_CATEGORIES)}",
-  "priority": "Critical | High | Medium | Normal",
-  "responsible_authority": "generic functional public authority",
-  "resolution_path": "Direct Government Action | Collaborative Innovation | Hybrid",
-  "recommended_collaborators": ["Students", "University", "Industry"],
-  "reason": "short explanation for the routing recommendation",
-  "recommended_action": "short next step for the government/nodal administrator",
-  "missing_information": ["up to four useful missing details"],
-  "target_days": 7
-}}
-
-RULES FOR target_days:
-- Integer from 1 to 30.
-- It is only a PROTOTYPE accountability target, never an official SLA.
-- Critical immediate-safety matters should be much shorter.
-- Routine service issues can be short.
-- Complex innovation/hybrid work can be longer.
-"""
-
-            result = _call_json(
-                client,
-                instructions,
-                {
-                    "challenge_id": challenge_id or None,
-                    "title": title,
-                    "description": description,
-                    "location": location,
-                    "district": district,
-                    "affected_people_reported": affected,
-                    "current_category": current_category or None,
-                    "current_stage": current_stage or None,
-                },
-                max_output_tokens=700,
-            )
-
-            return jsonify(_sanitize_analysis(result)), 200
-
-        return jsonify(error="Unsupported AI task."), 400
-
-    except Exception:
-        app.logger.exception("JanSamadhan AI request failed")
-        return jsonify(error="AI decision support is temporarily unavailable."), 500
+    return jsonify(error="Unsupported AI task."), 400
 
 
 if __name__ == "__main__":
