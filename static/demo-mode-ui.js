@@ -1,6 +1,6 @@
 /* JanSamadhan AI — lightweight runtime status + workflow loader.
    Keeps the page responsive, reports the active AI mode honestly,
-   and loads workflow-v4 + recurrence intelligence exactly once. */
+   and loads workflow-v4 + recurrence intelligence + admin profile exactly once. */
 (function(){
   "use strict";
 
@@ -96,11 +96,21 @@
     document.body.appendChild(s);
   }
 
+  function loadAdminProfile(){
+    if(id("js-admin-profile-v1"))return;
+    var s=document.createElement("script");
+    s.id="js-admin-profile-v1";
+    s.src="/static/admin-profile-v1.js";
+    s.defer=true;
+    document.body.appendChild(s);
+  }
+
   function init(){
     ensureBadge();
     checkHealth();
     loadWorkflow();
     loadRecurrence();
+    loadAdminProfile();
     new MutationObserver(function(){
       setTimeout(function(){ensureBadge();updatePrivacyNote()},0);
     }).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
