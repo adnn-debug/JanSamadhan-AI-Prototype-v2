@@ -75,6 +75,7 @@
     loadScript("js-recurrence-v1","/static/recurrence-v1.js");
     loadScript("js-admin-profile-v1","/static/admin-profile-v1.js");
     loadScript("js-judge-hardening-v1","/static/judge-hardening-v1.js");
+    loadScript("js-ui-simplification-v1","/static/ui-simplification-v1.js");
 
     new MutationObserver(function(){setTimeout(cleanChatbot,0)}).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
     new MutationObserver(function(){setTimeout(cleanChatbot,0)}).observe(document.body,{childList:true,subtree:true});
