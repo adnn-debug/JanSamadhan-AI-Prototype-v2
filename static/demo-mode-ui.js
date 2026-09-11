@@ -1,64 +1,40 @@
-/* JanSamadhan AI — lightweight runtime status + workflow loader.
-   Keeps the page responsive, reports the active AI mode honestly,
-   and loads workflow-v4 + recurrence intelligence + admin profile exactly once. */
+/* JanSamadhan AI — runtime status + additive workflow loader.
+   Keeps the interface clean while preserving an accessible AI/privacy disclosure. */
 (function(){
   "use strict";
 
   var modeLabel="AI decision support · Local fallback ready";
   var groqActive=false;
-  var noteObserver=null;
-  var updatingNote=false;
 
   function id(x){return document.getElementById(x)}
-  function setText(node,value){if(node&&node.textContent!==value)node.textContent=value}
   function isHindi(){return document.documentElement.lang==="hi"}
 
-  function privacyText(){
+  function disclosure(){
     if(groqActive){
       return isHindi()
-        ? "शैक्षणिक प्रोटोटाइप · कुछ सामान्य चैट प्रश्न और AI विश्लेषण कॉन्फ़िगर की गई Groq AI सेवा द्वारा प्रोसेस किए जा सकते हैं। चैलेंज ट्रैकिंग, लॉगिन और सत्यापित कार्यवाही जनसमाधान द्वारा ही संभाली जाती है। पासवर्ड, OTP, आधार नंबर या बैंकिंग जानकारी दर्ज न करें। आवाज़ पहचान आपके ब्राउज़र की स्पीच सेवा का उपयोग करती है, इसलिए माइक्रोफोन ऑडियो ब्राउज़र/प्रदाता द्वारा प्रोसेस हो सकता है। जनसमाधान कच्चा ऑडियो संग्रहीत नहीं करता।"
-        : "Academic prototype · Some free-text chat questions and AI analysis may be processed by the configured Groq AI service. Challenge tracking, login and verified workflow actions remain handled by JanSamadhan. Do not enter passwords, OTPs, Aadhaar numbers or banking information. Voice recognition uses your browser speech service, so microphone audio may be processed by the browser/provider. JanSamadhan does not store raw audio.";
+        ?"शैक्षणिक प्रोटोटाइप: सामान्य चैट और AI विश्लेषण Groq-आधारित LLM सेवा द्वारा प्रोसेस किए जा सकते हैं। सेवा उपलब्ध न होने पर deterministic local fallback उपयोग होता है। अंतिम रूटिंग और सत्यापन मानव प्रशासक करता है।"
+        :"Academic prototype: free-text chat and AI analysis may use the configured Groq-backed LLM service, with deterministic local fallback when unavailable. Final routing and verification remain human-controlled.";
     }
     return isHindi()
-      ? "शैक्षणिक प्रोटोटाइप · चैट और AI निर्णय सहायता अभी स्थानीय fallback logic से प्रोसेस होती है; कोई टेक्स्ट Groq को नहीं भेजा जाता। पासवर्ड, OTP, आधार नंबर या बैंकिंग जानकारी फिर भी दर्ज न करें। आवाज़ पहचान आपके ब्राउज़र की स्पीच सेवा का उपयोग करती है, इसलिए माइोफोन ऑडियो ब्राउज़र/प्रदाता द्वारा प्रोसेस हो सकता है। जनसमाधान कच्चा ऑडियो संग्रहीत नहीं करता।"
-      : "Academic prototype · Chat and AI decision support are currently processed by the local fallback logic; no text is sent to Groq. Still, do not enter passwords, OTPs, Aadhaar numbers or banking information. Voice recognition uses your browser speech service, so microphone audio may be processed by the browser/provider. JanSamadhan does not store raw audio.";
+      ?"शैक्षणिक प्रोटोटाइप: AI निर्णय-सहायता अभी deterministic local fallback logic पर चल रही है। अंतिम रूटिंग और सत्यापन मानव प्रशासक करता है।"
+      :"Academic prototype: AI decision support is currently using deterministic local fallback logic. Final routing and verification remain human-controlled.";
   }
 
-  function updatePrivacyNote(){
+  function cleanChatbot(){
     var note=id("chatbotNote");
-    if(!note)return;
-    var next=privacyText();
-    if(note.textContent===next)return;
-    updatingNote=true;
-    note.textContent=next;
-    updatingNote=false;
-  }
+    if(note)note.style.display="none";
 
-  function ensureNoteObserver(){
-    var note=id("chatbotNote");
-    if(!note||noteObserver)return;
-    noteObserver=new MutationObserver(function(){
-      if(updatingNote)return;
-      setTimeout(updatePrivacyNote,0);
-    });
-    noteObserver.observe(note,{childList:true,characterData:true,subtree:true});
-  }
-
-  function ensureBadge(){
-    var panel=id("chatbotPanel");
-    if(!panel)return;
     var badge=id("jsDemoModeBadge");
-    if(!badge){
-      badge=document.createElement("div");
-      badge.id="jsDemoModeBadge";
-      badge.style.cssText="font-size:.68rem;opacity:.72;margin:6px 11px 0;";
-      var note=id("chatbotNote");
-      if(note&&note.parentNode)note.parentNode.insertBefore(badge,note);
-      else panel.appendChild(badge);
+    if(badge)badge.remove();
+
+    var voiceTools=document.querySelector(".voice-tools");
+    if(voiceTools)voiceTools.style.display="none";
+
+    var info=id("jsh-chat-info");
+    if(info){
+      info.title=disclosure();
+      info.setAttribute("aria-label",isHindi()?"प्रोटोटाइप और AI जानकारी":"Prototype and AI information");
     }
-    setText(badge,modeLabel);
-    ensureNoteObserver();
-    updatePrivacyNote();
   }
 
   function checkHealth(){
@@ -66,54 +42,42 @@
       .then(function(r){if(!r.ok)throw new Error("health");return r.json()})
       .then(function(data){
         groqActive=!!(data&&data.ai_mode==="groq+local-fallback");
-        modeLabel=groqActive
-          ?"Real LLM via Groq · Automatic local fallback"
-          :"AI decision support · Local fallback mode";
-        ensureBadge();
+        modeLabel=groqActive?"LLM-assisted + local fallback":"Local fallback decision support";
+        window.JanSamadhanRuntime=window.JanSamadhanRuntime||{};
+        window.JanSamadhanRuntime.aiMode=groqActive?"groq":"local";
+        window.JanSamadhanRuntime.modeLabel=modeLabel;
+        cleanChatbot();
       })
       .catch(function(){
         groqActive=false;
-        modeLabel="AI decision support · Local fallback ready";
-        ensureBadge();
+        modeLabel="Local fallback decision support";
+        window.JanSamadhanRuntime=window.JanSamadhanRuntime||{};
+        window.JanSamadhanRuntime.aiMode="local";
+        window.JanSamadhanRuntime.modeLabel=modeLabel;
+        cleanChatbot();
       });
   }
 
-  function loadWorkflow(){
-    if(id("js-workflow-v4"))return;
+  function loadScript(scriptId,src){
+    if(id(scriptId))return;
     var s=document.createElement("script");
-    s.id="js-workflow-v4";
-    s.src="/static/workflow-v4.js";
-    s.defer=true;
-    document.body.appendChild(s);
-  }
-
-  function loadRecurrence(){
-    if(id("js-recurrence-v1"))return;
-    var s=document.createElement("script");
-    s.id="js-recurrence-v1";
-    s.src="/static/recurrence-v1.js";
-    s.defer=true;
-    document.body.appendChild(s);
-  }
-
-  function loadAdminProfile(){
-    if(id("js-admin-profile-v1"))return;
-    var s=document.createElement("script");
-    s.id="js-admin-profile-v1";
-    s.src="/static/admin-profile-v1.js";
+    s.id=scriptId;
+    s.src=src;
     s.defer=true;
     document.body.appendChild(s);
   }
 
   function init(){
-    ensureBadge();
+    cleanChatbot();
     checkHealth();
-    loadWorkflow();
-    loadRecurrence();
-    loadAdminProfile();
-    new MutationObserver(function(){
-      setTimeout(function(){ensureBadge();updatePrivacyNote()},0);
-    }).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
+
+    loadScript("js-workflow-v4","/static/workflow-v4.js");
+    loadScript("js-recurrence-v1","/static/recurrence-v1.js");
+    loadScript("js-admin-profile-v1","/static/admin-profile-v1.js");
+    loadScript("js-judge-hardening-v1","/static/judge-hardening-v1.js");
+
+    new MutationObserver(function(){setTimeout(cleanChatbot,0)}).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
+    new MutationObserver(function(){setTimeout(cleanChatbot,0)}).observe(document.body,{childList:true,subtree:true});
   }
 
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});
