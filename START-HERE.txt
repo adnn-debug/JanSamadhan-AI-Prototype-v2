@@ -4,7 +4,7 @@ JANSAMADHAN AI - ADVANCED COLLEGE PROTOTYPE
 RECOMMENDATION
 Update the present GitHub repository. Do not create a new repository.
 The current repository already has the Render deployment and Firebase connection.
-Develop and test on the advanced-college-demo branch, then merge it into main.
+Use a short-lived feature branch for changes, review them, then merge into main.
 
 MAIN DEPLOYED FILE
 templates/index.html
@@ -27,9 +27,9 @@ BrightGrid Solutions / BrightGrid Solutions123
 BEST 7-MINUTE COLLEGE DEMO
 1. Start on the homepage and explain that citizens do not need an account.
 2. Open Track Status and enter JS-1003. Show its institution, progress and public timeline.
-3. Report a new societal challenge. Show the AI category, priority, institution matches and Challenge ID receipt.
+3. Report a new societal challenge. Add a map pin, then show the AI category, priority, duplicate/location signals and Challenge ID receipt.
 4. Register a new Student partner. Show that login is blocked while approval is pending.
-5. Log in as admin. Approve the partner and show critical alerts, analytics and lifecycle controls.
+5. Log in as admin. Show the GIS Challenge Map, critical alerts, analytics and lifecycle controls.
 6. Log in as Aditi. Open JS-1003, show its proposal, add a milestone and submit a solution for validation.
 7. Return as admin. Verify completion with beneficiaries, outcome metric and evidence.
 8. Track the same ID again as a citizen and show the published impact.
@@ -39,10 +39,14 @@ WHAT IS NOW FUNCTIONAL
 - Citizen reporting without login or approval
 - Challenge ID receipt, copy action and public status search
 - Privacy-safe public tracking result
-- Explainable AI category, urgency and safety analysis
+- LLM-assisted analysis when Groq is configured, with deterministic local fallback
+- Explainable category, urgency, safety, routing and duplicate signals
 - Active duplicate matching and evidence clustering
+- Optional citizen-selected map pin and explicit browser geolocation button
+- Admin GIS challenge map with exact-vs-approximate location labels
+- Location-based nearby-case and recurrence signals for geo-tagged reports
 - Critical, high, medium and normal priority support
-- University recommendations by challenge category
+- University recommendations by challenge category/capability context
 - Partner registration with administrator approve/reject flow
 - Student team claim, proposal, milestone and solution submission
 - University mentoring/lab support and milestone validation
@@ -53,36 +57,39 @@ WHAT IS NOW FUNCTIONAL
 - Analytics for category distribution and pipeline position
 - Verified beneficiary and outcome metrics
 - Live Firebase sync with local browser fallback
-- Hindi homepage entry points, text resizing and high contrast
+- Hindi interface support, text resizing and high contrast
+- Progressive disclosure: important status first, deeper reasoning one click away
 
 IMPORTANT TRUTH FOR THE JURY
-The AI in this college prototype is an explainable rule-based simulation. Say that clearly.
-It demonstrates the product workflow and the inputs/outputs expected from a future trained model.
-Human validation remains required for priority, assignment and completion.
+The prototype uses LLM-assisted decision support when Groq is configured and deterministic local fallback when it is unavailable.
+Duplicate/recurrence intelligence remains explainable and combines report text/concepts, locality/category/recency signals and, where available, map coordinates.
+AI recommendations are advisory. Government / Nodal Administrator remains the case owner and human validation controls routing and completion.
+Do not claim the current prototype is a trained proprietary model or a production-ready government system.
 
 WHAT A PRODUCTION VERSION STILL NEEDS
-- Server-side authentication, role authorization and secure administrator controls
+- Server-side authentication, verified role authorization and secure administrator controls
 - OTP or verified institutional identity instead of demo credentials
-- A trained multilingual classification and semantic duplicate model
-- GIS maps, geotag verification and jurisdiction routing
+- Vector/embedding semantic search and trained multilingual classification where justified
+- Verified geocoding, jurisdiction boundaries and department routing rules
 - SMS, WhatsApp, email and push notifications
 - Secure object storage for evidence instead of data URLs in Firestore
 - Formal consent, retention, audit log and content-moderation policies
-- Government department APIs and SLA/escalation integrations
+- Government department APIs and official SLA/escalation integrations
 - Offline-first mobile/PWA reporting and assisted access kiosks
 - Model monitoring, bias testing, appeal/correction workflow and security testing
 
 SAFE GITHUB AND RENDER UPDATE
-1. Keep the current main branch live while testing.
-2. Push advanced-college-demo to the same GitHub repository.
-3. Open a pull request into main and review the changed templates/index.html file.
-4. Merge only after the report, tracker and four role dashboards work on your laptop.
-5. Render should automatically deploy main using the existing build and start commands.
-6. Open the Render URL in an incognito window and run the 7-minute demo once.
+1. Keep main live while developing on a feature branch.
+2. Open a pull request into main and review every changed file.
+3. Merge only after report, map, tracker and all four role dashboards pass a smoke test.
+4. Render should automatically deploy main using the existing build and start commands.
+5. Open the Render URL in an incognito window and run the full demo once.
+6. Verify the map degrades gracefully if Leaflet/OpenStreetMap cannot load.
 7. If Firebase says Local demo mode, verify Firebase Anonymous Authentication and Firestore rules before presentation day.
 
 DO NOT
 - Create a second repository unless the current repository cannot be accessed.
 - Delete the existing Render service or Firebase project.
-- Claim that the demo AI is a trained production model.
+- Claim that AI recommendations are official government decisions.
+- Claim that the current prototype is production-ready or uses a proprietary trained model.
 - Use real personal passwords in prototype registration.
