@@ -34,7 +34,6 @@
     card.dataset.jsuSimplified="1";
     var block=makeDetails(hi()?"अधिक विवरण":"View details");
     var moved=false;
-
     var meta=card.querySelector(":scope > .meta");
     if(meta){
       meta.classList.add("jsu-primary-meta");
@@ -45,11 +44,9 @@
         block.body.appendChild(extra);moved=true;
       }
     }
-
     [".ai",".review-flag",".supportlist",".solution",".jsai-box",".jsh-dup",".jswf-path-note"].forEach(function(sel){
       Array.from(card.querySelectorAll(":scope > "+sel)).forEach(function(n){block.body.appendChild(n);moved=true})
     });
-
     if(moved){
       var actions=card.querySelector(":scope > .cardactions");
       if(actions)card.insertBefore(block.root,actions);else card.appendChild(block.root);
@@ -62,12 +59,9 @@
       if(box.dataset.jsuCompact)return;box.dataset.jsuCompact="1";box.classList.add("jsu-compact-ai");
       var detail=makeDetails(hi()?"AI ने यह क्यों सुझाया?":"Why this recommendation?");
       var moved=false;
-      Array.from(box.children).forEach(function(n){
-        if(n.tagName==="P"||n.tagName==="SMALL"){detail.body.appendChild(n);moved=true}
-      });
+      Array.from(box.children).forEach(function(n){if(n.tagName==="P"||n.tagName==="SMALL"){detail.body.appendChild(n);moved=true}});
       if(moved)box.appendChild(detail.root);
     });
-
     Array.from(out.querySelectorAll(":scope > .jsh-dup")).forEach(function(box){
       if(box.parentElement&&box.parentElement.classList.contains("jsu-dup-wrap"))return;
       if(box.classList.contains("high"))return;
@@ -98,11 +92,21 @@
     });
   }
 
-  function cleanSecondaryHeadings(){
-    if(isAdmin())return;
-    document.querySelectorAll("#content .panelhead p").forEach(function(p){
-      if(String(p.textContent||"").length>110)p.style.display="none";
+  function updateLabels(){
+    document.querySelectorAll(".jsu-details>summary").forEach(function(s){
+      if(s.closest("#jsai-report-result"))s.textContent=hi()?"AI ने यह क्यों सुझाया?":"Why this recommendation?";
+      else if(s.closest("#trackResult"))s.textContent=hi()?"रूटिंग का कारण":"Why this route?";
+      else s.textContent=hi()?"अधिक विवरण":"View details";
     });
+    document.querySelectorAll(".jsu-home-details>summary").forEach(function(s){s.textContent=hi()?"सिस्टम कैसे काम करता है देखें":"See system details"});
+    document.querySelectorAll(".jsu-dup-wrap>summary").forEach(function(s){s.textContent=hi()?"डुप्लिकेट जाँच":"Duplicate check"});
+  }
+
+  function cleanSecondaryHeadings(){
+    var paragraphs=document.querySelectorAll("#content .panelhead p");
+    paragraphs.forEach(function(p){p.style.display=""});
+    if(isAdmin())return;
+    paragraphs.forEach(function(p){if(String(p.textContent||"").length>110)p.style.display="none"});
   }
 
   function scan(){
@@ -112,6 +116,7 @@
     simplifyTracker();
     simplifyHomepage();
     cleanSecondaryHeadings();
+    updateLabels();
   }
 
   function init(){
