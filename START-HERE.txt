@@ -62,9 +62,9 @@ WHAT IS NOW FUNCTIONAL
 
 IMPORTANT TRUTH FOR THE JURY
 The prototype uses LLM-assisted decision support when Groq is configured and deterministic local fallback when it is unavailable.
-Duplicate/recurrence intelligence remains explainable and combines report text/concepts, locality/category/recency signals and, where available, map coordinates.
-AI recommendations are advisory. Government / Nodal Administrator remains the case owner and human validation controls routing and completion.
-Do not claim the current prototype is a trained proprietary model or a production-ready government system.
+The core automatic duplicate merge is still based on explainable text/concept, locality and category similarity. GIS adds separate nearby-case and coordinate-based recurrence signals where citizens provide a map pin.
+AI and GIS signals are advisory. Government / Nodal Administrator remains the case owner and human validation controls routing and completion.
+Do not claim the current prototype is a trained proprietary model, vector-search system or production-ready government platform.
 
 WHAT A PRODUCTION VERSION STILL NEEDS
 - Server-side authentication, verified role authorization and secure administrator controls
