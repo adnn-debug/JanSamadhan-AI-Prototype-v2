@@ -86,3 +86,65 @@
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});
   else init();
 })();
+
+/* Leaflet report-map resize hotfix.
+   The report map is created while its modal can still be hidden. Leaflet then
+   measures a tiny/zero container and only paints tiles in part of the visible
+   area. When the modal/map becomes visible, trigger the resize event Leaflet
+   already listens for so it recalculates the map size and fills the container. */
+(function(){
+  "use strict";
+
+  var observedMap=null;
+  var resizeObserver=null;
+  var attachTimer=null;
+
+  function mapBox(){return document.getElementById("jsgeo-report-map")}
+
+  function refreshMapLayout(){
+    var box=mapBox();
+    if(!box||box.offsetWidth<40||box.offsetHeight<40)return;
+    try{window.dispatchEvent(new Event("resize"))}catch(e){}
+  }
+
+  function scheduleRefresh(){
+    [0,60,160,320].forEach(function(delay){setTimeout(refreshMapLayout,delay)});
+  }
+
+  function attachResizeWatch(){
+    var box=mapBox();
+    if(!box||box===observedMap)return;
+    observedMap=box;
+
+    if(resizeObserver){try{resizeObserver.disconnect()}catch(e){}}
+    if("ResizeObserver" in window){
+      resizeObserver=new ResizeObserver(function(entries){
+        var rect=entries&&entries[0]&&entries[0].contentRect;
+        if(rect&&rect.width>40&&rect.height>40)scheduleRefresh();
+      });
+      resizeObserver.observe(box);
+    }
+    scheduleRefresh();
+  }
+
+  function queueAttach(){
+    clearTimeout(attachTimer);
+    attachTimer=setTimeout(attachResizeWatch,0);
+  }
+
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",queueAttach,{once:true});
+  else queueAttach();
+
+  new MutationObserver(function(){queueAttach()}).observe(document.body,{
+    childList:true,
+    subtree:true,
+    attributes:true,
+    attributeFilter:["class","style","open","aria-hidden"]
+  });
+
+  document.addEventListener("click",function(){
+    if(mapBox())scheduleRefresh();
+  },true);
+
+  window.addEventListener("orientationchange",scheduleRefresh);
+})();
