@@ -63,7 +63,7 @@
     var s=document.createElement("script");
     s.id=scriptId;
     s.src=src;
-    s.defer=true;
+    s.async=false;
     document.body.appendChild(s);
   }
 
@@ -76,6 +76,7 @@
     loadScript("js-admin-profile-v1","/static/admin-profile-v1.js");
     loadScript("js-judge-hardening-v1","/static/judge-hardening-v1.js");
     loadScript("js-ui-simplification-v1","/static/ui-simplification-v1.js");
+    loadScript("js-jharkhand-map-bounds-v1","/static/jharkhand-map-bounds-v1.js");
     loadScript("js-gis-map-v1","/static/gis-map-v1.js");
     loadScript("js-gis-receipt-fix-v1","/static/gis-receipt-fix-v1.js");
     loadScript("js-jharkhand-jurisdiction-v1","/static/jharkhand-jurisdiction-v1.js");
