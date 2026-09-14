@@ -60,10 +60,10 @@
     wrap.appendChild(n);
   }
 
-  function labelUseLocation(){
+  function annotateUseLocation(){
     var btn=id("jsgeo-use-location");if(!btn)return;
-    btn.textContent=isHindi()?"मेरी लोकेशन (केवल झारखंड में)":"Use my location (Jharkhand only)";
-    btn.title=isHindi()?"यदि आप झारखंड के बाहर हैं तो मानचित्र पर झारखंड स्थान चुनें।":"If you are outside Jharkhand, choose a Jharkhand location on the map instead.";
+    btn.title=isHindi()?"केवल झारखंड के अंदर होने पर उपयोग करें। बाहर होने पर मानचित्र पर झारखंड स्थान चुनें।":"Use only when you are physically inside Jharkhand. Otherwise choose a Jharkhand location on the map.";
+    btn.setAttribute("aria-label",isHindi()?"मेरी लोकेशन इस्तेमाल करें — केवल झारखंड में":"Use my location — Jharkhand only");
   }
 
   function bindSubmit(){
@@ -85,7 +85,7 @@
   }
 
   function scan(){
-    wrapGIS();labelUseLocation();bindSubmit();ensureNotice();
+    wrapGIS();annotateUseLocation();bindSubmit();ensureNotice();
     if(!mapFailed()&&id("jsdemo-map-fallback-note"))id("jsdemo-map-fallback-note").remove();
   }
 
@@ -93,7 +93,7 @@
     scan();
     new MutationObserver(function(){clearTimeout(scanTimer);scanTimer=setTimeout(scan,80)}).observe(document.body,{childList:true,subtree:true});
     new MutationObserver(function(){setTimeout(scan,0)}).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
-    window.JanSamadhanDemoResilience={version:"1.0",mapFallbackActive:function(){return mapFailed()},fallbackUsed:function(){return fallbackUsed}};
+    window.JanSamadhanDemoResilience={version:"1.1",mapFallbackActive:function(){return mapFailed()},fallbackUsed:function(){return fallbackUsed}};
   }
 
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
