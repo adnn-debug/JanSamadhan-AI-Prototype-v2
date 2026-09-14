@@ -46,6 +46,35 @@
     wrapped=true;
   }
 
+  function ensureRequirementStyles(){
+    if(id("jsdemo-map-requirement-style"))return;
+    var s=document.createElement("style");
+    s.id="jsdemo-map-requirement-style";
+    s.textContent='.jsdemo-map-label{font-size:0!important}.jsdemo-map-label::after{content:"Map location (required)";font-size:.77rem;font-weight:800;color:#30483b}html[lang="hi"] .jsdemo-map-label::after{content:"मानचित्र स्थान (आवश्यक)"}body.jsdemo-map-outage .jsdemo-map-label::after{content:"Map location (temporarily unavailable)"}html[lang="hi"] body.jsdemo-map-outage .jsdemo-map-label::after{content:"मानचित्र स्थान (अस्थायी रूप से उपलब्ध नहीं)"}';
+    document.head.appendChild(s);
+  }
+
+  function requirementText(){
+    return isHindi()?"रिपोर्ट जमा करने से पहले झारखंड के अंदर स्थान पिन चुनें।":"Choose a pin inside Jharkhand before submitting the report.";
+  }
+
+  function annotateMapRequirement(){
+    ensureRequirementStyles();
+    var wrap=id("jsgeo-wrap"),failed=mapFailed();
+    document.body.classList.toggle("jsdemo-map-outage",failed);
+    if(!wrap)return;
+    var label=wrap.querySelector("label");
+    if(label){
+      label.classList.add("jsdemo-map-label");
+      label.setAttribute("aria-label",failed?(isHindi()?"मानचित्र स्थान अस्थायी रूप से उपलब्ध नहीं":"Map location temporarily unavailable"):(isHindi()?"मानचित्र स्थान आवश्यक":"Map location required"));
+    }
+    if(!failed){
+      var status=id("jsgeo-status"),geo=null;
+      try{if(window.JanSamadhanGIS&&typeof window.JanSamadhanGIS.getPendingGeo==="function")geo=window.JanSamadhanGIS.getPendingGeo()}catch(e){}
+      if(status&&!geo&&status.textContent!==requirementText())status.textContent=requirementText();
+    }
+  }
+
   function ensureNotice(){
     var box=id("jsgeo-report-map");
     if(!box||!mapFailed())return;
@@ -64,6 +93,18 @@
     var btn=id("jsgeo-use-location");if(!btn)return;
     btn.title=isHindi()?"केवल झारखंड के अंदर होने पर उपयोग करें। बाहर होने पर मानचित्र पर झारखंड स्थान चुनें।":"Use only when you are physically inside Jharkhand. Otherwise choose a Jharkhand location on the map.";
     btn.setAttribute("aria-label",isHindi()?"मेरी लोकेशन इस्तेमाल करें — केवल झारखंड में":"Use my location — Jharkhand only");
+  }
+
+  function bindClearPin(){
+    var btn=id("jsgeo-clear");if(!btn||btn.dataset.jsdemoRequiredBound==="1")return;
+    btn.dataset.jsdemoRequiredBound="1";
+    btn.addEventListener("click",function(){
+      setTimeout(function(){
+        if(mapFailed())return;
+        var s=id("jsgeo-status");
+        if(s)s.textContent=requirementText();
+      },30);
+    });
   }
 
   function bindSubmit(){
@@ -85,7 +126,7 @@
   }
 
   function scan(){
-    wrapGIS();annotateUseLocation();bindSubmit();ensureNotice();
+    wrapGIS();annotateMapRequirement();annotateUseLocation();bindClearPin();bindSubmit();ensureNotice();
     if(!mapFailed()&&id("jsdemo-map-fallback-note"))id("jsdemo-map-fallback-note").remove();
   }
 
@@ -93,7 +134,7 @@
     scan();
     new MutationObserver(function(){clearTimeout(scanTimer);scanTimer=setTimeout(scan,80)}).observe(document.body,{childList:true,subtree:true});
     new MutationObserver(function(){setTimeout(scan,0)}).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
-    window.JanSamadhanDemoResilience={version:"1.1",mapFallbackActive:function(){return mapFailed()},fallbackUsed:function(){return fallbackUsed}};
+    window.JanSamadhanDemoResilience={version:"1.2",mapFallbackActive:function(){return mapFailed()},fallbackUsed:function(){return fallbackUsed}};
   }
 
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
