@@ -79,6 +79,7 @@
     loadScript("js-jharkhand-map-bounds-v1","/static/jharkhand-map-bounds-v1.js");
     loadScript("js-gis-map-v1","/static/gis-map-v1.js");
     loadScript("js-gis-receipt-fix-v1","/static/gis-receipt-fix-v1.js");
+    loadScript("js-demo-resilience-v1","/static/demo-resilience-v1.js");
     loadScript("js-jharkhand-jurisdiction-v1","/static/jharkhand-jurisdiction-v1.js");
 
     new MutationObserver(function(){setTimeout(cleanChatbot,0)}).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
