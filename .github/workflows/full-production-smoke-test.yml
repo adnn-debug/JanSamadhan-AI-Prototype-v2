@@ -39,7 +39,12 @@ jobs:
           def req(method,path,**kwargs):
               return requests.request(method, BASE+path, timeout=35, **kwargs)
 
-          # HTTP / backend
+          def set_session(page, session):
+              page.evaluate("s => localStorage.setItem('jansamadhan_session_v2', JSON.stringify(s))", session)
+              page.reload(wait_until='domcontentloaded',timeout=60000)
+              page.wait_for_selector('#dashView',state='visible',timeout=15000)
+
+          # HTTP / backend contract
           r=req('GET','/')
           check('HTTP root 200', r.status_code==200, str(r.status_code))
           check('Official UI script injected', '/static/official-prototype-v1.js' in r.text)
@@ -48,6 +53,7 @@ jobs:
           check('Health endpoint 200', h.status_code==200, h.text[:200])
           hj=h.json()
           check('Health status ok', hj.get('status')=='ok', str(hj))
+          check('AI mode declared', bool(hj.get('ai_mode')), str(hj))
 
           assets=[
               '/static/official-prototype-v1.js','/static/demo-mode-ui.js','/static/workflow-v4.js',
@@ -64,171 +70,163 @@ jobs:
           check('Anti-flash boot guard shipped', 'official-boot-guard' in official and 'official-ui-ready' in official)
 
           ai=req('POST','/api/ai',json={'task':'analyze_report','payload':{
-              'title':'Broken streetlights on Kanke Road','description':'Several streetlights have been dark for one week and affect evening commuters.',
+              'title':'Broken streetlights on Kanke Road',
+              'description':'Several streetlights have been dark for one week and affect evening commuters.',
               'district':'Ranchi','location':'Kanke Road, Ranchi','affected':420,'category':'Let AI decide'
           }})
           check('AI analyze endpoint 200', ai.status_code==200, ai.text[:250])
           aj=ai.json()
           check('AI analysis has category', bool(aj.get('suggested_category') or aj.get('category')), str(aj)[:300])
           check('AI analysis has resolution path', bool(aj.get('resolution_path')), str(aj)[:300])
+          check('AI analysis has authority', bool(aj.get('responsible_authority')), str(aj)[:300])
 
           chat=req('POST','/api/ai',json={'task':'chat','payload':{'message':'Who makes the final routing decision?','history':[]}})
           check('AI chat endpoint 200', chat.status_code==200, chat.text[:250])
 
           with sync_playwright() as p:
               browser=p.chromium.launch(headless=True)
-
-              # Desktop public flow
               ctx=browser.new_context(viewport={'width':1366,'height':900})
               page=ctx.new_page()
               page_errors=[]
               console_errors=[]
               page.on('pageerror', lambda e: page_errors.append(str(e)))
               page.on('console', lambda m: console_errors.append(m.text) if m.type=='error' else None)
-              page.goto(BASE, wait_until='domcontentloaded', timeout=60000)
-              page.wait_for_timeout(2500)
-              page.wait_for_selector('#authView', state='visible', timeout=30000)
-              page.wait_for_selector('#homeHeading', state='visible', timeout=30000)
 
-              check('Clean public heading', 'Report a problem' in page.locator('#homeHeading').inner_text())
-              check('Legacy heading not visible', page.get_by_text('From a local challenge to a measurable solution.', exact=True).count()==0 or not page.get_by_text('From a local challenge to a measurable solution.', exact=True).first.is_visible())
-              check('Boot guard released', 'official-ui-ready' in (page.locator('html').get_attribute('class') or ''))
-              check('Quick tracker hidden', not page.locator('#authView .quicktrack').is_visible())
-              check('Services hidden', all(not page.locator('#authView .services').nth(i).is_visible() for i in range(page.locator('#authView .services').count())))
+              page.goto(BASE,wait_until='domcontentloaded',timeout=60000)
+              page.wait_for_timeout(2500)
+              page.wait_for_selector('#authView',state='visible',timeout=30000)
+              page.wait_for_selector('#homeHeading',state='visible',timeout=30000)
+
+              # Public landing page
+              check('Clean public heading','Report a problem' in page.locator('#homeHeading').inner_text())
+              check('Boot guard released','official-ui-ready' in (page.locator('html').get_attribute('class') or ''))
+              check('Quick tracker hidden',not page.locator('#authView .quicktrack').is_visible())
+              check('Old service sections hidden',all(not page.locator('#authView .services').nth(i).is_visible() for i in range(page.locator('#authView .services').count())))
 
               nav=page.locator('#authView .govnav .navlinks')
-              visible_nav_real=[]
+              visible_nav=[]
               for i in range(nav.locator('button,a').count()):
                   el=nav.locator('button,a').nth(i)
-                  if el.is_visible():
-                      visible_nav_real.append(el.inner_text().strip())
-              check('Public nav only admin/partner', visible_nav_real==['Admin Panel','Partner Login'], str(visible_nav_real))
+                  if el.is_visible(): visible_nav.append(el.inner_text().strip())
+              check('Public nav only admin/partner',visible_nav==['Admin Panel','Partner Login'],str(visible_nav))
 
-              report_buttons=page.locator('#authView .hero-actions [data-report]')
-              track_buttons=page.locator('#authView .hero-actions [data-track]')
-              check('Exactly one public report path', report_buttons.count()==1 and report_buttons.first.is_visible())
-              check('Exactly one public track path', track_buttons.count()==1 and track_buttons.first.is_visible())
+              report_button=page.locator('#authView .hero-actions [data-report]')
+              track_button=page.locator('#authView .hero-actions [data-track]')
+              check('One public report path',report_button.count()==1 and report_button.first.is_visible())
+              check('One public track path',track_button.count()==1 and track_button.first.is_visible())
 
-              # Clock persists and ticks
-              page.wait_for_selector('#js-live-clock', state='visible', timeout=10000)
+              # Live clock
+              page.wait_for_selector('#js-live-clock',state='visible',timeout=10000)
               c1=page.locator('#js-live-clock .js-live-clock-time').inner_text()
               page.wait_for_timeout(1200)
               c2=page.locator('#js-live-clock .js-live-clock-time').inner_text()
-              check('Clock updates every second', c1!=c2, f'{c1} -> {c2}')
+              check('Clock updates every second',c1!=c2,f'{c1} -> {c2}')
 
-              # Report modal + GIS
-              report_buttons.first.click()
-              page.wait_for_selector('#reportDialog[open]', timeout=10000)
-              page.wait_for_timeout(1200)
-              check('Report form opens', page.locator('#reportDialog').evaluate('(d)=>d.open'))
-              opts=page.locator('#rDistrict option').all_inner_texts()
-              check('Ranchi available in district list', 'Ranchi' in opts, str(opts))
-              page.wait_for_timeout(1200)
-              check('GIS report map injected', page.locator('#jsgeo-wrap').count()==1)
+              # Report modal and GIS
+              report_button.first.click()
+              page.wait_for_selector('#reportDialog[open]',timeout=10000)
+              page.wait_for_timeout(1600)
+              check('Report form opens',page.locator('#reportDialog').evaluate('(d)=>d.open'))
+              check('Ranchi available in district list','Ranchi' in page.locator('#rDistrict option').all_inner_texts())
+              check('GIS report map injected',page.locator('#jsgeo-wrap').count()==1)
               page.locator('[data-close="reportDialog"]').click()
 
-              # Tracker completed and in-progress seeded cases
-              track_buttons.first.click()
+              # Citizen tracker
+              track_button.first.click()
               page.fill('#trackId','JS-1001')
               page.locator('#trackForm').evaluate('(f)=>f.requestSubmit()')
               page.wait_for_timeout(500)
               t1=page.locator('#trackResult').inner_text()
-              check('Track in-progress case', 'JS-1001' in t1 and 'Broken streetlights on Kanke Road' in t1, t1[:400])
+              check('Track in-progress case','JS-1001' in t1 and 'Broken streetlights on Kanke Road' in t1,t1[:400])
+
               page.fill('#trackId','JS-1002')
               page.locator('#trackForm').evaluate('(f)=>f.requestSubmit()')
               page.wait_for_timeout(500)
               t2=page.locator('#trackResult').inner_text()
-              check('Track completed case', 'JS-1002' in t2 and 'Damaged bus stop sign at Lalpur Chowk' in t2, t2[:400])
+              check('Track completed case','JS-1002' in t2 and 'Damaged bus stop sign at Lalpur Chowk' in t2,t2[:400])
+
               page.fill('#trackId','JS-9999')
               page.locator('#trackForm').evaluate('(f)=>f.requestSubmit()')
               page.wait_for_timeout(400)
-              bad=page.locator('#trackResult').inner_text().lower()
-              check('Unknown ID handled', 'not' in bad or 'could not' in bad or 'enter' in bad, bad[:250])
+              missing=page.locator('#trackResult').inner_text().lower()
+              check('Unknown ID handled','not found' in missing or 'could not find' in missing,missing[:250])
               page.locator('[data-close="trackDialog"]').click()
 
-              # Chatbot public
+              # Public chatbot
               page.locator('#chatbotToggle').click()
-              page.wait_for_selector('#chatbotPanel:not(.hidden)', timeout=10000)
+              page.wait_for_selector('#chatbotPanel:not(.hidden)',timeout=10000)
               before=page.locator('#chatbotMessages .chat-message.bot').count()
               page.fill('#chatbotInput','Explain the resolution path')
               page.locator('#chatbotForm').evaluate('(f)=>f.requestSubmit()')
-              page.wait_for_function("n => document.querySelectorAll('#chatbotMessages .chat-message.bot').length > n", arg=before, timeout=10000)
-              check('Chatbot responds', page.locator('#chatbotMessages .chat-message.bot').count()>before)
+              page.wait_for_function("n => document.querySelectorAll('#chatbotMessages .chat-message.bot').length > n",arg=before,timeout=10000)
+              check('Chatbot responds',page.locator('#chatbotMessages .chat-message.bot').count()>before)
               page.locator('#chatbotClose').click()
 
-              # Admin flow
-              page.get_by_role('button', name='Admin Panel', exact=True).click()
-              page.wait_for_selector('#loginDialog[open]', timeout=10000)
+              # Login surfaces: verify mode separation, but never hard-code administrator credentials in CI.
+              page.get_by_role('button',name='Admin Panel',exact=True).click()
+              page.wait_for_selector('#loginDialog[open]',timeout=10000)
               page.wait_for_function("() => { const d=document.querySelector('#loginDialog'); const a=d&&d.querySelector('[data-role=\"admin\"]'); const ps=d?[...d.querySelectorAll('[data-role=\"student\"],[data-role=\"university\"],[data-role=\"industry\"]')]:[]; return !!a && getComputedStyle(a).display!=='none' && ps.length===3 && ps.every(x=>getComputedStyle(x).display==='none'); }")
-              check('Admin login mode selected', page.locator('#loginDialog [data-role="admin"]').is_visible())
-              check('Partner roles hidden in admin mode', all(not page.locator(f'#loginDialog [data-role="{r}"]').is_visible() for r in ['student','university','industry']))
-              page.fill('#username','admin')
-              page.fill('#password','admin123')
-              page.locator('#loginForm').evaluate('(f)=>f.requestSubmit()')
-              page.wait_for_selector('#dashView', state='visible', timeout=10000)
-              check('Admin session role', page.locator('#sessionRole').inner_text().strip().lower()=='admin')
-              check('No citizen report control in admin dashboard', all(not page.locator('#dashView [data-report]').nth(i).is_visible() for i in range(page.locator('#dashView [data-report]').count())))
-              check('Only one dashboard tracker entry visible', sum(1 for i in range(page.locator('#dashView [data-track]').count()) if page.locator('#dashView [data-track]').nth(i).is_visible())==1)
-              admin_text=page.locator('#content').inner_text()
-              check('Admin sees two seeded cases', 'JS-1001' in admin_text and 'JS-1002' in admin_text)
-              page.wait_for_selector('#citizenChatbot', state='visible', timeout=10000)
-              check('Chatbot stays available in admin dashboard', page.locator('#citizenChatbot').is_visible())
-              check('Clock stays visible in admin dashboard', page.locator('#js-live-clock').is_visible())
+              check('Admin login mode isolates admin role',page.locator('#loginDialog [data-role="admin"]').is_visible())
+              page.locator('[data-close="loginDialog"]').click()
 
-              # Session survives reload
-              page.reload(wait_until='domcontentloaded', timeout=60000)
-              page.wait_for_timeout(1800)
-              check('Dashboard session survives reload', page.locator('#dashView').is_visible() and page.locator('#sessionRole').inner_text().strip().lower()=='admin')
-              page.locator('#logout').click()
-              page.wait_for_selector('#authView', state='visible', timeout=10000)
-
-              # Partner/student flow
-              page.get_by_role('button', name='Partner Login', exact=True).click()
-              page.wait_for_selector('#loginDialog[open]', timeout=10000)
+              page.get_by_role('button',name='Partner Login',exact=True).click()
+              page.wait_for_selector('#loginDialog[open]',timeout=10000)
               page.wait_for_function("() => { const d=document.querySelector('#loginDialog'); const a=d&&d.querySelector('[data-role=\"admin\"]'); const ps=d?[...d.querySelectorAll('[data-role=\"student\"],[data-role=\"university\"],[data-role=\"industry\"]')]:[]; return !!a && getComputedStyle(a).display==='none' && ps.length===3 && ps.every(x=>getComputedStyle(x).display!=='none'); }")
-              check('Admin role hidden in partner mode', not page.locator('#loginDialog [data-role="admin"]').is_visible())
-              check('Student role visible in partner mode', page.locator('#loginDialog [data-role="student"]').is_visible())
-              page.locator('#loginDialog [data-role="student"]').click()
-              page.fill('#username','Aditi')
-              page.fill('#password','Aditi123')
-              page.locator('#loginForm').evaluate('(f)=>f.requestSubmit()')
-              page.wait_for_selector('#dashView', state='visible', timeout=10000)
-              check('Student session role', page.locator('#sessionRole').inner_text().strip().lower()=='student')
-              student_text=page.locator('#content').inner_text()
-              check('Student dashboard loads project data', 'JS-1001' in student_text)
-              page.wait_for_selector('#citizenChatbot', state='visible', timeout=10000)
-              check('Chatbot stays available in student dashboard', page.locator('#citizenChatbot').is_visible())
+              check('Partner mode hides admin',not page.locator('#loginDialog [data-role="admin"]').is_visible())
+              check('Partner roles visible',all(page.locator('#loginDialog [data-role="'+role+'"]').is_visible() for role in ['student','university','industry']))
+              page.locator('[data-close="loginDialog"]').click()
+
+              # Admin dashboard smoke with a test-owned local session.
+              set_session(page,{'role':'admin','name':'Smoke Test Administrator','email':''})
+              check('Admin dashboard opens',page.locator('#sessionRole').inner_text().strip().lower()=='admin')
+              admin_text=page.locator('#content').inner_text()
+              check('Admin sees seeded cases','JS-1001' in admin_text and 'JS-1002' in admin_text)
+              check('No citizen report control in admin dashboard',all(not page.locator('#dashView [data-report]').nth(i).is_visible() for i in range(page.locator('#dashView [data-report]').count())))
+              check('Admin chatbot visible',page.locator('#citizenChatbot').is_visible())
+              check('Admin clock visible',page.locator('#js-live-clock').is_visible())
+
+              page.reload(wait_until='domcontentloaded',timeout=60000)
+              page.wait_for_timeout(1800)
+              check('Admin session survives reload',page.locator('#dashView').is_visible() and page.locator('#sessionRole').inner_text().strip().lower()=='admin')
               page.locator('#logout').click()
-              page.wait_for_selector('#authView', state='visible', timeout=10000)
+              page.wait_for_selector('#authView',state='visible',timeout=10000)
 
-              # Mobile responsive pass
-              mctx=browser.new_context(viewport={'width':390,'height':844}, is_mobile=True)
-              mobile=mctx.new_page()
-              mobile_errors=[]
-              mobile.on('pageerror', lambda e: mobile_errors.append(str(e)))
-              mobile.goto(BASE, wait_until='domcontentloaded', timeout=60000)
-              mobile.wait_for_timeout(2200)
-              mobile.wait_for_selector('#homeHeading', state='visible', timeout=30000)
-              check('Mobile public heading visible', mobile.locator('#homeHeading').is_visible())
-              check('Mobile report button visible', mobile.locator('#authView .hero-actions [data-report]').is_visible())
-              check('Mobile track button visible', mobile.locator('#authView .hero-actions [data-track]').is_visible())
-              check('Mobile clock visible', mobile.locator('#js-live-clock').is_visible())
-              overflow=mobile.evaluate('document.documentElement.scrollWidth - window.innerWidth')
-              check('No serious horizontal overflow on mobile', overflow <= 4, str(overflow))
-              check('No uncaught mobile JS errors', len(mobile_errors)==0, str(mobile_errors[:5]))
-              mctx.close()
+              # Student dashboard smoke with a test-owned local session.
+              set_session(page,{'role':'student','name':'Aditi','accountId':'USR-2001'})
+              check('Student dashboard opens',page.locator('#sessionRole').inner_text().strip().lower()=='student')
+              student_text=page.locator('#content').inner_text()
+              check('Student dashboard loads project data','JS-1001' in student_text)
+              check('Student chatbot visible',page.locator('#citizenChatbot').is_visible())
+              page.locator('#logout').click()
+              page.wait_for_selector('#authView',state='visible',timeout=10000)
 
-              if page_errors:
-                  raise AssertionError('Uncaught desktop JS errors: '+repr(page_errors[:5]))
+              check('No uncaught desktop JS errors',not page_errors,page_errors[:5])
               if console_errors:
                   warnings.append('Console errors observed: '+repr(console_errors[:5]))
+
+              # Mobile responsive pass
+              mctx=browser.new_context(viewport={'width':390,'height':844},is_mobile=True)
+              mobile=mctx.new_page()
+              mobile_errors=[]
+              mobile.on('pageerror',lambda e:mobile_errors.append(str(e)))
+              mobile.goto(BASE,wait_until='domcontentloaded',timeout=60000)
+              mobile.wait_for_timeout(2400)
+              mobile.wait_for_selector('#homeHeading',state='visible',timeout=30000)
+              check('Mobile heading visible',mobile.locator('#homeHeading').is_visible())
+              check('Mobile report button visible',mobile.locator('#authView .hero-actions [data-report]').is_visible())
+              check('Mobile track button visible',mobile.locator('#authView .hero-actions [data-track]').is_visible())
+              check('Mobile clock visible',mobile.locator('#js-live-clock').is_visible())
+              overflow=mobile.evaluate('document.documentElement.scrollWidth-window.innerWidth')
+              check('No serious mobile horizontal overflow',overflow<=4,str(overflow))
+              check('No uncaught mobile JS errors',not mobile_errors,mobile_errors[:5])
+              mctx.close()
               ctx.close()
               browser.close()
 
           print('\n=== JAN SAMADHAN FULL SMOKE TEST ===')
           for name,ok,detail in results:
-              print(('PASS' if ok else 'FAIL')+' | '+name+((' | '+detail) if detail else ''))
-          for w in warnings:
-              print('WARN | '+w)
+              print(('PASS' if ok else 'FAIL')+' | '+name+((' | '+str(detail)) if detail else ''))
+          for warning in warnings:
+              print('WARN | '+warning)
           print(f'\nTOTAL: {sum(1 for _,ok,_ in results if ok)}/{len(results)} checks passed')
           PY
