@@ -72,6 +72,7 @@
     checkHealth();
 
     loadScript("js-workflow-v4","/static/workflow-v4.js");
+    loadScript("js-citizen-feedback-v1","/static/citizen-feedback-v1.js");
     loadScript("js-recurrence-v1","/static/recurrence-v1.js");
     loadScript("js-admin-profile-v1","/static/admin-profile-v1.js");
     loadScript("js-judge-hardening-v1","/static/judge-hardening-v1.js");
