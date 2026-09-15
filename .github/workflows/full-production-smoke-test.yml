@@ -24,7 +24,7 @@ jobs:
       - name: Run HTTP, API, desktop and mobile smoke tests
         run: |
           python - <<'PY'
-          import os, time, json, requests
+          import os, requests
           from playwright.sync_api import sync_playwright
 
           BASE=os.environ['BASE_URL'].rstrip('/')
@@ -43,20 +43,25 @@ jobs:
           r=req('GET','/')
           check('HTTP root 200', r.status_code==200, str(r.status_code))
           check('Official UI script injected', '/static/official-prototype-v1.js' in r.text)
-          check('Anti-flash boot guard present', 'js-boot-overlay' in r.text or 'js-boot-ready' in r.text or 'Loading JanSamadhan AI' in r.text)
 
           h=req('GET','/health')
           check('Health endpoint 200', h.status_code==200, h.text[:200])
           hj=h.json()
           check('Health status ok', hj.get('status')=='ok', str(hj))
 
-          for asset in [
+          assets=[
               '/static/official-prototype-v1.js','/static/demo-mode-ui.js','/static/workflow-v4.js',
               '/static/gis-map-v1.js','/static/recurrence-v1.js','/static/citizen-feedback-v1.js',
               '/static/jharkhand-jurisdiction-v1.js','/static/demo-flow-guard-v1.js','/static/jansahayak-ai-v3.js'
-          ]:
+          ]
+          asset_responses={}
+          for asset in assets:
               a=req('GET',asset)
+              asset_responses[asset]=a
               check('Asset '+asset, a.status_code==200 and len(a.content)>0, f'{a.status_code} {len(a.content)} bytes')
+
+          official=asset_responses['/static/official-prototype-v1.js'].text
+          check('Anti-flash boot guard shipped', 'official-boot-guard' in official and 'official-ui-ready' in official)
 
           ai=req('POST','/api/ai',json={'task':'analyze_report','payload':{
               'title':'Broken streetlights on Kanke Road','description':'Several streetlights have been dark for one week and affect evening commuters.',
@@ -87,6 +92,7 @@ jobs:
 
               check('Clean public heading', 'Report a problem' in page.locator('#homeHeading').inner_text())
               check('Legacy heading not visible', page.get_by_text('From a local challenge to a measurable solution.', exact=True).count()==0 or not page.get_by_text('From a local challenge to a measurable solution.', exact=True).first.is_visible())
+              check('Boot guard released', 'official-ui-ready' in (page.locator('html').get_attribute('class') or ''))
               check('Quick tracker hidden', not page.locator('#authView .quicktrack').is_visible())
               check('Services hidden', all(not page.locator('#authView .services').nth(i).is_visible() for i in range(page.locator('#authView .services').count())))
 
