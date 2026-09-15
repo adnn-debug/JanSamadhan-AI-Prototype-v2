@@ -8,6 +8,38 @@
   var REVISION_KEY="jansamadhan_seed_revision_v2";
   var REVISION="jharkhand-demo-clean-v1";
 
+  /* Anti-FOUC boot guard.
+     This file is parser-blocking in <head>, so these rules are installed before
+     the legacy body markup can paint. The page is revealed only after the
+     simplification layer has actually initialized. */
+  (function installBootGuard(){
+    if(!document.head||document.getElementById("official-boot-guard"))return;
+    var style=document.createElement("style");
+    style.id="official-boot-guard";
+    style.textContent=
+      "html:not(.official-ui-ready) #authView,html:not(.official-ui-ready) #dashView{visibility:hidden!important}"+
+      "html:not(.official-ui-ready) body:before{content:'Loading JanSamadhan AI…';position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:#f3f7f4;color:#075b3a;font:800 15px Inter,'Segoe UI',Arial,sans-serif;letter-spacing:.01em}"+
+      "html.official-ui-ready body:before{display:none!important}";
+    document.head.appendChild(style);
+
+    var released=false;
+    function release(){
+      if(released)return;
+      released=true;
+      document.documentElement.classList.add("official-ui-ready");
+    }
+    function check(){
+      if(released)return;
+      var simplificationReady=!!document.getElementById("jsu-style");
+      var clockReady=!!document.getElementById("official-clock-bar");
+      if(document.readyState!=="loading"&&simplificationReady&&clockReady){release();return}
+      setTimeout(check,25);
+    }
+    if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",check,{once:true});
+    else check();
+    setTimeout(release,4500);
+  })();
+
   function ago(days){return new Date(Date.now()-days*86400000).toISOString()}
 
   function canonicalSeed(){
@@ -82,8 +114,6 @@
     console.warn("Official local-storage namespace unavailable",e);
   }
 
-  /* Seed the cleaned official dataset before the main inline application initializes.
-     The revision marker prevents normal user-created reports from being reset later. */
   try{
     if(localStorage.getItem(REVISION_KEY)!==REVISION){
       localStorage.setItem(DATA_KEY,JSON.stringify(canonicalSeed()));
@@ -130,9 +160,6 @@
     console.error("Official Firestore namespace failed",e);
   }
 
-  /* The base application defines seed() later in the page. Replace that global
-     as soon as it exists so Firebase seeding and the Reset Demo Data action use
-     the same cleaned two-case dataset with no pending demo account. */
   var seedOverrideAttempts=0;
   var seedOverrideTimer=setInterval(function(){
     seedOverrideAttempts++;
