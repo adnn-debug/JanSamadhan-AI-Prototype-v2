@@ -1,9 +1,9 @@
-/* clean-public-dashboard: isolate preview data from the main demo
+/* JanSamadhan official prototype data and UI layer
    and keep the public navigation/chatbot presentation-safe. */
 (function(){
   "use strict";
 
-  var PREFIX="clean_public_dashboard_v3__";
+  var PREFIX="official_prototype_v1__";
 
   function mapLocalKey(key){
     key=String(key==null?"":key);
@@ -25,7 +25,7 @@
       return originalRemove.call(this,this===window.localStorage?mapLocalKey(key):key);
     };
   }catch(e){
-    console.warn("Preview local-storage namespace unavailable",e);
+    console.warn("Official local-storage namespace unavailable",e);
   }
 
   try{
@@ -59,10 +59,10 @@
         try{Object.defineProperty(namespacedFirestore,prop,Object.getOwnPropertyDescriptor(originalFirestore,prop));}catch(e){}
       });
       firebase.firestore=namespacedFirestore;
-      window.JanSamadhanPreviewNamespace=PREFIX;
+      window.JanSamadhanOfficialNamespace=PREFIX;
     }
   }catch(e){
-    console.error("Preview Firestore namespace failed",e);
+    console.error("Official Firestore namespace failed",e);
   }
 
   function isHindi(){
@@ -74,9 +74,9 @@
   }
 
   function installUiStyles(){
-    if(document.getElementById("clean-preview-ui-style"))return;
+    if(document.getElementById("official-prototype-ui-style"))return;
     var style=document.createElement("style");
-    style.id="clean-preview-ui-style";
+    style.id="official-prototype-ui-style";
     style.textContent=
       "#authView.jsu-public-clean .govnav .navlinks>[data-report],"+
       "#authView.jsu-public-clean .govnav .navlinks>[data-track],"+

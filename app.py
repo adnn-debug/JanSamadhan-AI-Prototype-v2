@@ -74,8 +74,8 @@ HYBRID_TERMS = [
 
 
 def _inject_ai_addon(html):
-    if '/static/branch-db-namespace.js' not in html:
-        html = html.replace("</head>", '  <script src="/static/branch-db-namespace.js"></script>\n</head>')
+    if '/static/official-prototype-v1.js' not in html:
+        html = html.replace("</head>", '  <script src="/static/official-prototype-v1.js"></script>\n</head>')
     addons = (
         '<script src="/static/jansahayak-ai-v3.js" defer></script>\n'
         '<script src="/static/demo-mode-ui.js" defer></script>'
