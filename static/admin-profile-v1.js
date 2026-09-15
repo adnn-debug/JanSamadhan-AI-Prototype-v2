@@ -1,12 +1,13 @@
 /* JanSamadhan Admin Profile v1
-   Keeps partner demo accounts untouched while replacing the public admin demo login.
-   This is still prototype-only client-side authentication, not production security. */
+   Keeps partner demo accounts untouched and aligns the administrator login
+   with the official presentation credential used across the prototype.
+   This remains prototype-only client-side authentication, not production security. */
 (function(){
   "use strict";
 
   var SESSION="jansamadhan_session_v2";
   var selectedRole="student";
-  var ADMIN_HASH="39896613c29955371d63b7eeb74d3eb2c40a8c9746d48e5fe12e47144899a00f";
+  var ADMIN_HASH="240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9";
 
   function id(x){return document.getElementById(x)}
   async function sha256(text){
@@ -19,9 +20,9 @@
   function updateAdminUI(){
     if(selectedRole!=="admin")return;
     var hint=id("hint"),u=id("username"),p=id("password");
-    if(hint)hint.innerHTML="<strong>Administrator account:</strong> <b>Adnan</b> · <b>adnan123@gmail.com</b><br><small>Use the administrator credentials provided for the prototype.</small>";
-    if(u)u.placeholder="Adnan or adnan123@gmail.com";
-    if(p)p.placeholder="Password";
+    if(hint)hint.innerHTML="<strong>Administrator demo:</strong> <b>admin</b> / <b>admin123</b>.";
+    if(u)u.placeholder="admin";
+    if(p)p.placeholder="admin123";
   }
 
   document.addEventListener("click",function(e){
@@ -41,7 +42,7 @@
     var password=String(p&&p.value||"");
     if(error)error.textContent="";
 
-    var identityOk=identity==="adnan"||identity==="adnan123@gmail.com";
+    var identityOk=identity==="admin";
     var passwordOk=false;
     try{passwordOk=(await sha256(password))===ADMIN_HASH}catch(err){if(error)error.textContent="Administrator login is unavailable in this browser.";return}
 
@@ -50,7 +51,7 @@
       return;
     }
 
-    localStorage.setItem(SESSION,JSON.stringify({role:"admin",name:"Adnan",email:"adnan123@gmail.com"}));
+    localStorage.setItem(SESSION,JSON.stringify({role:"admin",name:"Administrator",email:""}));
     try{if(id("loginDialog")&&id("loginDialog").open)id("loginDialog").close()}catch(err){}
     window.location.reload();
   },true);
