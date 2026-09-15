@@ -253,3 +253,37 @@
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",initClock,{once:true});
   else initClock();
 })();
+
+/* Admin dashboard cleanup.
+   Citizen reporting stays public; administrators only need governance controls. */
+(function(){
+  "use strict";
+
+  var timer=null;
+
+  function isAdminDashboard(){
+    var dash=document.getElementById("dashView");
+    var role=document.getElementById("sessionRole");
+    return !!(dash&&!dash.classList.contains("hidden")&&role&&String(role.textContent||"").trim().toLowerCase()==="admin");
+  }
+
+  function syncAdminControls(){
+    var admin=isAdminDashboard();
+    document.querySelectorAll("#dashView [data-report]").forEach(function(btn){
+      btn.style.display=admin?"none":"";
+      btn.setAttribute("aria-hidden",admin?"true":"false");
+      if(admin)btn.setAttribute("tabindex","-1");
+      else btn.removeAttribute("tabindex");
+    });
+  }
+
+  function schedule(){
+    clearTimeout(timer);
+    timer=setTimeout(syncAdminControls,0);
+  }
+
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",schedule,{once:true});
+  else schedule();
+
+  new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:["class"]});
+})();
