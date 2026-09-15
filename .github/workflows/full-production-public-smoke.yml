@@ -1,0 +1,79 @@
+name: Full Production Public Smoke
+
+on:
+  push:
+    branches: [full-smoke-test]
+    paths:
+      - '.github/workflows/full-production-public-smoke.yml'
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BASE_URL: https://jansamadhan-ai-prototype-irzt.onrender.com
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install browser tools
+        run: |
+          pip install requests playwright
+          python -m playwright install --with-deps chromium
+      - name: Test live production without mutating data
+        run: |
+          python - <<'PY'
+          import os, requests, sys
+          from playwright.sync_api import sync_playwright
+          BASE=os.environ['BASE_URL'].rstrip('/')
+          out=[]
+          def check(name,ok,detail=''):
+              out.append((name,bool(ok),detail)); print(('PASS' if ok else 'FAIL')+' | '+name+((' | '+str(detail)) if detail else ''))
+          def rq(method,path,**kw):
+              try:return requests.request(method,BASE+path,timeout=40,**kw)
+              except Exception as e: check(method+' '+path,False,repr(e)); return None
+
+          r=rq('GET','/'); check('Root 200',r is not None and r.status_code==200,getattr(r,'status_code',None)); check('Official script linked',r is not None and '/static/official-prototype-v1.js' in r.text)
+          h=rq('GET','/health'); check('Health 200',h is not None and h.status_code==200,getattr(h,'text','')[:180]);
+          if h is not None and h.ok:
+              j=h.json(); check('Health status ok',j.get('status')=='ok',j); check('AI mode declared',bool(j.get('ai_mode')),j)
+          assets=['/static/official-prototype-v1.js','/static/demo-mode-ui.js','/static/workflow-v4.js','/static/gis-map-v1.js','/static/recurrence-v1.js','/static/citizen-feedback-v1.js','/static/jharkhand-jurisdiction-v1.js','/static/demo-flow-guard-v1.js','/static/jansahayak-ai-v3.js']
+          got={}
+          for a in assets:
+              x=rq('GET',a); got[a]=x; check('Asset '+a,x is not None and x.status_code==200 and len(x.content)>0,(getattr(x,'status_code',None),len(x.content) if x else 0))
+          x=got.get('/static/official-prototype-v1.js'); check('Anti-FOUC guard shipped',x is not None and 'official-boot-guard' in x.text and 'official-ui-ready' in x.text)
+          ai=rq('POST','/api/ai',json={'task':'analyze','payload':{'title':'Broken streetlights on Kanke Road','description':'Streetlights have been dark for one week and affect evening commuters.','district':'Ranchi','location':'Kanke Road, Ranchi','affected':420,'category':'Let AI decide'}})
+          check('AI analyze 200',ai is not None and ai.status_code==200,getattr(ai,'text','')[:220])
+          if ai is not None and ai.ok:
+              j=ai.json(); check('AI category returned',bool(j.get('suggested_category') or j.get('category')),j); check('AI resolution path returned',bool(j.get('resolution_path')),j); check('AI authority returned',bool(j.get('responsible_authority')),j)
+          c=rq('POST','/api/ai',json={'task':'chat','payload':{'message':'Who makes the final routing decision?','history':[]}}); check('AI chat 200',c is not None and c.status_code==200,getattr(c,'text','')[:220])
+
+          with sync_playwright() as p:
+              b=p.chromium.launch(headless=True); ctx=b.new_context(viewport={'width':1366,'height':900}); page=ctx.new_page(); errs=[]; page.on('pageerror',lambda e:errs.append(str(e)))
+              page.goto(BASE,wait_until='domcontentloaded',timeout=60000); page.wait_for_timeout(3000)
+              try: page.wait_for_selector('#homeHeading',state='visible',timeout=30000); check('Public home visible',True)
+              except Exception as e: check('Public home visible',False,repr(e))
+              check('Clean hero visible','Report a problem' in page.locator('#homeHeading').inner_text())
+              legacy=page.get_by_text('From a local challenge to a measurable solution.',exact=True); check('Legacy hero hidden',legacy.count()==0 or not legacy.first.is_visible())
+              check('Boot guard released','official-ui-ready' in (page.locator('html').get_attribute('class') or ''))
+              check('Quick tracker hidden',not page.locator('#authView .quicktrack').is_visible())
+              check('Old service sections hidden',all(not page.locator('#authView .services').nth(i).is_visible() for i in range(page.locator('#authView .services').count())))
+              nav=page.locator('#authView .govnav .navlinks'); vis=[]
+              for i in range(nav.locator('button,a').count()):
+                  el=nav.locator('button,a').nth(i)
+                  if el.is_visible():vis.append(el.inner_text().strip())
+              check('Top bar only Admin/Partner',vis==['Admin Panel','Partner Login'],vis)
+              rb=page.locator('#authView .hero-actions [data-report]'); tb=page.locator('#authView .hero-actions [data-track]'); check('One Report action',rb.count()==1 and rb.first.is_visible()); check('One Track action',tb.count()==1 and tb.first.is_visible())
+              page.wait_for_selector('#js-live-clock',state='visible',timeout=10000); t1=page.locator('#js-live-clock .js-live-clock-time').inner_text(); page.wait_for_timeout(1200); t2=page.locator('#js-live-clock .js-live-clock-time').inner_text(); check('Clock ticks',t1!=t2,(t1,t2))
+              rb.first.click(); page.wait_for_selector('#reportDialog[open]',timeout=10000); page.wait_for_timeout(2200); check('Report modal opens',page.locator('#reportDialog').evaluate('(d)=>d.open')); check('Ranchi district present','Ranchi' in page.locator('#rDistrict option').all_inner_texts()); check('GIS wrapper injected',page.locator('#jsgeo-wrap').count()==1); check('Leaflet map initialized',page.locator('#jsgeo-report-map.leaflet-container').count()==1); page.locator('[data-close="reportDialog"]').click()
+              tb.first.click(); page.fill('#trackId','JS-1001'); page.locator('#trackForm').evaluate('(f)=>f.requestSubmit()'); page.wait_for_timeout(600); s=page.locator('#trackResult').inner_text(); check('Track in-progress seed','JS-1001' in s and 'Broken streetlights on Kanke Road' in s,s[:260]); page.fill('#trackId','JS-1002'); page.locator('#trackForm').evaluate('(f)=>f.requestSubmit()'); page.wait_for_timeout(600); s=page.locator('#trackResult').inner_text(); check('Track completed seed','JS-1002' in s and 'Damaged bus stop sign at Lalpur Chowk' in s,s[:260]); page.fill('#trackId','JS-9999'); page.locator('#trackForm').evaluate('(f)=>f.requestSubmit()'); page.wait_for_timeout(400); s=page.locator('#trackResult').inner_text().lower(); check('Unknown ID handled','not found' in s,s[:180]); page.locator('[data-close="trackDialog"]').click()
+              page.locator('#chatbotToggle').click(); page.wait_for_selector('#chatbotPanel:not(.hidden)',timeout=10000); before=page.locator('#chatbotMessages .chat-message.bot').count(); page.fill('#chatbotInput','Explain the resolution path'); page.locator('#chatbotForm').evaluate('(f)=>f.requestSubmit()'); page.wait_for_timeout(1000); after=page.locator('#chatbotMessages .chat-message.bot').count(); check('Chatbot responds',after>before,(before,after)); page.locator('#chatbotClose').click()
+              page.get_by_role('button',name='Admin Panel',exact=True).click(); page.wait_for_selector('#loginDialog[open]',timeout=10000); check('Admin login mode isolates admin role',page.locator('#loginDialog [data-role="admin"]').is_visible() and all(not page.locator('#loginDialog [data-role="'+z+'"]').is_visible() for z in ['student','university','industry'])); page.locator('[data-close="loginDialog"]').click()
+              page.get_by_role('button',name='Partner Login',exact=True).click(); page.wait_for_selector('#loginDialog[open]',timeout=10000); check('Partner mode hides admin',not page.locator('#loginDialog [data-role="admin"]').is_visible()); check('Partner roles visible',all(page.locator('#loginDialog [data-role="'+z+'"]').is_visible() for z in ['student','university','industry'])); page.locator('[data-close="loginDialog"]').click()
+              check('No uncaught desktop JS errors',not errs,errs[:4])
+              mctx=b.new_context(viewport={'width':390,'height':844},is_mobile=True); m=mctx.new_page(); merr=[]; m.on('pageerror',lambda e:merr.append(str(e))); m.goto(BASE,wait_until='domcontentloaded',timeout=60000); m.wait_for_timeout(2600); m.wait_for_selector('#homeHeading',state='visible',timeout=30000); check('Mobile heading visible',m.locator('#homeHeading').is_visible()); check('Mobile Report visible',m.locator('#authView .hero-actions [data-report]').is_visible()); check('Mobile Track visible',m.locator('#authView .hero-actions [data-track]').is_visible()); check('Mobile clock visible',m.locator('#js-live-clock').is_visible()); ov=m.evaluate('document.documentElement.scrollWidth-window.innerWidth'); check('No serious mobile horizontal overflow',ov<=4,ov); check('No uncaught mobile JS errors',not merr,merr[:4]); mctx.close(); ctx.close(); b.close()
+
+          fails=[x for x in out if not x[1]]; print('\nSUMMARY',len(out)-len(fails),'/',len(out),'passed')
+          if fails:
+              print('FAILED:'); [print(' -',n,'|',d) for n,_,d in fails]; sys.exit(1)
+          PY
