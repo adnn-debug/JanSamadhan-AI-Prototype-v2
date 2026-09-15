@@ -133,3 +133,93 @@
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
 })();
+
+/* JanSahayak memory/review guard v1.
+   Records all visible user messages in the current browser session and routes
+   long or explicit whole-conversation review requests directly to /api/ai
+   before the legacy keyword router can consume them. */
+(function(){
+  "use strict";
+
+  var MEMORY_KEY="jansahayak_chat_memory_v2";
+  var attached=false;
+
+  function id(x){return document.getElementById(x)}
+  function clean(x,limit){return String(x==null?"":x).replace(/\s+/g," ").trim().slice(0,limit||1200)}
+  function hi(){return document.documentElement.lang==="hi"}
+  function load(){
+    try{
+      var x=JSON.parse(sessionStorage.getItem(MEMORY_KEY)||"[]");
+      return Array.isArray(x)?x.filter(function(m){return m&&(m.role==="user"||m.role==="assistant")&&clean(m.content,1200)}).slice(-120):[];
+    }catch(e){return[]}
+  }
+  function save(items){try{sessionStorage.setItem(MEMORY_KEY,JSON.stringify((items||[]).slice(-120)))}catch(e){}}
+  function remember(role,content){
+    var text=clean(content,1200);if(!text||/JanSahayak AI (is thinking|सोच रहा है)/i.test(text))return;
+    var items=load(),last=items[items.length-1];
+    if(last&&last.role===role&&clean(last.content,1200)===text)return;
+    items.push({role:role,content:text});save(items);
+  }
+  function reviewIntent(q){
+    return /\b(review|overall|everything|all (the )?(information|details|things)|summari[sz]e|full context|whole conversation|what i told you|based on everything|overall answer|overall analysis)\b/i.test(q)||/(सभी|पूरी|सब कुछ|सारी|समग्र|सारांश|मैंने.*बताया|पूरी बातचीत)/.test(q);
+  }
+  function userChunks(items,maxChunks){
+    var users=(items||[]).filter(function(m){return m.role==="user"}).map(function(m,i){return (i+1)+". "+clean(m.content,520)});
+    if(!users.length)return[];
+    var count=Math.min(maxChunks,users.length),out=[];
+    for(var g=0;g<count;g++){
+      var start=Math.floor(g*users.length/count),end=Math.floor((g+1)*users.length/count);
+      var text="Earlier information supplied by this same citizen in this chat (part "+(g+1)+" of "+count+"). Treat it as context, not as verified government data:\n"+users.slice(start,end).join("\n");
+      out.push({role:"user",content:clean(text,680)});
+    }
+    return out;
+  }
+  function context(q){
+    var items=load();
+    if(items.length&&items[items.length-1].role==="user"&&clean(items[items.length-1].content,1200)===clean(q,1200))items=items.slice(0,-1);
+    var recent=items.slice(-2),older=items.slice(0,Math.max(0,items.length-2));
+    return userChunks(older,6).concat(recent).slice(-8);
+  }
+  function addMessage(text,role){
+    var box=id("chatbotMessages");if(!box)return null;
+    var n=document.createElement("div");n.className="chat-message "+(role==="user"?"user":"bot");n.textContent=text;box.appendChild(n);box.scrollTop=box.scrollHeight;return n;
+  }
+  function callAI(q,history){
+    return fetch("/api/ai",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({task:"chat",payload:{message:q,history:history}})}).then(function(r){return r.json().then(function(d){if(!r.ok)throw new Error(d.error||"AI unavailable");return d})});
+  }
+  function hardenInput(){var input=id("chatbotInput");if(input)input.maxLength=1200}
+  function observeMessages(){
+    var box=id("chatbotMessages");if(!box||box.dataset.memoryGuard)return;
+    box.dataset.memoryGuard="1";
+    new MutationObserver(function(ms){
+      ms.forEach(function(m){m.addedNodes.forEach(function(n){
+        if(!n||n.nodeType!==1||!n.classList.contains("chat-message"))return;
+        var text=clean(n.textContent,1200);if(!text)return;
+        remember(n.classList.contains("user")?"user":"assistant",text);
+      })})
+    }).observe(box,{childList:true});
+  }
+  function onSubmit(e){
+    if(!e.target||e.target.id!=="chatbotForm")return;
+    var input=id("chatbotInput"),q=clean(input&&input.value,1200);if(!q)return;
+    if(!reviewIntent(q)&&q.length<=180)return;
+    e.preventDefault();e.stopImmediatePropagation();
+    var history=context(q);if(input)input.value="";
+    addMessage(q,"user");remember("user",q);
+    var pending=addMessage(hi()?"JanSahayak AI सोच रहा है…":"JanSahayak AI is thinking…","assistant");
+    callAI(q,history).then(function(d){
+      var reply=clean(d&&d.reply,2400)|| (hi()?"मैं अभी इस बातचीत की समीक्षा नहीं कर सका।":"I could not review this conversation right now.");
+      if(pending)pending.textContent=reply;remember("assistant",reply);
+    }).catch(function(){
+      var fallback=hi()?"AI समीक्षा अभी उपलब्ध नहीं है। इस सत्र की बातचीत सुरक्षित है; थोड़ी देर बाद फिर पूछें।":"AI review is temporarily unavailable. Your conversation is still saved for this session; please try the review again.";
+      if(pending)pending.textContent=fallback;remember("assistant",fallback);
+    });
+  }
+  function attach(){
+    hardenInput();observeMessages();
+    if(!attached){document.addEventListener("submit",onSubmit,true);attached=true}
+    window.JanSahayakMemoryGuard={version:"1.0",maxInput:1200,maxStoredEntries:120};
+  }
+  function init(){attach();new MutationObserver(function(){setTimeout(attach,0)}).observe(document.body,{childList:true,subtree:true})}
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
+})();
