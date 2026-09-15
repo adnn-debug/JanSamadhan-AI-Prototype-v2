@@ -1,4 +1,4 @@
-name: Isolate preview database
+name: Clean preview demo data
 
 on:
   push:
@@ -11,112 +11,73 @@ permissions:
   contents: write
 
 jobs:
-  isolate:
+  clean-preview:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: clean-public-dashboard
 
-      - name: Add branch database namespace
+      - name: Keep only two demo cases and remove dashboard reporting
         shell: bash
         run: |
-          cat > static/branch-db-namespace.js <<'EOF'
-          /* clean-public-dashboard: isolate preview data from the main demo.
-             Loaded before the application inline script. */
-          (function(){
-            "use strict";
-
-            var PREFIX="clean_public_dashboard__";
-
-            function mapLocalKey(key){
-              key=String(key==null?"":key);
-              return key.indexOf("jansamadhan_")===0?PREFIX+key:key;
-            }
-
-            try{
-              var storageProto=Object.getPrototypeOf(window.localStorage);
-              var originalGet=storageProto.getItem;
-              var originalSet=storageProto.setItem;
-              var originalRemove=storageProto.removeItem;
-              storageProto.getItem=function(key){
-                return originalGet.call(this,this===window.localStorage?mapLocalKey(key):key);
-              };
-              storageProto.setItem=function(key,value){
-                return originalSet.call(this,this===window.localStorage?mapLocalKey(key):key,value);
-              };
-              storageProto.removeItem=function(key){
-                return originalRemove.call(this,this===window.localStorage?mapLocalKey(key):key);
-              };
-            }catch(e){
-              console.warn("Preview local-storage namespace unavailable",e);
-            }
-
-            try{
-              if(!window.firebase||!firebase.firestore)return;
-              var originalFirestore=firebase.firestore;
-              var cache=typeof WeakMap!=="undefined"?new WeakMap():null;
-
-              function wrapDatabase(db){
-                if(cache&&cache.has(db))return cache.get(db);
-                var wrapped=new Proxy(db,{
-                  get:function(target,prop){
-                    if(prop==="collection"){
-                      return function(name){
-                        return target.collection(PREFIX+String(name));
-                      };
-                    }
-                    var value=Reflect.get(target,prop,target);
-                    return typeof value==="function"?value.bind(target):value;
-                  }
-                });
-                if(cache)cache.set(db,wrapped);
-                return wrapped;
-              }
-
-              function namespacedFirestore(){
-                return wrapDatabase(originalFirestore.apply(firebase,arguments));
-              }
-
-              Object.getOwnPropertyNames(originalFirestore).forEach(function(prop){
-                if(prop==="length"||prop==="name"||prop==="prototype")return;
-                try{Object.defineProperty(namespacedFirestore,prop,Object.getOwnPropertyDescriptor(originalFirestore,prop));}catch(e){}
-              });
-              firebase.firestore=namespacedFirestore;
-              window.JanSamadhanPreviewNamespace=PREFIX;
-            }catch(e){
-              console.error("Preview Firestore namespace failed",e);
-            }
-          })();
-          EOF
-
           python - <<'PY'
           from pathlib import Path
+          import re
 
-          p = Path("app.py")
+          p = Path("templates/index.html")
           text = p.read_text(encoding="utf-8")
-          needle = "def _inject_ai_addon(html):\n    addons = ("
-          replacement = (
-              "def _inject_ai_addon(html):\n"
-              "    if '/static/branch-db-namespace.js' not in html:\n"
-              "        html = html.replace(\"</head>\", '  <script src=\"/static/branch-db-namespace.js\"></script>\\n</head>')\n"
-              "    addons = ("
+
+          # Remove citizen-report controls from every logged-in dashboard header/nav.
+          text = text.replace('<button class="btn secondary small" type="button" data-report>New challenge</button>', '')
+          text = text.replace('<button type="button" data-report>Citizen report</button>', '')
+
+          new_problems = '''function defaultProblems(){return[
+            {id:"JS-1001",title:"Broken streetlights on hostel approach road",category:"Energy",district:"Patna",location:"College Hostel Road",description:"Four streetlights are not working on the hostel approach road. The case has been verified and repair work is currently in progress.",reporter:"Local residents",affected:650,createdAt:ago(6),updatedAt:ago(1),status:"claimed",stage:"prototype",claimedBy:"Aditi",dupes:2,reporters:3,boost:false,help:false,criticalAcknowledged:false,assignedUniversity:"NIT Patna Technical Outreach",universities:[{provider:"NIT Patna Technical Outreach",type:"Electrical safety mentor"}],industries:[{provider:"BrightGrid Solutions",type:"Equipment and components"}],proposal:{summary:"Restore the failed streetlights and add a simple fault-reporting workflow for faster maintenance.",team:"Aditi and Campus Innovation Team",mentor:"Dr. Meera Singh",duration:"5 weeks",impact:"Restore safer evening access for students and residents",submittedAt:ago(3)},solution:null,impact:null,ai:{suggestedCategory:"Energy",category:"Energy",confidence:91,priority:"High",risk:"No critical safety phrase detected",critical:false,reasons:["Streetlight and electricity keywords detected","650 people reportedly affected","Human validation completed"],universityMatches:["NIT Patna Technical Outreach"]},statusHistory:[{stage:"submitted",by:"Citizen",note:"Challenge report received.",at:ago(6)},{stage:"ai_review",by:"JanSamadhan AI",note:"Category, priority and duplicate analysis completed.",at:ago(6)},{stage:"validated",by:"Administrator",note:"Report verified and approved for action.",at:ago(5)},{stage:"assigned",by:"Administrator",note:"Technical support assigned.",at:ago(4)},{stage:"team_formed",by:"Aditi",note:"Implementation team formed.",at:ago(3)},{stage:"prototype",by:"Aditi",note:"Repair and fault-reporting work is in progress.",at:ago(1)}],photo:""},
+            {id:"JS-1002",title:"Damaged bus stop sign near Neora",category:"Urban Development",district:"Patna",location:"Neora Bus Stop",description:"The damaged bus stop sign reduced visibility for commuters. A replacement sign with reflective markings was installed and verified.",reporter:"Local commuters",affected:310,createdAt:ago(15),updatedAt:ago(1),status:"solved",stage:"completed",claimedBy:"Aditi",dupes:0,reporters:1,boost:false,help:false,criticalAcknowledged:false,assignedUniversity:"MACET Innovation Cell",universities:[{provider:"MACET Innovation Cell",type:"Field verification support"}],industries:[],proposal:{summary:"Replace the damaged sign and improve night visibility with reflective markings.",team:"Aditi and Campus Innovation Team",mentor:"Faculty mentor",duration:"1 week",impact:"Improve visibility for daily commuters",submittedAt:ago(10)},solution:{note:"Installed a new sign with reflective markings and verified evening visibility.",by:"Aditi",status:"approved",submittedAt:ago(2)},impact:{beneficiaries:310,metric:"1 bus stop sign restored and verified",evidence:"Administrator field verification completed.",verifiedAt:ago(1)},ai:{suggestedCategory:"Urban Development",category:"Urban Development",confidence:89,priority:"High",risk:"No critical safety phrase detected",critical:false,reasons:["Road and bus-stop context detected","310 people reportedly affected","Human validation completed"],universityMatches:["MACET Innovation Cell"]},statusHistory:[{stage:"submitted",by:"Citizen",note:"Challenge report received.",at:ago(15)},{stage:"ai_review",by:"JanSamadhan AI",note:"Category and priority analysis completed.",at:ago(15)},{stage:"validated",by:"Administrator",note:"Report verified.",at:ago(13)},{stage:"assigned",by:"Administrator",note:"Implementation responsibility assigned.",at:ago(12)},{stage:"testing",by:"Aditi",note:"Replacement sign installed and checked.",at:ago(2)},{stage:"completed",by:"Administrator",note:"Resolution verified and impact published.",at:ago(1)}],photo:""}
+          ]}'''
+
+          text, count = re.subn(
+              r'function defaultProblems\(\)\{return\[.*?\]\}\n\s*function seed\(\)\{return\{next:1007,nextUser:2005,accounts:defaultAccounts\(\),problems:defaultProblems\(\)\}\}',
+              new_problems + '\n    function seed(){return{next:1003,nextUser:2005,accounts:defaultAccounts(),problems:defaultProblems()}}',
+              text,
+              count=1,
+              flags=re.S,
           )
-          if needle not in text:
-              raise SystemExit("Could not find _inject_ai_addon insertion point")
-          text = text.replace(needle, replacement, 1)
+          if count != 1:
+              raise SystemExit(f"defaultProblems replacement failed: {count}")
+
+          # On logged-in dashboards, keep JanSahayak but do not let it open citizen reporting.
+          old_report_handler = 'if(hasAny(lower,["report","submit","lodge","file complaint","new challenge","complaint","issue","problem","शिकायत","समस्या","दर्ज","रिपोर्ट"])){chatAdd(copy.report,"bot");setTimeout(function(){closeChat();document.getElementById("reportError").textContent="";document.getElementById("reportDialog").showModal()},450);return}'
+          new_report_handler = 'if(hasAny(lower,["report","submit","lodge","file complaint","new challenge","complaint","issue","problem","शिकायत","समस्या","दर्ज","रिपोर्ट"])){if(session()){chatAdd(chatLanguage==="hi"?"नागरिक समस्या दर्ज करने के लिए सार्वजनिक होम पेज का उपयोग करें। डैशबोर्ड केवल अधिकृत कार्य और सहयोग के लिए है।":"Citizen problem reporting is available only on the public home page. This dashboard is for authorized work and collaboration.","bot");return}chatAdd(copy.report,"bot");setTimeout(function(){closeChat();document.getElementById("reportError").textContent="";document.getElementById("reportDialog").showModal()},450);return}'
+          if old_report_handler not in text:
+              raise SystemExit("chat report handler insertion point not found")
+          text = text.replace(old_report_handler, new_report_handler, 1)
+
+          old_chat_action = 'if(action==="report"){chatAdd(copy.report,"bot");setTimeout(function(){closeChat();document.getElementById("reportError").textContent="";document.getElementById("reportDialog").showModal()},450)}'
+          new_chat_action = 'if(action==="report"){if(session()){chatAdd(chatLanguage==="hi"?"नागरिक समस्या दर्ज करने के लिए सार्वजनिक होम पेज का उपयोग करें।":"Citizen problem reporting is available only on the public home page.","bot");return}chatAdd(copy.report,"bot");setTimeout(function(){closeChat();document.getElementById("reportError").textContent="";document.getElementById("reportDialog").showModal()},450)}'
+          if old_chat_action not in text:
+              raise SystemExit("chat quick-action insertion point not found")
+          text = text.replace(old_chat_action, new_chat_action, 1)
+
           p.write_text(text, encoding="utf-8")
+
+          # Use a fresh preview namespace so the previous six seeded cases cannot reappear from Firestore/localStorage.
+          ns = Path("static/branch-db-namespace.js")
+          nstext = ns.read_text(encoding="utf-8")
+          nstext = re.sub(r'var PREFIX="clean_public_dashboard(?:_v\d+)?__";', 'var PREFIX="clean_public_dashboard_v3__";', nstext, count=1)
+          ns.write_text(nstext, encoding="utf-8")
           PY
 
-      - name: Commit isolation fix
+      - name: Commit preview cleanup
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app.py static/branch-db-namespace.js
+          git add templates/index.html static/branch-db-namespace.js
           if git diff --cached --quiet; then
             echo "No changes to commit"
             exit 0
           fi
-          git commit -m "fix: isolate preview database from main"
+          git commit -m "Clean dashboards and keep only two demo cases"
           git push origin HEAD:clean-public-dashboard
