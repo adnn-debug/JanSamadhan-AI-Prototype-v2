@@ -123,42 +123,9 @@
     console.warn("Official seed bootstrap unavailable",e);
   }
 
-  try{
-    if(window.firebase&&firebase.firestore){
-      var originalFirestore=firebase.firestore;
-      var cache=typeof WeakMap!=="undefined"?new WeakMap():null;
-
-      function wrapDatabase(db){
-        if(cache&&cache.has(db))return cache.get(db);
-        var wrapped=new Proxy(db,{
-          get:function(target,prop){
-            if(prop==="collection"){
-              return function(name){
-                return target.collection(PREFIX+String(name));
-              };
-            }
-            var value=Reflect.get(target,prop,target);
-            return typeof value==="function"?value.bind(target):value;
-          }
-        });
-        if(cache)cache.set(db,wrapped);
-        return wrapped;
-      }
-
-      function namespacedFirestore(){
-        return wrapDatabase(originalFirestore.apply(firebase,arguments));
-      }
-
-      Object.getOwnPropertyNames(originalFirestore).forEach(function(prop){
-        if(prop==="length"||prop==="name"||prop==="prototype")return;
-        try{Object.defineProperty(namespacedFirestore,prop,Object.getOwnPropertyDescriptor(originalFirestore,prop));}catch(e){}
-      });
-      firebase.firestore=namespacedFirestore;
-      window.JanSamadhanOfficialNamespace=PREFIX;
-    }
-  }catch(e){
-    console.error("Official Firestore namespace failed",e);
-  }
+  /* Keep the configured Firestore collection names unchanged.
+     The live database and its rules use accounts, problems and citizenDailyLimits.
+     Only browser localStorage is namespaced for the presentation-safe demo. */
 
   var seedOverrideAttempts=0;
   var seedOverrideTimer=setInterval(function(){
