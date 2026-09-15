@@ -1,0 +1,43 @@
+name: Authenticated Role Smoke
+
+on:
+  push:
+    branches: [full-smoke-test]
+    paths:
+      - '.github/workflows/authenticated-role-smoke.yml'
+
+jobs:
+  auth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BASE_URL: https://jansamadhan-ai-prototype-irzt.onrender.com
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: |
+          pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Test demo role logins and persistent UI
+        run: |
+          python - <<'PY'
+          import os,sys
+          from playwright.sync_api import sync_playwright
+          B=os.environ['BASE_URL']; bad=[]
+          def ck(n,v,d=''):
+              print(('PASS' if v else 'FAIL')+' | '+n+((' | '+str(d)) if d else ''))
+              if not v: bad.append((n,d))
+          def login(page,mode,role,user):
+              page.get_by_role('button',name=mode,exact=True).click(); page.wait_for_selector('#loginDialog[open]',timeout=10000); page.wait_for_timeout(250)
+              if role!='admin': page.locator('#loginDialog [data-role="'+role+'"]').click()
+              page.fill('#username',user); page.fill('#password',user+'123'); page.locator('#loginForm').evaluate('(f)=>f.requestSubmit()'); page.wait_for_selector('#dashView',state='visible',timeout=10000); page.wait_for_timeout(500)
+          with sync_playwright() as p:
+              b=p.chromium.launch(headless=True); page=b.new_page(viewport={'width':1366,'height':900}); errs=[]; page.on('pageerror',lambda e:errs.append(str(e))); page.goto(B,wait_until='domcontentloaded',timeout=60000); page.wait_for_timeout(3000)
+              login(page,'Admin Panel','admin','admin'); ck('Admin authenticated',page.locator('#sessionRole').inner_text().strip().lower()=='admin'); txt=page.locator('#content').inner_text(); ck('Admin dashboard has both demo cases','JS-1001' in txt and 'JS-1002' in txt); ck('Admin chatbot persists',page.locator('#citizenChatbot').is_visible()); ck('Admin clock persists',page.locator('#js-live-clock').is_visible()); page.reload(wait_until='domcontentloaded',timeout=60000); page.wait_for_timeout(1800); ck('Admin session survives reload',page.locator('#dashView').is_visible() and page.locator('#sessionRole').inner_text().strip().lower()=='admin'); page.locator('#logout').click(); page.wait_for_selector('#authView',state='visible',timeout=10000)
+              login(page,'Partner Login','student','Aditi'); ck('Student authenticated',page.locator('#sessionRole').inner_text().strip().lower()=='student'); ck('Student sees assigned JS-1001','JS-1001' in page.locator('#content').inner_text()); ck('Student chatbot persists',page.locator('#citizenChatbot').is_visible()); page.locator('#logout').click(); page.wait_for_selector('#authView',state='visible',timeout=10000)
+              login(page,'Partner Login','university','MACET'); ck('University authenticated',page.locator('#sessionRole').inner_text().strip().lower()=='university'); ck('University dashboard populated',len(page.locator('#content').inner_text().strip())>100); page.locator('#logout').click(); page.wait_for_selector('#authView',state='visible',timeout=10000)
+              industry='BrightGrid Solutions'; login(page,'Partner Login','industry',industry); ck('Industry authenticated',page.locator('#sessionRole').inner_text().strip().lower()=='industry'); ck('Industry dashboard populated',len(page.locator('#content').inner_text().strip())>100); page.locator('#logout').click(); page.wait_for_selector('#authView',state='visible',timeout=10000)
+              ck('No JS exceptions during role test',not errs,errs[:5]); b.close()
+          if bad: print('FAILED',bad); sys.exit(1)
+          PY
