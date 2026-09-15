@@ -156,7 +156,8 @@
 
 /* Live date + time clock.
    Uses the visitor's device/browser local time and updates on every real second.
-   Shows date plus 12-hour HH:MM:SS AM/PM and follows the visible app header. */
+   Shows date plus 12-hour HH:MM:SS AM/PM and stays in the global app clock bar
+   whenever that presentation-safe bar is available. */
 (function(){
   "use strict";
 
@@ -176,6 +177,8 @@
   }
 
   function clockTarget(){
+    var officialActions=document.getElementById("official-clock-actions");
+    if(officialActions)return officialActions;
     var appActions=document.querySelector(".apphead .actions");
     if(visible(appActions))return appActions;
     var utility=document.querySelector(".utility-right");
