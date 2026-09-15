@@ -161,7 +161,7 @@
     });
     var bits=[];
     bits.push((isHindi()?"2 किमी के भीतर सक्रिय मामले: ":"Active cases within 2 km: ")+nearActive.length);
-    bits.push((isHindi()?"संभावित पुनरावृत्ति संकेत: ":"Possible recurrence signals: ")+nearSolved.length);
+    bits.push((isHindi()?"समीक्षा के लिए नज़दीकी हल मामले: ":"Nearby solved cases to review: ")+nearSolved.length);
     if(nearActive.length)bits.push((isHindi()?"नज़दीकी सक्रिय: ":"Nearest active: ")+nearActive.sort(function(a,b){return a.km-b.km})[0].p.id);
     if(nearSolved.length)bits.push((isHindi()?"पहले हल मामला: ":"Nearby solved case: ")+nearSolved.sort(function(a,b){return a.km-b.km})[0].p.id);
     setText(el,bits.join(" · "));
