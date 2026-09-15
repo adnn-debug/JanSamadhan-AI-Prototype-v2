@@ -13,7 +13,7 @@ jobs:
     env:
       BASE_URL: https://jansamadhan-ai-prototype-irzt.onrender.com
     steps:
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
       - name: Install test dependencies
@@ -58,7 +58,7 @@ jobs:
               a=req('GET',asset)
               check('Asset '+asset, a.status_code==200 and len(a.content)>0, f'{a.status_code} {len(a.content)} bytes')
 
-          ai=req('POST','/api/ai',json={'task':'analyze','payload':{
+          ai=req('POST','/api/ai',json={'task':'analyze_report','payload':{
               'title':'Broken streetlights on Kanke Road','description':'Several streetlights have been dark for one week and affect evening commuters.',
               'district':'Ranchi','location':'Kanke Road, Ranchi','affected':420,'category':'Let AI decide'
           }})
@@ -91,7 +91,6 @@ jobs:
               check('Services hidden', all(not page.locator('#authView .services').nth(i).is_visible() for i in range(page.locator('#authView .services').count())))
 
               nav=page.locator('#authView .govnav .navlinks')
-              visible_nav=[x.strip() for x in nav.locator('button,a').all_inner_texts() if x.strip()]
               visible_nav_real=[]
               for i in range(nav.locator('button,a').count()):
                   el=nav.locator('button,a').nth(i)
@@ -144,15 +143,17 @@ jobs:
               # Chatbot public
               page.locator('#chatbotToggle').click()
               page.wait_for_selector('#chatbotPanel:not(.hidden)', timeout=10000)
+              before=page.locator('#chatbotMessages .chat-message.bot').count()
               page.fill('#chatbotInput','Explain the resolution path')
               page.locator('#chatbotForm').evaluate('(f)=>f.requestSubmit()')
-              page.wait_for_timeout(900)
-              check('Chatbot responds', page.locator('#chatbotMessages .chat-message.bot').count()>=2)
+              page.wait_for_function("n => document.querySelectorAll('#chatbotMessages .chat-message.bot').length > n", arg=before, timeout=10000)
+              check('Chatbot responds', page.locator('#chatbotMessages .chat-message.bot').count()>before)
               page.locator('#chatbotClose').click()
 
               # Admin flow
-              page.get_by_role('button', name='Admin Panel').click()
+              page.get_by_role('button', name='Admin Panel', exact=True).click()
               page.wait_for_selector('#loginDialog[open]', timeout=10000)
+              page.wait_for_function("() => { const d=document.querySelector('#loginDialog'); const a=d&&d.querySelector('[data-role=\"admin\"]'); const ps=d?[...d.querySelectorAll('[data-role=\"student\"],[data-role=\"university\"],[data-role=\"industry\"]')]:[]; return !!a && getComputedStyle(a).display!=='none' && ps.length===3 && ps.every(x=>getComputedStyle(x).display==='none'); }")
               check('Admin login mode selected', page.locator('#loginDialog [data-role="admin"]').is_visible())
               check('Partner roles hidden in admin mode', all(not page.locator(f'#loginDialog [data-role="{r}"]').is_visible() for r in ['student','university','industry']))
               page.fill('#username','admin')
@@ -164,6 +165,7 @@ jobs:
               check('Only one dashboard tracker entry visible', sum(1 for i in range(page.locator('#dashView [data-track]').count()) if page.locator('#dashView [data-track]').nth(i).is_visible())==1)
               admin_text=page.locator('#content').inner_text()
               check('Admin sees two seeded cases', 'JS-1001' in admin_text and 'JS-1002' in admin_text)
+              page.wait_for_selector('#citizenChatbot', state='visible', timeout=10000)
               check('Chatbot stays available in admin dashboard', page.locator('#citizenChatbot').is_visible())
               check('Clock stays visible in admin dashboard', page.locator('#js-live-clock').is_visible())
 
@@ -175,8 +177,9 @@ jobs:
               page.wait_for_selector('#authView', state='visible', timeout=10000)
 
               # Partner/student flow
-              page.get_by_role('button', name='Partner Login').click()
+              page.get_by_role('button', name='Partner Login', exact=True).click()
               page.wait_for_selector('#loginDialog[open]', timeout=10000)
+              page.wait_for_function("() => { const d=document.querySelector('#loginDialog'); const a=d&&d.querySelector('[data-role=\"admin\"]'); const ps=d?[...d.querySelectorAll('[data-role=\"student\"],[data-role=\"university\"],[data-role=\"industry\"]')]:[]; return !!a && getComputedStyle(a).display==='none' && ps.length===3 && ps.every(x=>getComputedStyle(x).display!=='none'); }")
               check('Admin role hidden in partner mode', not page.locator('#loginDialog [data-role="admin"]').is_visible())
               check('Student role visible in partner mode', page.locator('#loginDialog [data-role="student"]').is_visible())
               page.locator('#loginDialog [data-role="student"]').click()
@@ -187,6 +190,7 @@ jobs:
               check('Student session role', page.locator('#sessionRole').inner_text().strip().lower()=='student')
               student_text=page.locator('#content').inner_text()
               check('Student dashboard loads project data', 'JS-1001' in student_text)
+              page.wait_for_selector('#citizenChatbot', state='visible', timeout=10000)
               check('Chatbot stays available in student dashboard', page.locator('#citizenChatbot').is_visible())
               page.locator('#logout').click()
               page.wait_for_selector('#authView', state='visible', timeout=10000)
