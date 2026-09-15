@@ -1,0 +1,33 @@
+name: Clock Diagnostic
+on:
+  push:
+    branches: [full-smoke-test]
+    paths: ['.github/workflows/clock-diagnostic.yml']
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: |
+          pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Inspect live clock in admin dashboard
+        run: |
+          python - <<'PY'
+          from playwright.sync_api import sync_playwright
+          B='https://jansamadhan-ai-prototype-irzt.onrender.com'
+          with sync_playwright() as p:
+            b=p.chromium.launch(headless=True)
+            page=b.new_page(viewport={'width':1366,'height':900})
+            page.goto(B,wait_until='domcontentloaded',timeout=60000)
+            page.wait_for_timeout(3500)
+            print('PUBLIC',page.evaluate("""() => {const e=document.querySelector('#js-live-clock'); if(!e)return {exists:false}; const s=getComputedStyle(e), r=e.getBoundingClientRect(); return {exists:true,parent:e.parentElement&&e.parentElement.id,parentClass:e.parentElement&&e.parentElement.className,display:s.display,visibility:s.visibility,opacity:s.opacity,rect:[r.x,r.y,r.width,r.height],htmlClass:document.documentElement.className,bar:!!document.querySelector('#official-clock-bar'),barDisplay:document.querySelector('#official-clock-bar')?getComputedStyle(document.querySelector('#official-clock-bar')).display:null,barRect:document.querySelector('#official-clock-bar')?(()=>{const q=document.querySelector('#official-clock-bar').getBoundingClientRect();return [q.x,q.y,q.width,q.height]})():null}}"""))
+            page.evaluate("s => localStorage.setItem('jansamadhan_session_v2', JSON.stringify(s))",{'role':'admin','name':'Clock Diagnostic'})
+            page.reload(wait_until='domcontentloaded',timeout=60000)
+            page.wait_for_timeout(3500)
+            print('ADMIN',page.evaluate("""() => {const e=document.querySelector('#js-live-clock'); if(!e)return {exists:false}; const s=getComputedStyle(e), r=e.getBoundingClientRect(); let chain=[],n=e; while(n&&chain.length<8){const cs=getComputedStyle(n);chain.push({tag:n.tagName,id:n.id,cls:n.className,display:cs.display,visibility:cs.visibility,opacity:cs.opacity});n=n.parentElement;} return {exists:true,parent:e.parentElement&&e.parentElement.id,parentClass:e.parentElement&&e.parentElement.className,display:s.display,visibility:s.visibility,opacity:s.opacity,rect:[r.x,r.y,r.width,r.height],htmlClass:document.documentElement.className,bar:!!document.querySelector('#official-clock-bar'),barDisplay:document.querySelector('#official-clock-bar')?getComputedStyle(document.querySelector('#official-clock-bar')).display:null,barRect:document.querySelector('#official-clock-bar')?(()=>{const q=document.querySelector('#official-clock-bar').getBoundingClientRect();return [q.x,q.y,q.width,q.height]})():null,chain}}"""))
+            b.close()
+          PY
