@@ -80,10 +80,12 @@
     style.textContent=
       "#authView.jsu-public-clean .govnav .navlinks>[data-report],"+
       "#authView.jsu-public-clean .govnav .navlinks>[data-track],"+
+      "#authView.jsu-public-clean .govnav .navlinks>[data-login]{display:none!important}"+
       "#authView.jsu-public-clean .govnav .navlinks>.clean-admin-login,"+
       "#authView.jsu-public-clean .govnav .navlinks>.clean-partner-login{display:flex!important}"+
-      "#authView.jsu-public-clean .govnav .navlinks>[data-login]{display:none!important}"+
       "#authView.jsu-public-clean .govnav .navlinks{margin-left:auto;flex-wrap:wrap}"+
+      "#authView.jsu-public-clean .quicktrack{display:none!important}"+
+      "#authView.jsu-public-clean .hero{grid-template-columns:1fr!important;max-width:900px;margin:0 auto}"+
       "#citizenChatbot.hidden{display:block!important}"+
       ".clean-admin-login,.clean-partner-login{white-space:nowrap}"+
       "@media(max-width:720px){#authView.jsu-public-clean .govnav-inner{justify-content:center!important}.govnav .navlinks{width:100%;justify-content:center}.govnav .navlinks button{font-size:.72rem;padding:10px 9px}}";
@@ -128,17 +130,20 @@
     var source=nav&&nav.querySelector("[data-login]");
     if(!nav||!source)return;
 
-    /* Keep the original login trigger available for programmatic use only.
-       This prevents the obsolete "Dashboard Login" control from reappearing
-       when older cleanup styles run after this script. */
+    /* Public report and track actions live only in the main interface.
+       Keep the original login trigger programmatic-only. */
     source.setAttribute("aria-hidden","true");
     source.setAttribute("tabindex","-1");
     source.style.setProperty("display","none","important");
 
     var report=nav.querySelector("[data-report]");
     var track=nav.querySelector("[data-track]");
-    setText(report,isHindi()?"समस्या रिपोर्ट करें":"Report a Problem");
-    setText(track,isHindi()?"स्थिति ट्रैक करें":"Track Status");
+    [report,track].forEach(function(btn){
+      if(!btn)return;
+      btn.setAttribute("aria-hidden","true");
+      btn.setAttribute("tabindex","-1");
+      btn.style.setProperty("display","none","important");
+    });
 
     var admin=nav.querySelector(".clean-admin-login");
     if(!admin){
