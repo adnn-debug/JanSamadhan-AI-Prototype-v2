@@ -88,8 +88,27 @@
       "#authView.jsu-public-clean .hero{grid-template-columns:1fr!important;max-width:900px;margin:0 auto}"+
       "#citizenChatbot.hidden{display:block!important}"+
       ".clean-admin-login,.clean-partner-login{white-space:nowrap}"+
-      "@media(max-width:720px){#authView.jsu-public-clean .govnav-inner{justify-content:center!important}.govnav .navlinks{width:100%;justify-content:center}.govnav .navlinks button{font-size:.72rem;padding:10px 9px}}";
+      "#official-clock-bar{position:sticky!important;top:0!important;z-index:1200!important;background:#fff!important;border-bottom:1px solid var(--line,#cbd9d0)!important;display:block!important}"+
+      "#official-clock-bar .official-clock-inner{min-height:52px;display:flex;align-items:center;justify-content:flex-end;padding-top:6px;padding-bottom:6px}"+
+      "#official-clock-bar .actions{display:flex!important;align-items:center;justify-content:flex-end;width:100%}"+
+      "#official-clock-bar .js-live-clock{display:inline-flex!important;visibility:visible!important;opacity:1!important;margin:0!important}"+
+      "body.high-contrast #official-clock-bar{background:#000!important;border-color:#fff!important}"+
+      "@media(max-width:720px){#authView.jsu-public-clean .govnav-inner{justify-content:center!important}.govnav .navlinks{width:100%;justify-content:center}.govnav .navlinks button{font-size:.72rem;padding:10px 9px}#official-clock-bar .official-clock-inner{min-height:48px;justify-content:center}#official-clock-bar .actions{justify-content:center}}";
     document.head.appendChild(style);
+  }
+
+  function ensureGlobalClockBar(){
+    if(!document.body)return null;
+    var bar=document.getElementById("official-clock-bar");
+    if(!bar){
+      bar=document.createElement("div");
+      bar.id="official-clock-bar";
+      bar.className="apphead official-clock-bar";
+      bar.setAttribute("aria-label",isHindi()?"लाइव तारीख और समय":"Live date and time");
+      bar.innerHTML='<div class="shell official-clock-inner"><div class="actions" id="official-clock-actions"></div></div>';
+      document.body.insertBefore(bar,document.body.firstChild||null);
+    }
+    return bar;
   }
 
   function configureLoginDialog(mode){
@@ -173,6 +192,7 @@
 
   function syncPreviewUi(){
     installUiStyles();
+    ensureGlobalClockBar();
     installPublicNav();
     keepChatbotAvailable();
   }
