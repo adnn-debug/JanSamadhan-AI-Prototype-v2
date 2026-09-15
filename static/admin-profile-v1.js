@@ -24,3 +24,22 @@
     if(selectedRole==="admin")setTimeout(updateAdminUI,0);
   },true);
 })();
+
+/* Keep JanSahayak slightly above the viewport edge so it does not sit on top
+   of the bottom-most map/content controls during the live demo. */
+(function(){
+  "use strict";
+
+  function installChatbotPositionFix(){
+    if(document.getElementById("jansahayak-position-fix"))return;
+    var style=document.createElement("style");
+    style.id="jansahayak-position-fix";
+    style.textContent=
+      ".citizen-chatbot{bottom:54px!important}"+
+      "@media(max-width:650px){.citizen-chatbot{bottom:44px!important}.chatbot-panel{bottom:95px!important}}";
+    document.head.appendChild(style);
+  }
+
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",installChatbotPositionFix,{once:true});
+  else installChatbotPositionFix();
+})();
