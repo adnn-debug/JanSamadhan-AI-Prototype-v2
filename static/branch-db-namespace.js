@@ -128,6 +128,13 @@
     var source=nav&&nav.querySelector("[data-login]");
     if(!nav||!source)return;
 
+    /* Keep the original login trigger available for programmatic use only.
+       This prevents the obsolete "Dashboard Login" control from reappearing
+       when older cleanup styles run after this script. */
+    source.setAttribute("aria-hidden","true");
+    source.setAttribute("tabindex","-1");
+    source.style.setProperty("display","none","important");
+
     var report=nav.querySelector("[data-report]");
     var track=nav.querySelector("[data-track]");
     setText(report,isHindi()?"समस्या रिपोर्ट करें":"Report a Problem");
