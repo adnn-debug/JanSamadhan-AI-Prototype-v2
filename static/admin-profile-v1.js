@@ -25,8 +25,7 @@
   },true);
 })();
 
-/* Keep JanSahayak slightly above the viewport edge so it does not sit on top
-   of the bottom-most map/content controls during the live demo. */
+/* Keep JanSahayak above Leaflet/map layers and safely inside the viewport. */
 (function(){
   "use strict";
 
@@ -35,8 +34,11 @@
     var style=document.createElement("style");
     style.id="jansahayak-position-fix";
     style.textContent=
-      ".citizen-chatbot{bottom:54px!important}"+
-      "@media(max-width:650px){.citizen-chatbot{bottom:44px!important}.chatbot-panel{bottom:95px!important}}";
+      ".citizen-chatbot{position:fixed!important;right:24px!important;bottom:54px!important;z-index:12000!important;overflow:visible!important;isolation:isolate!important}"+
+      ".citizen-chatbot .chatbot-toggle{position:relative!important;z-index:2!important}"+
+      ".citizen-chatbot .chatbot-panel{z-index:3!important}"+
+      ".leaflet-container,.leaflet-pane,.leaflet-control-container{z-index:auto}"+
+      "@media(max-width:650px){.citizen-chatbot{right:12px!important;bottom:44px!important}.chatbot-panel{bottom:95px!important}}";
     document.head.appendChild(style);
   }
 
