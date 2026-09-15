@@ -118,10 +118,18 @@
   function init(){
     scan();
     document.addEventListener("submit",onSubmitCapture,true);
-    document.addEventListener("click",function(e){if(e.target.closest("[data-stage]"))setTimeout(hardenStageDialog,0)},true);
+    document.addEventListener("click",function(e){
+      var resetButton=e.target.closest("[data-reset]");
+      if(resetButton&&role()!=="admin"){
+        e.preventDefault();e.stopImmediatePropagation();
+        toast(tx("Only the administrator can reset demo data.","केवल प्रशासक डेमो डेटा रीसेट कर सकता है।"),"warn");
+        return;
+      }
+      if(e.target.closest("[data-stage]"))setTimeout(hardenStageDialog,0);
+    },true);
     new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true});
     new MutationObserver(schedule).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
-    window.JanSamadhanFlowGuard={version:"1.0",rescan:scan};
+    window.JanSamadhanFlowGuard={version:"1.1",rescan:scan};
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
 })();
