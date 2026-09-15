@@ -442,13 +442,13 @@
       new MutationObserver(scheduleUI).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
     }
     new MutationObserver(function(muts){
-      if(muts.some(function(m){return m.target&&m.target.closest&&m.target.closest("#jsgeo-metrics,#jsgeo-intel")}))setTimeout(patchGISLabels,0);
+      if(muts.some(function(m){return m.target&&m.target.closest&&m.target.closest("#jsgeo-metrics,#jsgeo-intel")}))patchGISLabels();
     }).observe(document.body,{childList:true,subtree:true,characterData:true});
   }
 
   function init(){
     ensureStyles();document.addEventListener("click",onClick);scan();observe();setTimeout(scan,900);setTimeout(patchGISLabels,1100);
-    window.JanSamadhanRecurrence={version:"2.0",rescan:scan};
+    window.JanSamadhanRecurrence={version:"2.1",rescan:scan};
   }
 
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
