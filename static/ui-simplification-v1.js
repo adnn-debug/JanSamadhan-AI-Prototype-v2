@@ -14,7 +14,24 @@
     if(id("jsu-style"))return;
     var s=document.createElement("style");
     s.id="jsu-style";
-    s.textContent=".jsu-details{margin:10px 0 0;border-top:1px solid var(--line,#cbd9d0);padding-top:8px}.jsu-details>summary{list-style:none;display:inline-flex;align-items:center;gap:6px;color:var(--forest,#075b3a);font-size:.72rem;font-weight:850;cursor:pointer;user-select:none}.jsu-details>summary::-webkit-details-marker{display:none}.jsu-details>summary:after{content:'+';display:grid;place-items:center;width:18px;height:18px;border:1px solid #9ebbaa;border-radius:50%;font-size:.7rem}.jsu-details[open]>summary:after{content:'–'}.jsu-detail-body{margin-top:9px;display:grid;gap:8px}.jsu-extra-meta{display:grid;grid-template-columns:1fr 1fr;gap:7px;font-size:.71rem;color:var(--muted,#5c6d64)}.jsu-extra-meta strong{color:var(--ink,#17231d)}.jsu-home-details{margin-top:16px;background:#fff;border:1px solid var(--line,#cbd9d0);border-radius:9px;padding:12px 14px}.jsu-home-details>summary{font-weight:850;color:var(--forest,#075b3a);cursor:pointer}.jsu-home-details .architecture{margin-top:12px}.jsu-compact-ai p,.jsu-compact-ai small{margin:7px 0 0}.jsu-dup-wrap{margin-top:8px}.jsu-dup-wrap>summary{color:var(--forest,#075b3a);font-size:.72rem;font-weight:850;cursor:pointer}.jsu-dup-wrap>.jsh-dup{margin-top:8px}.jsu-primary-meta{grid-template-columns:1fr 1fr}body.high-contrast .jsu-home-details,body.high-contrast .jsu-details{background:#000!important;color:#fff!important;border-color:#fff!important}body.high-contrast .jsu-details>summary,body.high-contrast .jsu-home-details>summary,body.high-contrast .jsu-dup-wrap>summary{color:#fff!important}@media(max-width:650px){.jsu-extra-meta,.jsu-primary-meta{grid-template-columns:1fr}}";
+    s.textContent=".jsu-details{margin:10px 0 0;border-top:1px solid var(--line,#cbd9d0);padding-top:8px}.jsu-details>summary{list-style:none;display:inline-flex;align-items:center;gap:6px;color:var(--forest,#075b3a);font-size:.72rem;font-weight:850;cursor:pointer;user-select:none}.jsu-details>summary::-webkit-details-marker{display:none}.jsu-details>summary:after{content:'+';display:grid;place-items:center;width:18px;height:18px;border:1px solid #9ebbaa;border-radius:50%;font-size:.7rem}.jsu-details[open]>summary:after{content:'–'}.jsu-detail-body{margin-top:9px;display:grid;gap:8px}.jsu-extra-meta{display:grid;grid-template-columns:1fr 1fr;gap:7px;font-size:.71rem;color:var(--muted,#5c6d64)}.jsu-extra-meta strong{color:var(--ink,#17231d)}.jsu-home-details{margin-top:16px;background:#fff;border:1px solid var(--line,#cbd9d0);border-radius:9px;padding:12px 14px}.jsu-home-details>summary{font-weight:850;color:var(--forest,#075b3a);cursor:pointer}.jsu-home-details .architecture{margin-top:12px}.jsu-compact-ai p,.jsu-compact-ai small{margin:7px 0 0}.jsu-dup-wrap{margin-top:8px}.jsu-dup-wrap>summary{color:var(--forest,#075b3a);font-size:.72rem;font-weight:850;cursor:pointer}.jsu-dup-wrap>.jsh-dup{margin-top:8px}.jsu-primary-meta{grid-template-columns:1fr 1fr}body.high-contrast .jsu-home-details,body.high-contrast .jsu-details{background:#000!important;color:#fff!important;border-color:#fff!important}body.high-contrast .jsu-details>summary,body.high-contrast .jsu-home-details>summary,body.high-contrast .jsu-dup-wrap>summary{color:#fff!important}@media(max-width:650px){.jsu-extra-meta,.jsu-primary-meta{grid-template-columns:1fr}}"+
+      "#authView.jsu-public-clean .utility,#authView.jsu-public-clean .noticebar,#authView.jsu-public-clean .services,#authView.jsu-public-clean .footer-links,#authView.jsu-public-clean #cloudStatus,#authView.jsu-public-clean .js-live-clock{display:none!important}"+
+      "#authView.jsu-public-clean .govnav .navlinks>a,#authView.jsu-public-clean .govnav .navlinks>button{display:none!important}"+
+      "#authView.jsu-public-clean .govnav .navlinks>[data-login]{display:flex!important;border-right:0}"+
+      "#authView.jsu-public-clean .govnav-inner{justify-content:flex-end;min-height:48px}"+
+      "#authView.jsu-public-clean .home-main{padding:48px 0 64px;min-height:calc(100vh - 235px);display:flex;align-items:center}"+
+      "#authView.jsu-public-clean .hero{width:100%;grid-template-columns:minmax(0,1.12fr) minmax(300px,.88fr);gap:20px}"+
+      "#authView.jsu-public-clean .intro{padding:46px 42px}"+
+      "#authView.jsu-public-clean .intro .eyebrow{display:none}"+
+      "#authView.jsu-public-clean .intro h1{max-width:650px;font-size:clamp(2.25rem,5vw,3.35rem)}"+
+      "#authView.jsu-public-clean .intro>p{max-width:620px;font-size:.98rem}"+
+      "#authView.jsu-public-clean .hero-actions{margin-top:26px}"+
+      "#authView.jsu-public-clean .quicktrack{padding:28px}"+
+      "#authView.jsu-public-clean .quicktrack .hint{display:none}"+
+      "#authView.jsu-public-clean .site-footer{background:#fff;border-top:1px solid var(--line,#cbd9d0)}"+
+      "#authView.jsu-public-clean .footer-inner{display:none}"+
+      "#authView.jsu-public-clean .copyright{padding:15px 16px}"+
+      "@media(max-width:820px){#authView.jsu-public-clean .home-main{padding:28px 0 42px;align-items:flex-start}#authView.jsu-public-clean .hero{grid-template-columns:1fr}#authView.jsu-public-clean .intro{padding:32px 24px}#authView.jsu-public-clean .quicktrack{padding:24px}}";
     document.head.appendChild(s);
   }
 
@@ -83,13 +100,32 @@
   }
 
   function simplifyHomepage(){
-    if(id("dashView")&&!id("dashView").classList.contains("hidden"))return;
-    Array.from(document.querySelectorAll(".architecture")).forEach(function(a){
-      if(a.closest(".jsu-home-details"))return;
-      var d=document.createElement("details");d.className="jsu-home-details";
-      var s=document.createElement("summary");s.textContent=hi()?"सिस्टम कैसे काम करता है देखें":"See system details";
-      a.parentNode.insertBefore(d,a);d.appendChild(s);d.appendChild(a);
-    });
+    var auth=id("authView");
+    var dash=id("dashView");
+    if(!auth)return;
+    if(dash&&!dash.classList.contains("hidden"))return;
+
+    auth.classList.add("jsu-public-clean");
+
+    var brandSub=id("brandSub");
+    if(brandSub)brandSub.textContent=hi()?"समस्या रिपोर्ट करें · स्थिति ट्रैक करें":"Report a problem · Track its status";
+
+    var heading=id("homeHeading");
+    if(heading)heading.textContent=hi()?"समस्या रिपोर्ट करें। समाधान ट्रैक करें।":"Report a problem. Track its resolution.";
+
+    var lead=id("homeLead");
+    if(lead)lead.textContent=hi()?"नागरिकों के लिए केवल दो सरल विकल्प। बाकी प्रशासनिक और सहयोगी सुविधाएँ लॉगिन के बाद डैशबोर्ड में उपलब्ध हैं।":"Two simple actions for citizens. Administrative, AI, analytics and collaboration tools are available after dashboard login.";
+
+    var login=auth.querySelector("[data-login]");
+    if(login)login.textContent=hi()?"डैशबोर्ड लॉगिन":"Dashboard Login";
+
+    auth.querySelectorAll(".hero-actions [data-report]").forEach(function(btn){btn.textContent=hi()?"समस्या रिपोर्ट करें":"Report a Problem"});
+    auth.querySelectorAll(".hero-actions [data-track]").forEach(function(btn){btn.textContent=hi()?"समस्या ट्रैक करें":"Track a Problem"});
+
+    var quickTitle=auth.querySelector(".quicktrack h2");
+    if(quickTitle)quickTitle.textContent=hi()?"समस्या ट्रैक करें":"Track a Problem";
+    var quickLead=auth.querySelector(".quicktrack p");
+    if(quickLead)quickLead.textContent=hi()?"अपना Challenge ID दर्ज करें।":"Enter your Challenge ID.";
   }
 
   function updateLabels(){
