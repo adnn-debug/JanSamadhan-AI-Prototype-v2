@@ -1,0 +1,43 @@
+name: Targeted Production Rerun
+
+on:
+  push:
+    branches: [full-smoke-test]
+    paths:
+      - '.github/workflows/targeted-production-rerun.yml'
+
+jobs:
+  targeted:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BASE_URL: https://jansamadhan-ai-prototype-irzt.onrender.com
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: |
+          pip install requests playwright
+          python -m playwright install --with-deps chromium
+      - name: Verify prior failures
+        run: |
+          python - <<'PY'
+          import os,requests,sys
+          from playwright.sync_api import sync_playwright
+          B=os.environ['BASE_URL']; failed=[]
+          def ck(n,v,d=''):
+              print(('PASS' if v else 'FAIL')+' | '+n+((' | '+str(d)) if d else ''))
+              if not v: failed.append((n,d))
+          r=requests.post(B+'/api/ai',timeout=40,json={'task':'analyze_report','payload':{'title':'Broken streetlights on Kanke Road','description':'Streetlights have been dark for one week and affect evening commuters.','district':'Ranchi','location':'Kanke Road, Ranchi','affected':420,'category':'Let AI decide'}})
+          ck('Correct AI analyze_report task',r.status_code==200,r.text[:300])
+          if r.ok:
+              j=r.json(); ck('Resolution path present',bool(j.get('resolution_path')),j); ck('Authority present',bool(j.get('responsible_authority')),j)
+          with sync_playwright() as p:
+              b=p.chromium.launch(headless=True); page=b.new_page(viewport={'width':1366,'height':900}); page.goto(B,wait_until='domcontentloaded',timeout=60000); page.wait_for_timeout(3000)
+              page.get_by_role('button',name='Admin Panel',exact=True).click(); page.wait_for_selector('#loginDialog[open]',timeout=10000); page.wait_for_timeout(250)
+              states={z:page.locator('#loginDialog [data-role="'+z+'"]').is_visible() for z in ['student','university','industry','admin']}; ck('Admin mode role visibility',states=={'student':False,'university':False,'industry':False,'admin':True},states); page.locator('[data-close="loginDialog"]').click(); page.wait_for_timeout(150)
+              page.get_by_role('button',name='Partner Login',exact=True).click(); page.wait_for_selector('#loginDialog[open]',timeout=10000); page.wait_for_timeout(250)
+              states={z:page.locator('#loginDialog [data-role="'+z+'"]').is_visible() for z in ['student','university','industry','admin']}; ck('Partner mode role visibility',states=={'student':True,'university':True,'industry':True,'admin':False},states); b.close()
+          if failed:
+              print('FAILED',failed); sys.exit(1)
+          PY
