@@ -3,7 +3,7 @@
 (function(){
   "use strict";
 
-  var PREFIX="clean_public_dashboard__";
+  var PREFIX="clean_public_dashboard_v3__";
 
   function mapLocalKey(key){
     key=String(key==null?"":key);
