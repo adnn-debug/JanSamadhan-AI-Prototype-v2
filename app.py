@@ -27,6 +27,15 @@ try:
 except Exception:
     app.logger.exception("PostgreSQL initialization failed; local demo mode remains available")
 
+_boot_storage = database_health()
+app.logger.info(
+    "PostgreSQL boot health enabled=%s ok=%s database=%s version=%s",
+    _boot_storage.get("enabled"),
+    _boot_storage.get("ok"),
+    _boot_storage.get("database"),
+    _boot_storage.get("version"),
+)
+
 GROQ_MODEL = os.environ.get("GROQ_MODEL", "openai/gpt-oss-20b")
 MAX_REQUESTS = 60
 RATE_WINDOW_SECONDS = 10 * 60
