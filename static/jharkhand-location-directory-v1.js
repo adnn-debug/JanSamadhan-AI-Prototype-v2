@@ -23,6 +23,7 @@
   function setBusy(select,label){
     select.innerHTML="";
     select.appendChild(option("",label));
+    select.dataset.loading="1";
     select.disabled=true;
   }
 
@@ -185,12 +186,23 @@
       o.dataset.type=x.type;
       select.appendChild(o);
     });
+    select.dataset.loading="0";
     select.disabled=false;
+    syncModeControls();
   }
 
   function showError(msg){
     var status=id("js-location-directory-status");
     if(status){status.textContent=msg;status.className="js-location-status bad"}
+  }
+
+  function syncModeControls(){
+    var type=id("rLocationType"),sd=id("rSubdistrict"),village=id("rVillage"),urbanBody=id("rUrbanBody");
+    if(!type)return;
+    var ruralActive=type.value==="rural",urbanActive=type.value==="urban";
+    if(sd){sd.required=ruralActive;sd.disabled=!ruralActive||sd.dataset.loading==="1"}
+    if(village){village.required=ruralActive;village.disabled=!ruralActive||village.dataset.loading==="1"}
+    if(urbanBody){urbanBody.required=urbanActive;urbanBody.disabled=!urbanActive||urbanBody.dataset.loading==="1"}
   }
 
   function toggleMode(){
@@ -200,6 +212,7 @@
     if(!type||!rural||!urban)return;
     rural.style.display=type.value==="rural"?"contents":"none";
     urban.style.display=type.value==="urban"?"contents":"none";
+    syncModeControls();
     if(type.value==="rural")loadSubdistricts();
     if(type.value==="urban")loadUrbanBodies();
     var status=id("js-location-directory-status");
