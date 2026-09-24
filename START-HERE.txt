@@ -3,7 +3,7 @@ JANSAMADHAN AI - ADVANCED COLLEGE PROTOTYPE
 
 RECOMMENDATION
 Update the present GitHub repository. Do not create a new repository.
-The current repository already has the Render deployment. The PostgreSQL migration branch replaces Firestore cloud persistence with Flask + PostgreSQL while retaining local browser fallback.
+The current repository already has the Render deployment. The PostgreSQL migration branch replaces legacy document database cloud persistence with Flask + PostgreSQL while retaining local browser fallback.
 Use a short-lived feature branch for changes, review them, then merge into main.
 
 MAIN DEPLOYED FILE
@@ -98,7 +98,7 @@ SAFE GITHUB AND RENDER UPDATE
 
 DO NOT
 - Create a second repository unless the current repository cannot be accessed.
-- Delete the existing Render service or the old Firebase project before the PostgreSQL migration is verified and backed up.
+- Delete the existing Render service or the old legacy cloud backend project before the PostgreSQL migration is verified and backed up.
 - Claim that AI recommendations are official government decisions.
 - Claim that the current prototype is production-ready or uses a proprietary trained model.
 - Use real personal passwords in prototype registration.
