@@ -123,7 +123,7 @@
     console.warn("Official seed bootstrap unavailable",e);
   }
 
-  /* Keep the configured Firestore collection names unchanged.
+  /* Keep the configured PostgreSQL-backed cloud data keys unchanged.
      The live database and its rules use accounts, problems and citizenDailyLimits.
      Only browser localStorage is namespaced for the presentation-safe demo. */
 
