@@ -166,7 +166,8 @@
     clearTimeout(cloudTimer);
     cloudTimer=setTimeout(function(){
       try{
-        if(!window.JSCloud)return;\n        changed.forEach(function(p){window.JSCloud.set("problems",p.id,{district:p.district,location:p.location,title:p.title,assignedUniversity:p.assignedUniversity,universities:p.universities},true).catch(function(){})});
+        if(!window.JSCloud)return;
+        changed.forEach(function(p){window.JSCloud.set("problems",p.id,{district:p.district,location:p.location,title:p.title,assignedUniversity:p.assignedUniversity,universities:p.universities},true).catch(function(){})});
       }catch(e){}
     },1200);
   }
