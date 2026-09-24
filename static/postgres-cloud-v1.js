@@ -28,7 +28,7 @@
     engine:"postgresql",
     health:function(){return request("/api/storage/health");},
     list:function(collection){return request(collectionPath(collection));},
-    get:function(collection,id){return request(collectionPath(collection)+"/"+encodeURIComponent(id));},
+    get:function(collection,id){return request(collectionPath(collection)+"/"+encodeURIComponent(id)).catch(function(err){if(err&&err.status===404)return null;throw err});},
     set:function(collection,id,data,merge){
       return request(collectionPath(collection)+"/"+encodeURIComponent(id)+"?merge="+(merge===false?"0":"1"),{
         method:"PUT",
