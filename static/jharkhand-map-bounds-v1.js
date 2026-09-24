@@ -38,11 +38,10 @@
 })();
 
 /* Cross-device report recovery + cloud sync v1.
-   The core prototype already has a Firestore listener, but a citizen can submit
-   during the short period before Firebase finishes connecting. In that case the
-   old syncProblem() path leaves the report only in localStorage, so an admin on
-   another device cannot see it. This bridge captures citizen-created JS-JH IDs,
-   retries them against Firestore, and keeps retrying after temporary outages. */
+   The core prototype already has PostgreSQL cloud synchronization, but a citizen can submit
+   during the short period before the API finishes connecting. In that case the
+   local report is queued here, retried against PostgreSQL, and kept pending
+   after temporary outages. */
 (function(){
   "use strict";
 
@@ -83,33 +82,29 @@
     });
   }
 
-  function ensureFirebaseReady(){
-    if(!(window.firebase&&firebase.firestore&&firebase.auth))return Promise.reject(new Error("Firebase SDK unavailable"));
-    if(!firebase.apps||!firebase.apps.length)return Promise.reject(new Error("Firebase app not initialized yet"));
-    if(firebase.auth().currentUser)return Promise.resolve();
-    return firebase.auth().signInAnonymously().then(function(){return undefined});
+  function ensureCloudReady(){
+    if(!window.JSCloud)return Promise.reject(new Error("PostgreSQL cloud adapter unavailable"));
+    return window.JSCloud.health().then(function(h){
+      if(!h||!h.ok)throw new Error("PostgreSQL API unavailable");
+      return undefined;
+    });
   }
 
   function flushPending(){
     captureLocalCitizenReports();
     if(busy||!Object.keys(pending).length)return;
     busy=true;
-    ensureFirebaseReady().then(function(){
-      var db=firebase.firestore();
+    ensureCloudReady().then(function(){
       var ids=Object.keys(pending);
-      return Promise.all(ids.map(function(id){
+      return Promise.all(ids.map(async function(id){
         var local=pending[id];
-        var ref=db.collection("problems").doc(id);
-        return ref.get().then(function(snap){
-          if(snap.exists){
-            var remote=snap.data()||{};
-            if(problemTime(remote)>problemTime(local)){
-              delete pending[id];
-              return;
-            }
-          }
-          return ref.set(local,{merge:true}).then(function(){delete pending[id]});
-        });
+        var remote=await window.JSCloud.get("problems",id);
+        if(remote&&problemTime(remote)>problemTime(local)){
+          delete pending[id];
+          return;
+        }
+        await window.JSCloud.set("problems",id,local,true);
+        delete pending[id];
       }));
     }).then(function(){
       lastError="";
@@ -118,12 +113,13 @@
       window.JanSamadhanCrossDeviceSync.pendingCount=Object.keys(pending).length;
     }).catch(function(err){
       lastError=String(err&&err.message||err||"Cloud sync failed");
+      setCloudWarning("Cloud sync retrying · local copy safe");
+    }).finally(function(){
+      busy=false;
       window.JanSamadhanCrossDeviceSync=window.JanSamadhanCrossDeviceSync||{};
-      window.JanSamadhanCrossDeviceSync.lastError=lastError;
       window.JanSamadhanCrossDeviceSync.pendingCount=Object.keys(pending).length;
-      if(Object.keys(pending).length)setCloudWarning("Cloud write retrying · local copy safe");
-      if(window.console&&console.warn)console.warn("Cross-device report sync retry",err);
-    }).then(function(){busy=false});
+      window.JanSamadhanCrossDeviceSync.lastError=lastError;
+    });
   }
 
   function schedule(){
