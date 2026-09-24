@@ -3,7 +3,7 @@ JANSAMADHAN AI - ADVANCED COLLEGE PROTOTYPE
 
 RECOMMENDATION
 Update the present GitHub repository. Do not create a new repository.
-The current repository already has the Render deployment and Firebase connection.
+The current repository already has the Render deployment. The PostgreSQL migration branch replaces Firestore cloud persistence with Flask + PostgreSQL while retaining local browser fallback.
 Use a short-lived feature branch for changes, review them, then merge into main.
 
 MAIN DEPLOYED FILE
@@ -56,7 +56,7 @@ WHAT IS NOW FUNCTIONAL
 - Public progress bar, simplified timeline and time-stamped history
 - Analytics for category distribution and pipeline position
 - Verified beneficiary and outcome metrics
-- Live Firebase sync with local browser fallback
+- Live PostgreSQL sync through Flask APIs with local browser fallback
 - Hindi interface support, text resizing and high contrast
 - Progressive disclosure: important status first, deeper reasoning one click away
 
@@ -66,13 +66,22 @@ The core automatic duplicate merge is still based on explainable text/concept, l
 AI and GIS signals are advisory. Government / Nodal Administrator remains the case owner and human validation controls routing and completion.
 Do not claim the current prototype is a trained proprietary model, vector-search system or production-ready government platform.
 
+POSTGRESQL MIGRATION ARCHITECTURE
+- PostgreSQL is the primary cloud persistence layer.
+- Flask exposes controlled API endpoints for accounts, challenges, seeding and daily complaint limits.
+- Important challenge fields (category, priority, stage, district, location, institution) are first-class relational columns for filtering/indexing.
+- Nested prototype state (history, proposals, partner offers, AI/GIS metadata, impact records) is retained in JSONB so the working demo does not lose functionality during migration.
+- citizen_daily_limits uses a PostgreSQL atomic upsert so the 10-reports-per-day rule is enforced consistently across devices.
+- Browser localStorage remains only as a resilience/demo fallback, not the primary cloud database.
+- A later production normalization can split history, proposals, milestones and partner offers into dedicated relational tables without changing the public workflow.
+
 WHAT A PRODUCTION VERSION STILL NEEDS
 - Server-side authentication, verified role authorization and secure administrator controls
 - OTP or verified institutional identity instead of demo credentials
 - Vector/embedding semantic search and trained multilingual classification where justified
 - Verified geocoding, jurisdiction boundaries and department routing rules
 - SMS, WhatsApp, email and push notifications
-- Secure object storage for evidence instead of data URLs in Firestore
+- Secure object storage for evidence instead of storing image data URLs inside database records
 - Formal consent, retention, audit log and content-moderation policies
 - Government department APIs and official SLA/escalation integrations
 - Offline-first mobile/PWA reporting and assisted access kiosks
@@ -85,11 +94,11 @@ SAFE GITHUB AND RENDER UPDATE
 4. Render should automatically deploy main using the existing build and start commands.
 5. Open the Render URL in an incognito window and run the full demo once.
 6. Verify the map degrades gracefully if Leaflet/OpenStreetMap cannot load.
-7. If Firebase says Local demo mode, verify Firebase Anonymous Authentication and Firestore rules before presentation day.
+7. If the UI says PostgreSQL unavailable / Local demo mode, verify DATABASE_URL and /api/storage/health before presentation day.
 
 DO NOT
 - Create a second repository unless the current repository cannot be accessed.
-- Delete the existing Render service or Firebase project.
+- Delete the existing Render service or the old Firebase project before the PostgreSQL migration is verified and backed up.
 - Claim that AI recommendations are official government decisions.
 - Claim that the current prototype is production-ready or uses a proprietary trained model.
 - Use real personal passwords in prototype registration.
