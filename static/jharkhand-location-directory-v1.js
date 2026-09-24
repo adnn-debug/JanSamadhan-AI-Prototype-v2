@@ -105,7 +105,8 @@
         id("rLocationCode").value=u.value;
       }
     }
-    location.value=base;
+    var detailText=detail?String(detail.value||"").trim():"";
+    location.value=base+(base&&detailText?" · "+detailText:"");
     if(detail)detail.dataset.baseLocation=base;
     var status=id("js-location-directory-status");
     if(status&&base){
@@ -279,6 +280,7 @@
     sd.addEventListener("change",loadVillages);
     village.addEventListener("change",syncLocationValue);
     id("rUrbanBody").addEventListener("change",syncLocationValue);
+    landmark.addEventListener("input",syncLocationValue);
 
     form.addEventListener("submit",function(e){
       syncLocationValue();
