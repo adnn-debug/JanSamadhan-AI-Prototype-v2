@@ -19,8 +19,70 @@ import os
 import re
 import time
 from collections import defaultdict, deque
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
 
 app = Flask(__name__)
+
+LGD_BASE_URL = "https://lgdirectory.gov.in/webservices/lgdws"
+JHARKHAND_LGD_STATE_CODE = 20
+_LGD_CACHE = {}
+_LGD_CACHE_TTL_SECONDS = 6 * 60 * 60
+
+
+def _lgd_rows(payload):
+    if isinstance(payload, list):
+        return payload
+    if isinstance(payload, dict):
+        for key in ("data", "records", "response", "result", "items"):
+            rows = payload.get(key)
+            if isinstance(rows, list):
+                return rows
+    return []
+
+
+def _lgd_fetch(endpoint, params):
+    query = urlencode({k: v for k, v in params.items() if v not in (None, "")})
+    url = f"{LGD_BASE_URL}/{endpoint}"
+    if query:
+        url += "?" + query
+    cache_key = url
+    cached = _LGD_CACHE.get(cache_key)
+    now_ts = time.time()
+    if cached and now_ts - cached["at"] < _LGD_CACHE_TTL_SECONDS:
+        return cached["data"]
+
+    last_error = None
+    for method in ("GET", "POST"):
+        try:
+            req = Request(
+                url,
+                data=b"" if method == "POST" else None,
+                headers={
+                    "Accept": "application/json",
+                    "User-Agent": "JanSamadhan-AI/1.0 (SIH prototype; LGD directory lookup)",
+                },
+                method=method,
+            )
+            with urlopen(req, timeout=12) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+            rows = _lgd_rows(payload)
+            _LGD_CACHE[cache_key] = {"at": now_ts, "data": rows}
+            return rows
+        except Exception as exc:
+            last_error = exc
+    raise RuntimeError(f"LGD directory request failed: {last_error}")
+
+
+def _positive_int(value, field_name):
+    try:
+        parsed = int(str(value).strip())
+    except (TypeError, ValueError):
+        raise ValueError(f"Invalid {field_name}")
+    if parsed <= 0:
+        raise ValueError(f"Invalid {field_name}")
+    return parsed
+
 
 try:
     init_database()
@@ -139,6 +201,100 @@ def _storage_error():
 def storage_health():
     status = database_health()
     return jsonify(status), (200 if status.get("ok") else 503)
+
+
+@app.get("/api/jharkhand/districts")
+def jharkhand_districts():
+    try:
+        rows = _lgd_fetch("districtList", {"stateCode": JHARKHAND_LGD_STATE_CODE})
+        items = sorted(
+            [
+                {
+                    "code": str(row.get("districtCode", "")).strip(),
+                    "name": str(row.get("districtNameEnglish", "")).strip().title(),
+                }
+                for row in rows
+                if row.get("districtCode") and row.get("districtNameEnglish")
+            ],
+            key=lambda item: item["name"],
+        )
+        return jsonify(state="Jharkhand", state_code=str(JHARKHAND_LGD_STATE_CODE), source="LGD", items=items)
+    except Exception as exc:
+        app.logger.warning("LGD district lookup failed: %s", exc)
+        return jsonify(error="Jharkhand LGD district directory is temporarily unavailable."), 503
+
+
+@app.get("/api/jharkhand/subdistricts")
+def jharkhand_subdistricts():
+    try:
+        district_code = _positive_int(request.args.get("district_code"), "district code")
+        rows = _lgd_fetch("subdistrictList", {"districtCode": district_code})
+        items = sorted(
+            [
+                {
+                    "code": str(row.get("subdistrictCode", "")).strip(),
+                    "name": str(row.get("subdistrictNameEnglish", "")).strip(),
+                }
+                for row in rows
+                if row.get("subdistrictCode") and row.get("subdistrictNameEnglish")
+            ],
+            key=lambda item: item["name"].lower(),
+        )
+        return jsonify(source="LGD", district_code=str(district_code), items=items)
+    except ValueError as exc:
+        return jsonify(error=str(exc)), 400
+    except Exception as exc:
+        app.logger.warning("LGD sub-district lookup failed: %s", exc)
+        return jsonify(error="Jharkhand LGD sub-district directory is temporarily unavailable."), 503
+
+
+@app.get("/api/jharkhand/villages")
+def jharkhand_villages():
+    try:
+        subdistrict_code = _positive_int(request.args.get("subdistrict_code"), "sub-district code")
+        rows = _lgd_fetch("villageListWithHierarchy", {"subDistrictCode": subdistrict_code})
+        items = sorted(
+            [
+                {
+                    "code": str(row.get("villageCode", "")).strip(),
+                    "name": str(row.get("villageNameEnglish", "")).strip(),
+                    "status": str(row.get("villageStatus", "")).strip(),
+                }
+                for row in rows
+                if row.get("villageCode") and row.get("villageNameEnglish")
+            ],
+            key=lambda item: item["name"].lower(),
+        )
+        return jsonify(source="LGD", subdistrict_code=str(subdistrict_code), items=items)
+    except ValueError as exc:
+        return jsonify(error=str(exc)), 400
+    except Exception as exc:
+        app.logger.warning("LGD village lookup failed: %s", exc)
+        return jsonify(error="Jharkhand LGD village directory is temporarily unavailable."), 503
+
+
+@app.get("/api/jharkhand/urban-bodies")
+def jharkhand_urban_bodies():
+    try:
+        type_labels = {4: "Municipal Corporation", 5: "Municipality", 7: "Town Panchayat"}
+        seen = {}
+        for type_code, fallback_label in type_labels.items():
+            rows = _lgd_fetch(
+                "localBodyList",
+                {"stateCode": JHARKHAND_LGD_STATE_CODE, "localbodyTypeCode": type_code},
+            )
+            for row in rows:
+                code = str(row.get("localBodyCode", "")).strip()
+                name = str(row.get("localBodyNameEnglish", "")).strip()
+                if not code or not name:
+                    continue
+                body_type = str(row.get("localBodyTypeName", "")).strip() or fallback_label
+                seen[code] = {"code": code, "name": name, "type": body_type}
+        items = sorted(seen.values(), key=lambda item: (item["name"].lower(), item["type"].lower()))
+        return jsonify(state="Jharkhand", state_code=str(JHARKHAND_LGD_STATE_CODE), source="LGD", items=items)
+    except Exception as exc:
+        app.logger.warning("LGD urban local-body lookup failed: %s", exc)
+        return jsonify(error="Jharkhand LGD urban directory is temporarily unavailable."), 503
 
 
 @app.get("/api/accounts")
