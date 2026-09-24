@@ -64,7 +64,7 @@
 
   function syncProblem(p){
     try{
-      if(window.firebase&&firebase.apps&&firebase.apps.length&&firebase.firestore){
+      if(window.JSCloud){
         var payload={
           citizenFeedback:p.citizenFeedback||null,
           citizenFeedbackHistory:p.citizenFeedbackHistory||[],
@@ -77,7 +77,7 @@
           routing:p.routing||null,
           updatedAt:p.updatedAt||now()
         };
-        firebase.firestore().collection("problems").doc(String(p.id)).set(payload,{merge:true}).catch(function(e){console.warn("Citizen feedback cloud sync unavailable",e)});
+        window.JSCloud.set("problems",String(p.id),payload,true).catch(function(e){console.warn("Citizen feedback cloud sync unavailable",e)});
       }
     }catch(e){}
   }

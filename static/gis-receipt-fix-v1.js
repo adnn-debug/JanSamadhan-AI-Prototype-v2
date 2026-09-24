@@ -23,7 +23,7 @@
     if(p.geoEvidence.length>20)p.geoEvidence=p.geoEvidence.slice(-20);
     p.geoUpdatedAt=new Date().toISOString();
     try{localStorage.setItem(s.key,JSON.stringify(s.data))}catch(e){console.warn("GIS receipt local save failed",e)}
-    try{if(window.firebase&&firebase.apps&&firebase.apps.length&&firebase.firestore){firebase.firestore().collection("problems").doc(id).set({geo:p.geo,geoEvidence:p.geoEvidence,geoUpdatedAt:p.geoUpdatedAt},{merge:true}).catch(function(e){console.warn("GIS receipt cloud sync failed",e)})}}catch(e){console.warn("GIS receipt cloud sync unavailable",e)}
+    try{if(window.JSCloud){window.JSCloud.set("problems",id,{geo:p.geo,geoEvidence:p.geoEvidence,geoUpdatedAt:p.geoUpdatedAt},true).catch(function(e){console.warn("GIS receipt cloud sync failed",e)})}}catch(e){console.warn("GIS receipt cloud sync unavailable",e)}
     try{sessionStorage.removeItem("jansamadhan_pending_geo_v1")}catch(e){}
   }
 

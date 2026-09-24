@@ -1,5 +1,19 @@
 from flask import Flask, render_template, jsonify, request
 from groq import Groq
+from database import (
+    enabled as database_enabled,
+    get_account,
+    get_challenge,
+    health as database_health,
+    init_database,
+    list_accounts,
+    list_challenges,
+    reserve_daily_limit,
+    seed_data,
+    upsert_account,
+    upsert_challenge,
+)
+
 import json
 import os
 import re
@@ -7,6 +21,20 @@ import time
 from collections import defaultdict, deque
 
 app = Flask(__name__)
+
+try:
+    init_database()
+except Exception:
+    app.logger.exception("PostgreSQL initialization failed; local demo mode remains available")
+
+_boot_storage = database_health()
+app.logger.warning(
+    "PostgreSQL boot health enabled=%s ok=%s database=%s version=%s",
+    _boot_storage.get("enabled"),
+    _boot_storage.get("ok"),
+    _boot_storage.get("database"),
+    _boot_storage.get("version"),
+)
 
 GROQ_MODEL = os.environ.get("GROQ_MODEL", "openai/gpt-oss-20b")
 MAX_REQUESTS = 60
@@ -93,7 +121,130 @@ def home():
 @app.get("/health")
 def health():
     mode = "groq+local-fallback" if os.environ.get("GROQ_API_KEY") else "local-fallback"
-    return jsonify(status="ok", service="JanSamadhan AI", ai_mode=mode), 200
+    storage = database_health()
+    return jsonify(
+        status="ok",
+        service="JanSamadhan AI",
+        ai_mode=mode,
+        storage="postgresql" if storage.get("ok") else "local-fallback",
+        storage_ok=bool(storage.get("ok")),
+    ), 200
+
+
+def _storage_error():
+    return jsonify(error="PostgreSQL storage is not configured or unavailable."), 503
+
+
+@app.get("/api/storage/health")
+def storage_health():
+    status = database_health()
+    return jsonify(status), (200 if status.get("ok") else 503)
+
+
+@app.get("/api/accounts")
+def api_accounts():
+    if not database_enabled():
+        return _storage_error()
+    try:
+        return jsonify(items=list_accounts()), 200
+    except Exception:
+        app.logger.exception("Could not list PostgreSQL accounts")
+        return _storage_error()
+
+
+@app.get("/api/accounts/<account_id>")
+def api_account(account_id):
+    if not database_enabled():
+        return _storage_error()
+    try:
+        item = get_account(account_id)
+        return (jsonify(item), 200) if item else (jsonify(error="Account not found."), 404)
+    except Exception:
+        app.logger.exception("Could not read PostgreSQL account")
+        return _storage_error()
+
+
+@app.put("/api/accounts/<account_id>")
+def api_upsert_account(account_id):
+    if not database_enabled():
+        return _storage_error()
+    payload = request.get_json(silent=True) or {}
+    try:
+        item = upsert_account(account_id, payload, merge=request.args.get("merge", "1") != "0")
+        return jsonify(item), 200
+    except Exception:
+        app.logger.exception("Could not save PostgreSQL account")
+        return _storage_error()
+
+
+@app.get("/api/problems")
+def api_problems():
+    if not database_enabled():
+        return _storage_error()
+    try:
+        return jsonify(items=list_challenges()), 200
+    except Exception:
+        app.logger.exception("Could not list PostgreSQL challenges")
+        return _storage_error()
+
+
+@app.get("/api/problems/<problem_id>")
+def api_problem(problem_id):
+    if not database_enabled():
+        return _storage_error()
+    try:
+        item = get_challenge(problem_id)
+        return (jsonify(item), 200) if item else (jsonify(error="Challenge not found."), 404)
+    except Exception:
+        app.logger.exception("Could not read PostgreSQL challenge")
+        return _storage_error()
+
+
+@app.put("/api/problems/<problem_id>")
+def api_upsert_problem(problem_id):
+    if not database_enabled():
+        return _storage_error()
+    payload = request.get_json(silent=True) or {}
+    try:
+        item = upsert_challenge(problem_id, payload, merge=request.args.get("merge", "1") != "0")
+        return jsonify(item), 200
+    except Exception:
+        app.logger.exception("Could not save PostgreSQL challenge")
+        return _storage_error()
+
+
+@app.post("/api/cloud/seed")
+def api_seed_cloud():
+    if not database_enabled():
+        return _storage_error()
+    payload = request.get_json(silent=True) or {}
+    try:
+        result = seed_data(
+            payload.get("accounts") or [],
+            payload.get("problems") or [],
+            force=bool(payload.get("force")),
+        )
+        return jsonify(result), 200
+    except Exception:
+        app.logger.exception("Could not seed PostgreSQL demo data")
+        return _storage_error()
+
+
+@app.post("/api/daily-limit/reserve")
+def api_reserve_daily_limit():
+    if not database_enabled():
+        return _storage_error()
+    payload = request.get_json(silent=True) or {}
+    day = _clean(payload.get("day"), 10)
+    citizen_hash = _clean(payload.get("citizenHash"), 128)
+    if not day or not citizen_hash:
+        return jsonify(error="day and citizenHash are required."), 400
+    try:
+        result = reserve_daily_limit(day, citizen_hash, payload.get("limit") or 10)
+        return jsonify(result), 200
+    except Exception:
+        app.logger.exception("Could not reserve PostgreSQL daily limit")
+        return _storage_error()
 
 
 def _client_ip():

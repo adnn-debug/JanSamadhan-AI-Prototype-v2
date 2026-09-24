@@ -4,7 +4,7 @@
    - explicit browser geolocation only on user action
    - admin challenge map with exact-vs-approximate labels
    - nearby / recurrence signals for geo-tagged cases
-   - local + Firebase persistence without changing the core report flow
+   - local + PostgreSQL persistence without changing the core report flow
 */
 (function(){
   "use strict";
@@ -257,8 +257,8 @@
     saveStore(store);
 
     try{
-      if(window.firebase&&firebase.apps&&firebase.apps.length&&firebase.firestore){
-        firebase.firestore().collection("problems").doc(challengeId).set({geo:p.geo,geoEvidence:p.geoEvidence,geoUpdatedAt:p.geoUpdatedAt},{merge:true}).catch(function(e){console.warn("GIS cloud sync failed",e)});
+      if(window.JSCloud){
+        window.JSCloud.set("problems",challengeId,{geo:p.geo,geoEvidence:p.geoEvidence,geoUpdatedAt:p.geoUpdatedAt},true).catch(function(e){console.warn("GIS cloud sync failed",e)});
       }
     }catch(e){console.warn("GIS cloud sync unavailable",e)}
 

@@ -166,9 +166,8 @@
     clearTimeout(cloudTimer);
     cloudTimer=setTimeout(function(){
       try{
-        if(!(window.firebase&&firebase.apps&&firebase.apps.length&&firebase.firestore))return;
-        var db=firebase.firestore();
-        changed.forEach(function(p){db.collection("problems").doc(p.id).set({district:p.district,location:p.location,title:p.title,assignedUniversity:p.assignedUniversity,universities:p.universities},{merge:true}).catch(function(){})});
+        if(!window.JSCloud)return;
+        changed.forEach(function(p){window.JSCloud.set("problems",p.id,{district:p.district,location:p.location,title:p.title,assignedUniversity:p.assignedUniversity,universities:p.universities},true).catch(function(){})});
       }catch(e){}
     },1200);
   }
