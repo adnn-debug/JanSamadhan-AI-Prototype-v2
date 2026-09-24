@@ -1,0 +1,40 @@
+databases:
+  - name: jansamadhan-postgres
+    plan: free
+    region: oregon
+    postgresMajorVersion: "18"
+
+services:
+  - type: web
+    name: jansamadhan-postgres-preview
+    runtime: python
+    plan: free
+    region: oregon
+    repo: https://github.com/adnn-debug/JanSamadhan-AI-Prototype-v2
+    branch: feature/postgresql-migration
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: jansamadhan-postgres
+          property: connectionString
+
+  - type: web
+    name: JanSamadhan-AI-Prototype
+    runtime: python
+    plan: free
+    region: oregon
+    repo: https://github.com/adnn-debug/JanSamadhan-AI-Prototype-v2
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: jansamadhan-postgres
+          property: connectionString
