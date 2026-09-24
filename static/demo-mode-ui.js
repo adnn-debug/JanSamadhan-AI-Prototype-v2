@@ -71,19 +71,21 @@
     cleanChatbot();
     checkHealth();
 
-    loadScript("js-workflow-v4","/static/workflow-v4.js");
-    loadScript("js-citizen-feedback-v1","/static/citizen-feedback-v1.js");
-    loadScript("js-recurrence-v1","/static/recurrence-v1.js");
-    loadScript("js-admin-profile-v1","/static/admin-profile-v1.js");
-    loadScript("js-judge-hardening-v1","/static/judge-hardening-v1.js");
-    loadScript("js-ui-simplification-v1","/static/ui-simplification-v1.js");
-    loadScript("js-jharkhand-map-bounds-v1","/static/jharkhand-map-bounds-v1.js");
-    loadScript("js-gis-map-v1","/static/gis-map-v1.js");
-    loadScript("js-gis-receipt-fix-v1","/static/gis-receipt-fix-v1.js");
-    loadScript("js-demo-resilience-v1","/static/demo-resilience-v1.js");
-    loadScript("js-jharkhand-jurisdiction-v1","/static/jharkhand-jurisdiction-v1.js");
-    loadScript("js-jharkhand-location-directory-v1","/static/jharkhand-location-directory-v1.js");
-    loadScript("js-demo-flow-guard-v1","/static/demo-flow-guard-v1.js");
+    [
+      ["js-workflow-v4","workflow-v4.js"],
+      ["js-citizen-feedback-v1","citizen-feedback-v1.js"],
+      ["js-recurrence-v1","recurrence-v1.js"],
+      ["js-admin-profile-v1","admin-profile-v1.js"],
+      ["js-judge-hardening-v1","judge-hardening-v1.js"],
+      ["js-ui-simplification-v1","ui-simplification-v1.js"],
+      ["js-jharkhand-map-bounds-v1","jharkhand-map-bounds-v1.js"],
+      ["js-gis-map-v1","gis-map-v1.js"],
+      ["js-gis-receipt-fix-v1","gis-receipt-fix-v1.js"],
+      ["js-demo-resilience-v1","demo-resilience-v1.js"],
+      ["js-jharkhand-jurisdiction-v1","jharkhand-jurisdiction-v1.js"],
+      ["js-jharkhand-location-directory-v1","jharkhand-location-directory-v1.js"],
+      ["js-demo-flow-guard-v1","demo-flow-guard-v1.js"]
+    ].forEach(function(script){loadScript(script[0],"/static/"+script[1])});
 
     new MutationObserver(function(){setTimeout(cleanChatbot,0)}).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
     new MutationObserver(function(){setTimeout(cleanChatbot,0)}).observe(document.body,{childList:true,subtree:true});
