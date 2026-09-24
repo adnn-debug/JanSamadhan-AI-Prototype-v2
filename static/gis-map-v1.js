@@ -41,7 +41,6 @@
   var pendingGeo=null;
   var scanTimer=null;
   var receiptTimer=null;
-  var lastReceiptId="";
 
   function id(x){return document.getElementById(x)}
   function isHindi(){return document.documentElement.lang==="hi"}
@@ -283,7 +282,7 @@
       receiptTimer=setTimeout(function(){
         var rid=body.querySelector(".receipt-id");
         var challengeId=rid?String(rid.textContent||"").trim():"";
-        if(challengeId&&challengeId!==lastReceiptId){lastReceiptId=challengeId;persistGeo(challengeId)}
+        if(challengeId)persistGeo(challengeId)
       },80);
     }).observe(body,{childList:true,subtree:true});
   }
