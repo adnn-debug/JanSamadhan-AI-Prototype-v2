@@ -85,6 +85,13 @@ def _positive_int(value, field_name):
 
 
 try:
+    _preview_lgd_probe = _lgd_fetch("districtList", {"stateCode": JHARKHAND_LGD_STATE_CODE})
+    app.logger.warning("LGD preview probe ok=%s Jharkhand_district_rows=%s", bool(_preview_lgd_probe), len(_preview_lgd_probe))
+except Exception as exc:
+    app.logger.warning("LGD preview probe failed: %s", exc)
+
+
+try:
     init_database()
 except Exception:
     app.logger.exception("PostgreSQL initialization failed; local demo mode remains available")
