@@ -1,7 +1,5 @@
-import json
 import os
 from contextlib import contextmanager
-from datetime import datetime, timezone
 
 import psycopg
 from psycopg.rows import dict_row
