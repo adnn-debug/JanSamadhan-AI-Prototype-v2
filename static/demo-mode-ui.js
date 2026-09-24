@@ -80,7 +80,6 @@
       ["js-ui-simplification-v1","ui-simplification-v1.js"],
       ["js-jharkhand-map-bounds-v1","jharkhand-map-bounds-v1.js"],
       ["js-gis-map-v1","gis-map-v1.js"],
-      ["js-gis-receipt-fix-v1","gis-receipt-fix-v1.js"],
       ["js-demo-resilience-v1","demo-resilience-v1.js"],
       ["js-jharkhand-jurisdiction-v1","jharkhand-jurisdiction-v1.js"],
       ["js-jharkhand-location-directory-v1","jharkhand-location-directory-v1.js"],
