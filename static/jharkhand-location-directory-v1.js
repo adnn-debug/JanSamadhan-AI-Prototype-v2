@@ -282,7 +282,9 @@
     id("rUrbanBody").addEventListener("change",syncLocationValue);
     landmark.addEventListener("input",syncLocationValue);
 
-    form.addEventListener("reset",function(){setTimeout(function(){resetLocationValue();toggleMode()},0)});\n\n    form.addEventListener("submit",function(e){
+    form.addEventListener("reset",function(){setTimeout(function(){resetLocationValue();toggleMode()},0)});
+
+    form.addEventListener("submit",function(e){
       syncLocationValue();
       var loc=id("rLocation");
       var valid=!!(loc&&loc.value);
