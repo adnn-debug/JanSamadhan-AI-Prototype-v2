@@ -53,7 +53,7 @@ def _lgd_fetch(endpoint, params):
         return cached["data"]
 
     last_error = None
-    for method in ("POST", "GET"):
+    for method in ("GET", "POST"):
         try:
             req = Request(
                 url,
@@ -85,6 +85,7 @@ def _positive_int(value, field_name):
 
 
 try:
+    _preview_probe_started = time.time()
     _preview_lgd_probe = _lgd_fetch("districtList", {"stateCode": JHARKHAND_LGD_STATE_CODE})
     _preview_subdistricts = _lgd_fetch("subdistrictList", {"districtCode": 339})
     _preview_subdistrict_code = (
@@ -100,11 +101,12 @@ try:
         {"stateCode": JHARKHAND_LGD_STATE_CODE, "localbodyTypeCode": 4},
     )
     app.logger.warning(
-        "LGD preview probe districts=%s Ranchi_subdistricts=%s sample_villages=%s municipal_corporations=%s",
+        "LGD preview probe districts=%s Ranchi_subdistricts=%s sample_villages=%s municipal_corporations=%s elapsed=%.2fs",
         len(_preview_lgd_probe),
         len(_preview_subdistricts),
         len(_preview_villages),
         len(_preview_urban),
+        time.time() - _preview_probe_started,
     )
 except Exception as exc:
     app.logger.warning("LGD preview probe failed: %s", exc)
