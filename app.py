@@ -28,7 +28,7 @@ except Exception:
     app.logger.exception("PostgreSQL initialization failed; local demo mode remains available")
 
 _boot_storage = database_health()
-app.logger.info(
+app.logger.warning(
     "PostgreSQL boot health enabled=%s ok=%s database=%s version=%s",
     _boot_storage.get("enabled"),
     _boot_storage.get("ok"),
