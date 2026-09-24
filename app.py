@@ -86,7 +86,26 @@ def _positive_int(value, field_name):
 
 try:
     _preview_lgd_probe = _lgd_fetch("districtList", {"stateCode": JHARKHAND_LGD_STATE_CODE})
-    app.logger.warning("LGD preview probe ok=%s Jharkhand_district_rows=%s", bool(_preview_lgd_probe), len(_preview_lgd_probe))
+    _preview_subdistricts = _lgd_fetch("subdistrictList", {"districtCode": 339})
+    _preview_subdistrict_code = (
+        _preview_subdistricts[0].get("subdistrictCode") if _preview_subdistricts else None
+    )
+    _preview_villages = (
+        _lgd_fetch("villageListWithHierarchy", {"subDistrictCode": _preview_subdistrict_code})
+        if _preview_subdistrict_code
+        else []
+    )
+    _preview_urban = _lgd_fetch(
+        "localBodyList",
+        {"stateCode": JHARKHAND_LGD_STATE_CODE, "localbodyTypeCode": 4},
+    )
+    app.logger.warning(
+        "LGD preview probe districts=%s Ranchi_subdistricts=%s sample_villages=%s municipal_corporations=%s",
+        len(_preview_lgd_probe),
+        len(_preview_subdistricts),
+        len(_preview_villages),
+        len(_preview_urban),
+    )
 except Exception as exc:
     app.logger.warning("LGD preview probe failed: %s", exc)
 
