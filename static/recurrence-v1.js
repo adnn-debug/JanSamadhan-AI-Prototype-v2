@@ -237,8 +237,8 @@
 
   function syncProblem(p){
     try{
-      if(window.firebase&&firebase.apps&&firebase.apps.length&&firebase.firestore){
-        firebase.firestore().collection("problems").doc(String(p.id)).set({recurrence:p.recurrence||null,updatedAt:now()},{merge:true}).catch(function(e){console.warn("Recurrence sync unavailable",e)});
+      if(window.JSCloud){
+        window.JSCloud.set("problems",String(p.id),{recurrence:p.recurrence||null,updatedAt:now()},true).catch(function(e){console.warn("Recurrence sync unavailable",e)});
       }
     }catch(e){}
   }
