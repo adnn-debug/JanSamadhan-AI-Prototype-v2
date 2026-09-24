@@ -33,7 +33,9 @@
     (items||[]).forEach(function(item){
       select.appendChild(option(item[valueKey],labelFn(item)));
     });
+    select.dataset.loading="0";
     select.disabled=false;
+    syncModeControls();
   }
 
   async function getJson(url){
