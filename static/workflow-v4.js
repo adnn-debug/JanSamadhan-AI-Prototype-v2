@@ -50,8 +50,8 @@
     var d=loadData(),p=(d.problems||[]).find(function(x){return String(x.id||"").toUpperCase()===cid});
     if(p){p.routing=meta;p.updatedAt=now();saveData(d)}
     try{
-      if(window.firebase&&firebase.apps&&firebase.apps.length&&firebase.firestore){
-        firebase.firestore().collection("problems").doc(cid).set({routing:meta,updatedAt:now()},{merge:true}).catch(function(e){console.warn("Routing sync unavailable",e)});
+      if(window.JSCloud){
+        window.JSCloud.set("problems",cid,{routing:meta,updatedAt:now()},true).catch(function(e){console.warn("Routing sync unavailable",e)});
       }
     }catch(e){}
   }
@@ -236,7 +236,7 @@
       p.statusHistory.push({stage:p.stage,by:"Government / Nodal Administrator",note:"Accountability: "+action+(note?" — "+note:""),at:now()});
       if(p.statusHistory.length>30)p.statusHistory=p.statusHistory.slice(-30);
       saveData(d);
-      try{if(window.firebase&&firebase.apps&&firebase.apps.length&&firebase.firestore)firebase.firestore().collection("problems").doc(cid).set({routing:meta,statusHistory:p.statusHistory,updatedAt:now()},{merge:true})}catch(e){}
+      try{if(window.JSCloud)window.JSCloud.set("problems",cid,{routing:meta,statusHistory:p.statusHistory,updatedAt:now()},true)}catch(e){}
     }
     toast(action+" recorded for "+cid,"warn");scheduleAll();
   }
